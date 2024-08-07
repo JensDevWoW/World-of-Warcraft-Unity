@@ -10,7 +10,8 @@ public class ClientNetworkManager : MonoBehaviour
         opcodeHandler = new ClientOpcodeHandler();
 
         // Register opcode handlers
-        opcodeHandler.RegisterHandler(Opcodes.SMSG_SPELL_START, HandleSpellStart);
+        opcodeHandler.RegisterHandler(Opcodes.SMSG_SPELL_START,         HandleSpellStart);
+        opcodeHandler.RegisterHandler(Opcodes.SMSG_SPELL_GO,            HandleSpellGo);
 
         // Register the OpcodeMessage handler on the client
         NetworkClient.RegisterHandler<OpcodeMessage>(OnOpcodeMessageReceived);

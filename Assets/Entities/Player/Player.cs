@@ -18,4 +18,9 @@ public class Player : Unit
         Debug.Log($"{playerName} has stopped casting.");
         // Add any additional logic specific to the Player class here
     }
+
+    public override Unit ToUnit()
+    {
+        return this as Unit;
+    }
 }

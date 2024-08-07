@@ -8,13 +8,16 @@ using SpellFlags;
 using Mirror;
 using static UnityEditor.PlayerSettings;
 using Org.BouncyCastle.Asn1;
-public class Spell
+using UnityEditor.UI;
+using Unity.VisualScripting;
+using System;
+public class Spell : SpellManager
 {
     public int spellId;
     public Unit caster, target;
     public bool isPreparing = false;
     public bool isPositive = true;
-    public SpellState m_spellState;
+    public int m_spellState;
     public SpellInfo m_spellInfo { get; protected set; }
     public int CastFlags;
     public float CastTime;
@@ -23,15 +26,118 @@ public class Spell
     public bool IsSpellQueueSpell;
     public Vector3 AoEPosition;
     public bool VOC;
-    public float SpellTime = 0f;
+    public float m_spellTime = 0f;
+    public float m_initialSpellTime = 0f;
+    public float m_speed;
+    public float m_elapsedTime = 0f;
+    public int m_minDistanceToTarget = 3;
     public Spell(int spellId, Unit caster, Unit target, SpellInfo spellInfo)
     {
         this.spellId = spellId;
         this.caster = caster;
         this.target = target;
         this.m_spellInfo = spellInfo;
+        SpellManager.Instance.AddSpell(this);
+
+        this.CastTime = spellInfo.CastTime;
+
+        if (spellInfo.HasFlag("SPELL_FLAG_NEEDS_TARGET"))
+        {
+            if (spellInfo.SpellTime == true)
+            {
+                if (target)
+                {
+                    float distance = caster.ToLocation().GetDistanceFrom(target);
+                    float travelTime = distance / spellInfo.Speed;
+
+                    this.m_spellTime = travelTime;
+                    this.m_initialSpellTime = travelTime;
+                }
+            }
+        }
     }
 
+    public void Update()
+    {
+        switch (m_spellState)
+        {
+            case SPELL_STATE_PREPARING:
+                bool shouldCancel =
+                    !caster.IsAlive(); /* ||
+                    (caster.IsMoving() && !HasFlag("SPELL_FLAG_CAST_WHILE_MOVING")) ||
+                    caster.HasState("UNIT_STATE_SILENCED") ||
+                    caster.HasState("UNIT_STATE_STUNNED") ||
+                    caster.HasState("UNIT_STATE_FEARED");*/
+
+                if (shouldCancel)
+                {
+                    Cancel();
+                    break;
+                }
+
+                if (CastTime > 0f)
+                {
+                    CastTime -= Time.deltaTime;
+                }
+                else
+                {
+                    print("Got here!");
+                    Cast();
+                }
+                break;
+
+            case SPELL_STATE_DELAYED:
+                Unit target = this.target;
+
+                if (target != null)
+                {
+                    if (m_initialSpellTime == 0f)
+                    {
+                        m_initialSpellTime = m_spellTime;
+                        m_elapsedTime = 0f;
+                    }
+
+                    m_elapsedTime += Time.deltaTime;
+                    float distanceTraveled = m_speed * m_elapsedTime;
+                    float totalDistance = caster.ToLocation().GetDistanceFrom(target);
+                    float remainingDistance = totalDistance - distanceTraveled;
+
+                    if (remainingDistance <= m_minDistanceToTarget)
+                    {
+                        m_spellTime = 0f;
+                        //OnHit();
+                        //HandleEffects();
+                        //SetState(SPELL_STATE_NULL);
+                        //m_isPreparing = false;
+                        return;
+                    }
+
+                    float travelTime = remainingDistance / m_speed;
+                    m_spellTime = travelTime;
+                }
+
+                m_spellTime -= Time.deltaTime;
+                break;
+            case SPELL_STATE_FINISHED:
+                m_spellTime = 0f;
+                //OnHit();
+                //HandleEffects();
+                //SetState(SPELL_STATE_NULL);
+                //m_isPreparing = false;
+                //return true;
+                break;
+            case SPELL_STATE_NULL:
+                //caster.m_spellList.Remove(this); // Assuming m_spellList is a List<Spell>
+                break; // Cast complete, nothing left to do
+
+            default:
+                // Handle other possible states or add a default case
+                break;
+        }
+
+
+
+    }
     public void prepare()
     {
         if (isPreparing)
@@ -55,7 +161,7 @@ public class Spell
             if (canCast != "")
                 Debug.Log("OOPS!");
             caster.SetCasting();
-            m_spellState = SpellState.Preparing;
+            m_spellState = SPELL_STATE_PREPARING;
             SendSpellStartPacket();
         }
     }
@@ -68,6 +174,46 @@ public class Spell
     public string CheckCast()
     {
         return "";
+    }
+
+    public void Cancel()
+    {
+        if (m_spellState == SPELL_STATE_FINISHED)
+            return;
+
+        int m_oldState = m_spellState;
+        m_spellState = SPELL_STATE_FINISHED;
+
+        switch (m_oldState)
+        {
+            case SPELL_STATE_PREPARING:
+            case SPELL_STATE_DELAYED:
+                CancelGlobalCooldown();
+
+                break;
+            case SPELL_STATE_CASTING:
+                break;
+        }
+    }
+
+    public void CancelGlobalCooldown()
+    {
+        return;
+        /*if (!CanHaveGlobalCooddown(caster))
+            return;
+
+        if (caster.ToUnit().GetCurrentSpell() != this)
+            return;
+
+        if (caster.ToPlayer())
+        {
+            caster.ToPlayer().GetGlobalCooldownMgr().CancelGlobalCooldown(m_spellInfo);
+        }*/
+    }
+
+    public int GetSpellState()
+    {
+        return m_spellState;
     }
 
     [Server]  // Ensure this runs only on the server
@@ -131,7 +277,7 @@ public class Spell
         writer.WriteNetworkIdentity(target != null ? target.Identity : null); // Target's NetworkIdentity
         writer.WriteFloat(CastTime); // CastTime from the spell
         writer.WriteInt(spellId); // Spell ID
-        writer.WriteFloat(SpellTime); // Assuming SpellTime is another property in your Spell class
+        writer.WriteFloat(m_spellTime); // Assuming SpellTime is another property in your Spell class
         writer.WriteBool(AnimationEnabled); // Animation enabled flag
         writer.WriteVector3(AoEPosition); // AoE position
         writer.WriteInt(0); // Assuming ManaCost is an integer or float property in your Spell class
@@ -157,6 +303,72 @@ public class Spell
         NetworkServer.SendToAll(msg);
     }
 
+    private void Cast()
+    {
+        if (!caster)
+            { return; }
+        //SelectSpellTargets();
+
+        //if (HasHitDelay())
+        //m_spellState = SPELL_STATE_DELAYED;
+        //else
+        //m_spellState = SPELL_STATE_FINISHED;
+        Execute();
+        OnCast();
+    }
+
+    private void Execute()
+    {
+        if (!caster)
+            { return; }
+
+        if ((NeedsTarget() && !target)) // || !caster.IsWithinLOS(target))
+        {
+            //HandleFailed("target");
+            //m_spellState = SPELL_STATE_FAILED;
+            //caster.CancelCast(this);
+            //return;
+        }
+
+        if (!target.IsAlive() || !caster.IsAlive())
+        {
+            //HandleFailed("dead_target");
+            //m_spellState = SPELL_STATE_FAILED;
+            //caster.CancelCast(this);
+            //return;
+        }
+
+        SendSpellGo();
+        //HandleMana();
+        //if (IsNegative())
+        //    caster.SetInCombatWith(target);
+
+        /*--Consume a charge if you have charges and set on cooldown that way so we can handle it already being on cooldown
+
+            if self:HasCharges() then
+                self:DropCharge(); --Drop 1 charge;
+
+            else
+                if self:HasCooldown() then
+                    -- Toggled spells shouldn't apply cooldown on first cast
+
+                    if self.spell:findFirstChild("Toggle") then
+
+                        return;
+        end
+        -- Overridden spells need to go on cooldown manually
+
+                    if not self: HasFlag("SPELL_FLAG_OVERRIDE") then
+                        self:SetOnCooldown();
+        end*/
+
+
+    }
+
+    private void OnCast()
+    {
+
+    }
     private bool IsInstant()
     {
         return true;

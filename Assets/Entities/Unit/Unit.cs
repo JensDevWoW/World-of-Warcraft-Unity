@@ -5,12 +5,12 @@ public class Unit : MonoBehaviour
 {
     // Reference to the NetworkIdentity component
     public NetworkIdentity Identity { get; private set; }
-
+    public LocationHandler location {  get; private set; }
     // Data
     public string m_name = "Voreli";
     public int m_health = 1000;
     public int m_mana = 100;
-
+    private bool m_isAlive = true;
     public bool IsCasting { get; protected set; }
 
     // Initialize the NetworkIdentity reference
@@ -56,11 +56,27 @@ public class Unit : MonoBehaviour
         return this as Player;
     }
 
+    public LocationHandler ToLocation()
+    {
+        return location;
+    }
+
     // Check if this unit is the local player
     public bool IsLocalPlayer()
     {
         return Identity != null && Identity.isLocalPlayer;
     }
+
+    public bool IsAlive()
+    {
+        return m_isAlive;
+    }
+
+    public virtual Unit ToUnit()
+    {
+        return this;
+    }
+    
 
     //public void DealDamage(Spell spell, Unit target, DamageType damageType)
    // {

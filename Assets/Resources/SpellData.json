@@ -6,7 +6,9 @@
             "schoolMask": "Fire",
             "type": "Damage",
             "manaCost": 100,
-            "castTime": 2.5
+            "castTime": 2.5,
+            "spellTime": true,
+            "speed": 1.0
         },
         {
             "id": 2,
@@ -14,7 +16,9 @@
             "schoolMask": "Frost",
             "type": "Damage",
             "manaCost": 80,
-            "castTime": 2.0
+            "castTime": 2.0,
+            "spellTime": true,
+            "speed": 1.0
         }
     ]
 }

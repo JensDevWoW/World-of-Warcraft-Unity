@@ -10,6 +10,8 @@ public class SpellData
     public string type;
     public int manaCost;
     public float castTime;
+    public bool spellTime;
+    public float speed;
 }
 
 [System.Serializable]
@@ -66,7 +68,7 @@ public class SpellDataHandler : MonoBehaviour
             SpellSchoolMask mask = GetSchoolMaskFromString(spellData.schoolMask);
             SpellType type = GetSpellTypeFromString(spellData.type);
 
-            SpellInfo spell = new SpellInfo(spellData.id, mask, type, spellData.manaCost, spellData.castTime);
+            SpellInfo spell = new SpellInfo(spellData.id, mask, type, spellData.manaCost, spellData.castTime, spellData.spellTime, spellData.speed);
             Spells.Add(spell);
         }
 

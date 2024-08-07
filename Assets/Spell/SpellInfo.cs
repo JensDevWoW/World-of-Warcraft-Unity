@@ -10,13 +10,24 @@ public class SpellInfo
     public int ManaCost { get; private set; }
     public float CastTime { get; private set; }
 
-    public SpellInfo(int id, SpellSchoolMask schoolMask, SpellType type, int manaCost, float castTime)
+    public bool SpellTime { get; private set; }
+
+    public float Speed {  get; private set; }
+
+    public SpellInfo(int id, SpellSchoolMask schoolMask, SpellType type, int manaCost, float castTime, bool spellTime, float speed)
     {
         Id = id;
         SchoolMask = schoolMask;
         Type = type;
         ManaCost = manaCost;
         CastTime = castTime;
+        SpellTime = spellTime;
+        Speed = speed;
+    }
+
+    public bool HasFlag(string flag)
+    {
+        return true;
     }
 }
 

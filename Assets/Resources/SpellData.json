@@ -1,0 +1,20 @@
+{
+    "spells": [
+        {
+            "id": 1,
+            "name": "Fireball",
+            "schoolMask": "Fire",
+            "type": "Damage",
+            "manaCost": 100,
+            "castTime": 2.5
+        },
+        {
+            "id": 2,
+            "name": "Frostbolt",
+            "schoolMask": "Frost",
+            "type": "Damage",
+            "manaCost": 80,
+            "castTime": 2.0
+        }
+    ]
+}

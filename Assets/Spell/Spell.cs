@@ -11,8 +11,10 @@ using Org.BouncyCastle.Asn1;
 using UnityEditor.UI;
 using Unity.VisualScripting;
 using System;
-public class Spell : SpellManager
+public class Spell : MonoBehaviour
 {
+    public const int SPELL_STATE_PREPARING = 1, SPELL_STATE_DELAYED = 2, SPELL_STATE_FINISHED = 3, SPELL_STATE_CASTING = 4, SPELL_STATE_NULL = 5;
+
     public int spellId;
     public Unit caster, target;
     public bool isPreparing = false;
@@ -45,13 +47,6 @@ public class Spell : SpellManager
             this.target = caster.GetTarget();
         this.m_spellInfo = spellInfo;
 
-        // Ensure SpellManager is initialized
-        if (SpellManager.Instance == null)
-        {
-            Debug.LogError("SpellManager instance is null.");
-            return;
-        }
-
         this.CastTime = spellInfo.CastTime;
         this.isPositive = spellInfo.Positive;
 
@@ -66,17 +61,11 @@ public class Spell : SpellManager
                 this.m_initialSpellTime = travelTime;
             }
         }
-
-        Debug.Log($"Spell instantiated: ID = {spellId}");
-        Debug.Log($"Caster = {caster.m_name}");
-        if (target != null)
-            Debug.Log($"Target = {target.m_name}");
     }
 
 
-    public void UpdateSpell()
+    public void Update()
     {
-        print($"{this} is still a thing when updating!");
         switch (m_spellState)
         {
             case SPELL_STATE_PREPARING:
@@ -99,8 +88,6 @@ public class Spell : SpellManager
                 }
                 else
                 {
-                    print("Spell is casting, bitches!");
-                    print($"{this} is still a thing while casting, bitches!");
                     Cast();
                 }
                 break;
@@ -163,7 +150,6 @@ public class Spell : SpellManager
 
     public void prepare()
     {
-        print($"{this} is still a thing!");
         if (isPreparing)
             return;
 
@@ -242,7 +228,6 @@ public class Spell : SpellManager
 
     private void SendSpellStartPacket()
     {
-        print($"{this} is still a thing! Start!");
         // Ensure Caster and Target are not null before proceeding
         if (caster == null || caster.Identity == null)
         {
@@ -276,12 +261,10 @@ public class Spell : SpellManager
         };
 
         NetworkServer.SendToAll(msg);
-        print($"{this} is still a thing after sending SpellStart Packet");
     }
 
     private void SendSpellGo()
     {
-        print($"{this} is still a thing! Go!");
         // Ensure Caster and Target are not null before proceeding
         if (caster == null || caster.Identity == null)
         {
@@ -330,7 +313,6 @@ public class Spell : SpellManager
 
     private void Cast()
     {
-        print($"{this} is still a thing! Cast");
         if (!caster)
             { return; }
         //SelectSpellTargets();
@@ -346,7 +328,6 @@ public class Spell : SpellManager
 
     private void Execute()
     {
-        print($"{this} is still a thing! Execute");
         if (!caster)
             { return; }
 
@@ -389,9 +370,7 @@ public class Spell : SpellManager
                     if not self: HasFlag("SPELL_FLAG_OVERRIDE") then
                         self:SetOnCooldown();
         end*/
-        print("Damage is being dealt!");
         // Check what 'this' is referring to
-        Debug.Log($"This is referring to: {this}");
 
         caster.DealDamage(this, caster);
         m_spellState = SPELL_STATE_NULL;
@@ -405,6 +384,7 @@ public class Spell : SpellManager
     {
         return true;
     }
+
 
     private bool HasHitDelay()
     {

@@ -1,6 +1,7 @@
 using Mirror;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
@@ -23,9 +24,9 @@ public class Unit : MonoBehaviour
     //private List<Aura> auraList = new List<Aura>();
     // Data
     public string m_name = "Voreli";
-    public int m_health = 1000;
-    public int m_maxHealth = 1000;
-    public int m_mana = 100;
+    public float m_health = 1000;
+    public float m_maxHealth = 1000;
+    public float m_mana = 100;
     private float m_manaTickTimer = 1;
     private bool m_isAlive = true;
     public Player player { get; private set; }
@@ -180,17 +181,42 @@ public class Unit : MonoBehaviour
         spellList.Add(spell);
     }
 
-    public int GetHealth()
+    public Spell CreateSpellAndPrepare(int spellId, GameObject spellPrefab)
+    {
+        SpellInfo info = SpellDataHandler.Instance.Spells.FirstOrDefault(spell => spell.Id == spellId);
+
+        // Instantiate the prefab instead of creating a new GameObject
+        GameObject spellObject = Instantiate(spellPrefab);
+
+        // Set the name of the cloned object if needed
+        spellObject.name = "SpellObjectClone";
+
+        // Get the Spell component from the instantiated prefab
+        Spell newSpell = spellObject.GetComponent<Spell>();
+
+        DontDestroyOnLoad(spellObject);
+
+        newSpell.Initialize(spellId, this, info);
+        //SpellManager.Instance.AddSpell(newSpell);
+
+        newSpell.prepare();
+
+        return newSpell;
+
+        // Network-related: If you need the spell object to be networked
+        //NetworkServer.Spawn(spellObject);
+    }
+    public float GetHealth()
     {
         return m_health;
     }
 
-    public void SetHealth(int val)
+    public void SetHealth(float val)
     {
         m_health = val; 
     }
 
-    public int GetMaxHealth()
+    public float GetMaxHealth()
     {
         return m_maxHealth;
     }
@@ -326,20 +352,22 @@ public class Unit : MonoBehaviour
 
         if (!spell.isPositive && damage > 0)
         {
-            float newHealth = Mathf.Max(target.GetHealth() - damage, 0);
-            target.SetHealth((int)newHealth);
-            print(newHealth);
+            float newHealth = target.GetHealth() - damage;
+            newHealth = Mathf.Round(newHealth);
+            target.SetHealth(newHealth);
+            print($"Hit {target.name} with {spell.name}!");
+            print($"{newHealth} is his new health!");
             return;
         }
         else if (spell.isPositive)
         {
-            float newHealth = Mathf.Min(target.GetHealth() + damage, target.GetMaxHealth());
-            target.SetHealth((int)newHealth);
-            print(newHealth);
+            float newHealth = target.GetHealth() + damage;
+            newHealth = Mathf.Round(newHealth);
+            target.SetHealth(newHealth);
+            print($"Hit {target.name} with {spell.name}!");
+            print($"{newHealth} is his new health!");
             return;
         }
-
-        print("Nope5!");
 
         /* TODO: Handle stealth removal
         if (target.IsInStealth())
@@ -375,7 +403,6 @@ public class Unit : MonoBehaviour
         {
             Stats intellect = Stats.Intellect;
             doneTotal += UnityEngine.Random.Range(doneTotal + ((int)intellect / 8f), doneTotal + ((int)intellect / 7f));
-            print(doneTotal);
         }
         else if (damageClass == "Strength")
         {

@@ -217,6 +217,7 @@ MonoBehaviour:
   evaluationMethod: 0
   evaluationInterval: 3
   timeInterpolationGui: 0
+  spellPrefab: {fileID: 1353114717283006080, guid: 01e1422d3bb62cd45afc9d8dd8d83afd, type: 3}
 --- !u!4 &205446058
 Transform:
   m_ObjectHideFlags: 0

@@ -17,8 +17,9 @@ public class SpellManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
-        else
+        else if (Instance != this)
         {
+            Debug.LogWarning("Another instance of SpellManager exists, destroying this one.");
             Destroy(gameObject);
         }
     }
@@ -28,8 +29,18 @@ public class SpellManager : MonoBehaviour
         // Update all active spells
         for (int i = activeSpells.Count - 1; i >= 0; i--)
         {
-            activeSpells[i].UpdateSpell();
-            print($"{activeSpells[i]} is updating!");
+            Spell spell = activeSpells[i];
+            print($"{spell} is what it is, it really is, and I hate that shit because I would love if it it worked!!!!!!!");
+            // Just immediately stop if it's nulled for whatever reason
+            if (activeSpells[i] == null)
+            {
+                activeSpells.RemoveAt(i);
+                continue;
+            }
+
+           // activeSpells[i].UpdateSpell();
+            Debug.Log($"{activeSpells[i]} is updating!");
+
             // Move the spell to the inactive list if it's no longer active
             if (activeSpells[i].GetSpellState() == SPELL_STATE_NULL)
             {
@@ -42,7 +53,7 @@ public class SpellManager : MonoBehaviour
     public void AddSpell(Spell spell)
     {
         activeSpells.Add(spell);
-        print($"{spell} has been added.");
+        Debug.Log($"{spell} has been added.");
     }
 
     public void RemoveSpell(Spell spell)
@@ -57,3 +68,4 @@ public class SpellManager : MonoBehaviour
         }
     }
 }
+

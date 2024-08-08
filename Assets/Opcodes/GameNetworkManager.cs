@@ -7,7 +7,7 @@ using UnityEngine.Assertions;
 public class GameNetworkManager : NetworkManager
 {
     private OpcodeHandler opcodeHandler;
-
+    public GameObject spellPrefab;
     public override void OnStartServer()
     {
         opcodeHandler = new OpcodeHandler();
@@ -30,19 +30,8 @@ public class GameNetworkManager : NetworkManager
     {
         int spellId = reader.ReadInt();
         Unit caster = conn.identity.GetComponent<Unit>();
-        SpellInfo info = SpellDataHandler.Instance.Spells.FirstOrDefault(spell => spell.Id == spellId);
 
-        GameObject spellObject = new GameObject("SpellObject");
-
-        Spell newSpell = spellObject.AddComponent<Spell>();
-
-        newSpell.Initialize(spellId, caster, info);
-        SpellManager.Instance.AddSpell(newSpell);
-
-        newSpell.prepare();
-
-        print($"{newSpell} is a potato");
-        // Implement spell casting logic here
+        Spell spell = caster.CreateSpellAndPrepare(spellId, spellPrefab);
     }
 
     private void HandleMoveCharacter(NetworkConnection conn, NetworkReader reader)

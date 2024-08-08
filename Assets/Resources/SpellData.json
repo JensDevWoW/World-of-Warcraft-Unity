@@ -11,7 +11,8 @@
             "speed": 1.0,
             "positive": true,
             "basepoints": 10,
-            "damageclass": "Intellect"
+            "damageclass": "Intellect",
+            "effects": "SPELL_EFFECT_SCHOOL_DAMAGE"
         },
         {
             "id": 2,
@@ -24,7 +25,8 @@
             "speed": 1.0,
             "positive": true,
             "basepoints": 10,
-            "damageclass": "Intellect"
+            "damageclass": "Intellect",
+            "effects": "SPELL_EFFECT_SCHOOL_DAMAGE"
         }
     ]
 }

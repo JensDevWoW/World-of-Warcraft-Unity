@@ -33,6 +33,7 @@ public class Spell : MonoBehaviour
     public float m_speed;
     public float m_elapsedTime = 0f;
     public int m_minDistanceToTarget = 3;
+    public SpellEffectHandler effectHandler {  get; protected set; }
     public void Initialize(int spellId, Unit caster, SpellInfo spellInfo)
     {
         if (spellInfo == null || caster == null)
@@ -61,6 +62,9 @@ public class Spell : MonoBehaviour
                 this.m_initialSpellTime = travelTime;
             }
         }
+
+        // Handle SpellEffects;
+        effectHandler = new SpellEffectHandler();
     }
 
 
@@ -112,7 +116,7 @@ public class Spell : MonoBehaviour
                     {
                         m_spellTime = 0f;
                         //OnHit();
-                        //HandleEffects();
+                        HandleEffects();
                         //SetState(SPELL_STATE_NULL);
                         //m_isPreparing = false;
                         return;
@@ -127,7 +131,7 @@ public class Spell : MonoBehaviour
             case SPELL_STATE_FINISHED:
                 m_spellTime = 0f;
                 //OnHit();
-                //HandleEffects();
+                HandleEffects();
                 //SetState(SPELL_STATE_NULL);
                 //m_isPreparing = false;
                 //return true;
@@ -148,6 +152,11 @@ public class Spell : MonoBehaviour
         return m_spellInfo.BasePoints;
     }
 
+    private void HandleEffects()
+    {
+        print("Handling effects!");
+        effectHandler.HandleEffects(this);
+    }
     public void prepare()
     {
         if (isPreparing)
@@ -192,7 +201,7 @@ public class Spell : MonoBehaviour
             return;
 
         int m_oldState = m_spellState;
-        m_spellState = SPELL_STATE_FINISHED;
+        m_spellState = SPELL_STATE_NULL;
 
         switch (m_oldState)
         {
@@ -371,9 +380,6 @@ public class Spell : MonoBehaviour
                         self:SetOnCooldown();
         end*/
         // Check what 'this' is referring to
-
-        caster.DealDamage(this, caster);
-        m_spellState = SPELL_STATE_NULL;
     }
 
     private void OnCast()

@@ -15,6 +15,7 @@ public class SpellData
     public bool positive;
     public int basepoints;
     public string damageclass;
+    public string effects;
 }
 
 [System.Serializable]
@@ -71,8 +72,10 @@ public class SpellDataHandler : MonoBehaviour
             SpellSchoolMask mask = GetSchoolMaskFromString(spellData.schoolMask);
             SpellType type = GetSpellTypeFromString(spellData.type);
 
+            List<SpellEffect> effects = ParseEffects(spellData.effects);
+
             SpellInfo spell = new SpellInfo(spellData.id, mask, type, spellData.manaCost, spellData.castTime, 
-                spellData.spellTime, spellData.speed, spellData.positive, spellData.basepoints, spellData.damageclass);
+                spellData.spellTime, spellData.speed, spellData.positive, spellData.basepoints, spellData.damageclass, effects);
 
             Spells.Add(spell);
         }
@@ -80,6 +83,48 @@ public class SpellDataHandler : MonoBehaviour
         Debug.Log("Successfully loaded and parsed spells.");
     }
 
+    List<SpellEffect> ParseEffects(string effectsString)
+    {
+        List<SpellEffect> effects = new List<SpellEffect>();
+
+        // Split the string into individual effect names
+        string[] effectNames = effectsString.Split(',');
+
+        // Map the effect names to actual SpellEffect objects
+        foreach (string effectName in effectNames)
+        {
+            switch (effectName.Trim())
+            {
+                case "SPELL_EFFECT_SCHOOL_DAMAGE":
+                    effects.Add(SpellEffect.SPELL_EFFECT_SCHOOL_DAMAGE);
+                    break;
+                case "SPELL_EFFECT_CREATE_AREATRIGGER":
+                    effects.Add(SpellEffect.SPELL_EFFECT_CREATE_AREATRIGGER);
+                    break;
+                case "SPELL_EFFECT_APPLY_AURA":
+                    effects.Add(SpellEffect.SPELL_EFFECT_APPLY_AURA);
+                    break;
+                case "SPELL_EFFECT_DISPEL":
+                    effects.Add(SpellEffect.SPELL_EFFECT_DISPEL);
+                    break;
+                case "SPELL_EFFECT_TELEPORT":
+                    effects.Add(SpellEffect.SPELL_EFFECT_TELEPORT);
+                    break;
+                case "SPELL_EFFECT_INTERRUPT_CAST":
+                    effects.Add(SpellEffect.SPELL_EFFECT_INTERRUPT_CAST);
+                    break;
+                case "SPELL_EFFECT_REMOVE_AURA":
+                    effects.Add(SpellEffect.SPELL_EFFECT_REMOVE_AURA);
+                    break;
+                case "SPELL_EFFECT_DUMMY":
+                    effects.Add(SpellEffect.SPELL_EFFECT_DUMMY);
+                    break;
+                    // Add other cases as necessary
+            }
+        }
+
+        return effects;
+    }
 
     SpellSchoolMask GetSchoolMaskFromString(string maskName)
     {

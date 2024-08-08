@@ -8,7 +8,10 @@
             "manaCost": 100,
             "castTime": 2.5,
             "spellTime": true,
-            "speed": 1.0
+            "speed": 1.0,
+            "positive": true,
+            "basepoints": 10,
+            "damageclass": "Intellect"
         },
         {
             "id": 2,
@@ -18,7 +21,10 @@
             "manaCost": 80,
             "castTime": 2.0,
             "spellTime": true,
-            "speed": 1.0
+            "speed": 1.0,
+            "positive": true,
+            "basepoints": 10,
+            "damageclass": "Intellect"
         }
     ]
 }

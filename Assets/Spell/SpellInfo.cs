@@ -14,7 +14,13 @@ public class SpellInfo
 
     public float Speed {  get; private set; }
 
-    public SpellInfo(int id, SpellSchoolMask schoolMask, SpellType type, int manaCost, float castTime, bool spellTime, float speed)
+    public bool Positive {  get; private set; }
+
+    public int BasePoints { get; private set; }
+
+    public string damageClass {  get; private set; }
+
+    public SpellInfo(int id, SpellSchoolMask schoolMask, SpellType type, int manaCost, float castTime, bool spellTime, float speed, bool positive, int basePoints, string damageclass)
     {
         Id = id;
         SchoolMask = schoolMask;
@@ -23,6 +29,9 @@ public class SpellInfo
         CastTime = castTime;
         SpellTime = spellTime;
         Speed = speed;
+        Positive = positive;
+        BasePoints = basePoints;
+        damageClass = damageclass;
     }
 
     public bool HasFlag(string flag)
@@ -81,4 +90,21 @@ public class SpellType
     public static readonly SpellType Teleport = new SpellType("Teleport", 6);
     public static readonly SpellType Control = new SpellType("Control", 7);
     public static readonly SpellType Utility = new SpellType("Utility", 8);
+}
+
+public class DamageClass
+{
+    public string Name { get; private set; }
+    public int Id { get; private set; }
+
+    private DamageClass(string name, int id)
+    {
+        Name = name;
+        Id = id;
+    }
+
+    public static readonly DamageClass Damage = new DamageClass("Strength", 1);
+    public static readonly DamageClass Heal = new DamageClass("Intellect", 2);
+    public static readonly DamageClass Buff = new DamageClass("Agility", 3);
+    
 }

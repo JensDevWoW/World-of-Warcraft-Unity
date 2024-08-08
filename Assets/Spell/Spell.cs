@@ -16,7 +16,7 @@ public class Spell : SpellManager
     public int spellId;
     public Unit caster, target;
     public bool isPreparing = false;
-    public bool isPositive = true;
+    public bool isPositive;
     public int m_spellState;
     public SpellInfo m_spellInfo { get; protected set; }
     public int CastFlags;
@@ -31,34 +31,52 @@ public class Spell : SpellManager
     public float m_speed;
     public float m_elapsedTime = 0f;
     public int m_minDistanceToTarget = 3;
-    public Spell(int spellId, Unit caster, Unit target, SpellInfo spellInfo)
+    public void Initialize(int spellId, Unit caster, SpellInfo spellInfo)
     {
+        if (spellInfo == null || caster == null)
+        {
+            Debug.LogError("SpellInfo or Caster is null during Spell instantiation.");
+            return;
+        }
+
         this.spellId = spellId;
         this.caster = caster;
-        this.target = target;
+        if (caster.HasTarget())
+            this.target = caster.GetTarget();
         this.m_spellInfo = spellInfo;
-        SpellManager.Instance.AddSpell(this);
+
+        // Ensure SpellManager is initialized
+        if (SpellManager.Instance == null)
+        {
+            Debug.LogError("SpellManager instance is null.");
+            return;
+        }
 
         this.CastTime = spellInfo.CastTime;
+        this.isPositive = spellInfo.Positive;
 
         if (spellInfo.HasFlag("SPELL_FLAG_NEEDS_TARGET"))
         {
-            if (spellInfo.SpellTime == true)
+            if (spellInfo.SpellTime == true && target != null)
             {
-                if (target)
-                {
-                    float distance = caster.ToLocation().GetDistanceFrom(target);
-                    float travelTime = distance / spellInfo.Speed;
+                float distance = caster.ToLocation().GetDistanceFrom(target);
+                float travelTime = distance / spellInfo.Speed;
 
-                    this.m_spellTime = travelTime;
-                    this.m_initialSpellTime = travelTime;
-                }
+                this.m_spellTime = travelTime;
+                this.m_initialSpellTime = travelTime;
             }
         }
+
+        Debug.Log($"Spell instantiated: ID = {spellId}");
+        Debug.Log($"Caster = {caster.m_name}");
+        if (target != null)
+            Debug.Log($"Target = {target.m_name}");
     }
 
-    public void Update()
+
+    public void UpdateSpell()
     {
+        print($"{this} is still a thing when updating!");
         switch (m_spellState)
         {
             case SPELL_STATE_PREPARING:
@@ -81,7 +99,8 @@ public class Spell : SpellManager
                 }
                 else
                 {
-                    print("Got here!");
+                    print("Spell is casting, bitches!");
+                    print($"{this} is still a thing while casting, bitches!");
                     Cast();
                 }
                 break;
@@ -125,6 +144,7 @@ public class Spell : SpellManager
                 //SetState(SPELL_STATE_NULL);
                 //m_isPreparing = false;
                 //return true;
+                caster.RemoveSpellFromList(this);
                 break;
             case SPELL_STATE_NULL:
                 //caster.m_spellList.Remove(this); // Assuming m_spellList is a List<Spell>
@@ -134,12 +154,16 @@ public class Spell : SpellManager
                 // Handle other possible states or add a default case
                 break;
         }
-
-
-
     }
+
+    public int GetAmount()
+    {
+        return m_spellInfo.BasePoints;
+    }
+
     public void prepare()
     {
+        print($"{this} is still a thing!");
         if (isPreparing)
             return;
 
@@ -152,7 +176,7 @@ public class Spell : SpellManager
             }
             else // We have no target, check if positive spell, cast on self
                 if (isPositive) { target = caster; }
-
+        
         if (caster && target)
         {
             isPreparing = true;
@@ -216,9 +240,9 @@ public class Spell : SpellManager
         return m_spellState;
     }
 
-    [Server]  // Ensure this runs only on the server
     private void SendSpellStartPacket()
     {
+        print($"{this} is still a thing! Start!");
         // Ensure Caster and Target are not null before proceeding
         if (caster == null || caster.Identity == null)
         {
@@ -252,11 +276,12 @@ public class Spell : SpellManager
         };
 
         NetworkServer.SendToAll(msg);
+        print($"{this} is still a thing after sending SpellStart Packet");
     }
 
-    [Server] // Ensure this runs only on the server
     private void SendSpellGo()
     {
+        print($"{this} is still a thing! Go!");
         // Ensure Caster and Target are not null before proceeding
         if (caster == null || caster.Identity == null)
         {
@@ -305,20 +330,23 @@ public class Spell : SpellManager
 
     private void Cast()
     {
+        print($"{this} is still a thing! Cast");
         if (!caster)
             { return; }
         //SelectSpellTargets();
 
-        //if (HasHitDelay())
-        //m_spellState = SPELL_STATE_DELAYED;
-        //else
-        //m_spellState = SPELL_STATE_FINISHED;
+        if (HasHitDelay())
+            m_spellState = SPELL_STATE_DELAYED;
+        else
+            m_spellState = SPELL_STATE_FINISHED;
+
         Execute();
         OnCast();
     }
 
     private void Execute()
     {
+        print($"{this} is still a thing! Execute");
         if (!caster)
             { return; }
 
@@ -361,8 +389,12 @@ public class Spell : SpellManager
                     if not self: HasFlag("SPELL_FLAG_OVERRIDE") then
                         self:SetOnCooldown();
         end*/
+        print("Damage is being dealt!");
+        // Check what 'this' is referring to
+        Debug.Log($"This is referring to: {this}");
 
-
+        caster.DealDamage(this, caster);
+        m_spellState = SPELL_STATE_NULL;
     }
 
     private void OnCast()

@@ -2,6 +2,7 @@
 using Mirror;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public class GameNetworkManager : NetworkManager
 {
@@ -29,10 +30,18 @@ public class GameNetworkManager : NetworkManager
     {
         int spellId = reader.ReadInt();
         Unit caster = conn.identity.GetComponent<Unit>();
-        Unit target = caster.GetTarget();
         SpellInfo info = SpellDataHandler.Instance.Spells.FirstOrDefault(spell => spell.Id == spellId);
-        Spell new_spell = new Spell(spellId, caster, target, info);
-        new_spell.prepare();
+
+        GameObject spellObject = new GameObject("SpellObject");
+
+        Spell newSpell = spellObject.AddComponent<Spell>();
+
+        newSpell.Initialize(spellId, caster, info);
+        SpellManager.Instance.AddSpell(newSpell);
+
+        newSpell.prepare();
+
+        print($"{newSpell} is a potato");
         // Implement spell casting logic here
     }
 

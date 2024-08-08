@@ -20,9 +20,11 @@ public class SpellInfo
 
     public string damageClass {  get; private set; }
 
+    public string SpellScript { get; private set; }
+
     public List<SpellEffect> Effects { get; private set; }
 
-    public SpellInfo(int id, SpellSchoolMask schoolMask, SpellType type, int manaCost, float castTime, bool spellTime, float speed, bool positive, int basePoints, string damageclass, List<SpellEffect> effects)
+    public SpellInfo(int id, SpellSchoolMask schoolMask, SpellType type, int manaCost, float castTime, bool spellTime, float speed, bool positive, int basePoints, string damageclass, List<SpellEffect> effects, string spellScript)
     {
         Id = id;
         SchoolMask = schoolMask;
@@ -35,12 +37,14 @@ public class SpellInfo
         BasePoints = basePoints;
         damageClass = damageclass;
         Effects = effects;
+        SpellScript = spellScript;
     }
 
     public bool HasFlag(string flag)
     {
         return true;
     }
+
 }
 
 

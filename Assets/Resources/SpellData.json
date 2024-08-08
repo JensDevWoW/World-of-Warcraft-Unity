@@ -12,7 +12,8 @@
             "positive": true,
             "basepoints": 10,
             "damageclass": "Intellect",
-            "effects": "SPELL_EFFECT_SCHOOL_DAMAGE"
+            "effects": "SPELL_EFFECT_SCHOOL_DAMAGE",
+            "spellscript": "Fireball"
         },
         {
             "id": 2,
@@ -26,7 +27,8 @@
             "positive": true,
             "basepoints": 10,
             "damageclass": "Intellect",
-            "effects": "SPELL_EFFECT_SCHOOL_DAMAGE"
+            "effects": "SPELL_EFFECT_SCHOOL_DAMAGE",
+            "spellscript": "null"
         }
     ]
 }

@@ -16,6 +16,7 @@ public class SpellData
     public int basepoints;
     public string damageclass;
     public string effects;
+    public string spellscript;
 }
 
 [System.Serializable]
@@ -75,7 +76,7 @@ public class SpellDataHandler : MonoBehaviour
             List<SpellEffect> effects = ParseEffects(spellData.effects);
 
             SpellInfo spell = new SpellInfo(spellData.id, mask, type, spellData.manaCost, spellData.castTime, 
-                spellData.spellTime, spellData.speed, spellData.positive, spellData.basepoints, spellData.damageclass, effects);
+                spellData.spellTime, spellData.speed, spellData.positive, spellData.basepoints, spellData.damageclass, effects, spellData.spellscript);
 
             Spells.Add(spell);
         }

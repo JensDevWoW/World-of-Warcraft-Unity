@@ -34,6 +34,9 @@ public class Spell : MonoBehaviour
     public float m_elapsedTime = 0f;
     public int m_minDistanceToTarget = 3;
     public SpellEffectHandler effectHandler {  get; protected set; }
+
+    private SpellScript spellScript;
+
     public void Initialize(int spellId, Unit caster, SpellInfo spellInfo)
     {
         if (spellInfo == null || caster == null)
@@ -50,6 +53,8 @@ public class Spell : MonoBehaviour
 
         this.CastTime = spellInfo.CastTime;
         this.isPositive = spellInfo.Positive;
+
+        AttachSpellScript(spellId);
 
         if (spellInfo.HasFlag("SPELL_FLAG_NEEDS_TARGET"))
         {
@@ -115,7 +120,7 @@ public class Spell : MonoBehaviour
                     if (remainingDistance <= m_minDistanceToTarget)
                     {
                         m_spellTime = 0f;
-                        //OnHit();
+                        OnHit();
                         HandleEffects();
                         //SetState(SPELL_STATE_NULL);
                         //m_isPreparing = false;
@@ -130,7 +135,7 @@ public class Spell : MonoBehaviour
                 break;
             case SPELL_STATE_FINISHED:
                 m_spellTime = 0f;
-                //OnHit();
+                OnHit();
                 HandleEffects();
                 //SetState(SPELL_STATE_NULL);
                 //m_isPreparing = false;
@@ -152,9 +157,28 @@ public class Spell : MonoBehaviour
         return m_spellInfo.BasePoints;
     }
 
+    public void OnHit()
+    {
+        if (spellScript != null)
+        {
+            spellScript.OnHit(caster, target);
+        }
+        else
+            print("SpellScript does not exist!");
+    }
+
+    public void OnCast()
+    {
+        if (spellScript != null)
+        {
+            spellScript.OnCast(caster, target);
+        }
+        else
+            print("SpellScript does not exist!");
+    }
+
     private void HandleEffects()
     {
-        print("Handling effects!");
         effectHandler.HandleEffects(this);
     }
     public void prepare()
@@ -180,6 +204,7 @@ public class Spell : MonoBehaviour
             if (canCast != "")
                 Debug.Log("OOPS!");
             caster.SetCasting();
+
             m_spellState = SPELL_STATE_PREPARING;
             SendSpellStartPacket();
         }
@@ -188,6 +213,30 @@ public class Spell : MonoBehaviour
     public bool NeedsTarget()
     {
         return true;
+    }
+
+    private void AttachSpellScript(int spellId)
+    {
+        // Get the script type from the registry using the spellId
+        Type scriptType = SpellScriptRegistry.GetSpellScriptType(spellId);
+
+        if (scriptType != null)
+        {
+            // Attach the script as a component
+            spellScript = gameObject.AddComponent(scriptType) as SpellScript;
+            if (spellScript != null)
+            {
+                Debug.Log($"Attached script {scriptType.Name} to {gameObject.name}");
+            }
+            else
+            {
+                Debug.LogError($"Failed to attach script for spell ID {spellId}.");
+            }
+        }
+        else
+        {
+            Debug.LogError($"No script found for spell ID {spellId}.");
+        }
     }
 
     public string CheckCast()
@@ -380,11 +429,6 @@ public class Spell : MonoBehaviour
                         self:SetOnCooldown();
         end*/
         // Check what 'this' is referring to
-    }
-
-    private void OnCast()
-    {
-
     }
     private bool IsInstant()
     {

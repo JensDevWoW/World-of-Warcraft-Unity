@@ -1,4 +1,5 @@
 using Mirror;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -399,25 +400,21 @@ public class Unit : MonoBehaviour
             target.SetAbsorbAmount(abamt);
         }*/
 
-        
+        float newHealth = 0;
 
         if (!spell.isPositive && damage > 0)
         {
-            float newHealth = target.GetHealth() - damage;
-            newHealth = Mathf.Round(newHealth);
+            newHealth = Mathf.Round(target.GetHealth() - damage);
             target.SetHealth(newHealth);
             print($"Hit {target.name} with {spell.name}!");
             print($"{newHealth} is his new health!");
-            return;
         }
         else if (spell.isPositive)
         {
-            float newHealth = target.GetHealth() + damage;
-            newHealth = Mathf.Round(newHealth);
+            newHealth = Mathf.Round(target.GetHealth() + damage);
             target.SetHealth(newHealth);
             print($"Hit {target.name} with {spell.name}!");
             print($"{newHealth} is his new health!");
-            return;
         }
 
         /* TODO: Handle stealth removal
@@ -427,6 +424,25 @@ public class Unit : MonoBehaviour
         }*/
 
         // TODO: Send opcode to client about health loss
+        SendHealthUpdate(target, newHealth, spell.isPositive);
+    }
+
+    public void SendHealthUpdate(Unit target, float health, bool Positive)
+    {
+        NetworkWriter writer = new NetworkWriter();
+
+        // Writing data to the NetworkWriter
+        writer.WriteFloat(health);
+        writer.WriteBool(Positive);
+        writer.WriteNetworkIdentity(target.Identity); // Use Caster's NetworkIdentity
+
+        OpcodeMessage msg = new OpcodeMessage
+        {
+            opcode = Opcodes.SMSG_SEND_COMBAT_TEXT,  // Assuming this opcode is defined
+            payload = writer.ToArray()
+        };
+
+        NetworkServer.SendToAll(msg);
     }
 
     public float SpellDamageBonusDone(Unit victim, Spell spell, SpellInfo m_spellInfo, out bool crit)

@@ -12,6 +12,7 @@ public class ClientNetworkManager : MonoBehaviour
         // Register opcode handlers
         opcodeHandler.RegisterHandler(Opcodes.SMSG_SPELL_START,         HandleSpellStart);
         opcodeHandler.RegisterHandler(Opcodes.SMSG_SPELL_GO,            HandleSpellGo);
+        opcodeHandler.RegisterHandler(Opcodes.SMSG_SEND_COMBAT_TEXT,    HandleCombatText);
 
         // Register the OpcodeMessage handler on the client
         NetworkClient.RegisterHandler<OpcodeMessage>(OnOpcodeMessageReceived);
@@ -79,5 +80,17 @@ public class ClientNetworkManager : MonoBehaviour
         // Implement additional logic here, such as starting animations, reducing mana, etc.
     }
 
+    private void HandleCombatText(NetworkReader reader)
+    {
+        float newHealth = reader.ReadFloat();
+        bool positive = reader.ReadBool();
+        NetworkIdentity identity = reader.ReadNetworkIdentity();
 
+        Unit target = identity.GetComponent<Unit>();
+
+        if (identity.netId == NetworkClient.localPlayer.netId)
+        {
+            // This is working
+        }
+    }
 }

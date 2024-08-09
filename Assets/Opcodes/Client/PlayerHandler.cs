@@ -8,8 +8,8 @@ public class PlayerInput : NetworkBehaviour
 
     void Start()
     {
-        spellbook.Add(new SpellList("Fireball", 1, KeyCode.Alpha1));
-        spellbook.Add(new SpellList("Frostbolt", 2, KeyCode.Alpha2));
+        spellbook.Add(new SpellList("Flash of Light", 1, KeyCode.Alpha1));
+        spellbook.Add(new SpellList("TestInstant", 3, KeyCode.Alpha2));
     }
 
     void Update()

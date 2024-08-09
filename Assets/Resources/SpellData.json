@@ -2,18 +2,18 @@
     "spells": [
         {
             "id": 1,
-            "name": "Fireball",
-            "schoolMask": "Fire",
+            "name": "Flash of Light",
+            "schoolMask": "Holy",
             "type": "Damage",
             "manaCost": 10,
             "castTime": 1.5,
-            "spellTime": true,
+            "spellTime": false,
             "speed": 1.0,
             "positive": true,
             "basepoints": 10,
             "damageclass": "Intellect",
             "effects": "SPELL_EFFECT_SCHOOL_DAMAGE",
-            "spellscript": "Fireball"
+            "spellscript": "null"
         },
         {
             "id": 2,
@@ -23,6 +23,21 @@
             "manaCost": 10,
             "castTime": 2.0,
             "spellTime": true,
+            "speed": 1.0,
+            "positive": true,
+            "basepoints": 10,
+            "damageclass": "Intellect",
+            "effects": "SPELL_EFFECT_SCHOOL_DAMAGE",
+            "spellscript": "null"
+        },
+        {
+            "id": 3,
+            "name": "TestInstant",
+            "schoolMask": "Holy",
+            "type": "Damage",
+            "manaCost": 0,
+            "castTime": 0,
+            "spellTime": false,
             "speed": 1.0,
             "positive": true,
             "basepoints": 10,

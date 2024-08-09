@@ -223,6 +223,9 @@ public class Spell : MonoBehaviour
 
             m_spellState = SPELL_STATE_PREPARING;
             SendSpellStartPacket();
+
+            if (IsInstant())
+                Cast();
         }
     }
 
@@ -453,13 +456,13 @@ public class Spell : MonoBehaviour
     }
     private bool IsInstant()
     {
-        return true;
+        return m_spellInfo.CastTime == 0;
     }
 
 
     private bool HasHitDelay()
     {
-        return false;
+        return m_spellInfo.SpellTime;
     }
 
     

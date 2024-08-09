@@ -179,8 +179,6 @@ public class Spell : MonoBehaviour
         {
             spellScript.OnHit(caster, target);
         }
-        else
-            print("SpellScript does not exist!");
     }
 
     public void OnCast()
@@ -189,8 +187,6 @@ public class Spell : MonoBehaviour
         {
             spellScript.OnCast(caster, target);
         }
-        else
-            print("SpellScript does not exist!");
     }
 
     private void HandleEffects()
@@ -251,10 +247,6 @@ public class Spell : MonoBehaviour
             {
                 Debug.LogError($"Failed to attach script for spell ID {spellId}.");
             }
-        }
-        else
-        {
-            Debug.LogError($"No script found for spell ID {spellId}.");
         }
     }
 

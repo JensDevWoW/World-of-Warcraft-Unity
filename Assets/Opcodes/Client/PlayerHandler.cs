@@ -8,8 +8,10 @@ public class PlayerInput : NetworkBehaviour
 
     void Start()
     {
-        spellbook.Add(new SpellList("Flash of Light", 1, KeyCode.Alpha1));
-        spellbook.Add(new SpellList("TestInstant", 3, KeyCode.Alpha2));
+        KeyBindManager.LoadKeyBinds();
+
+        spellbook.Add(new SpellList("Flash of Light", 1, KeyBindManager.keyBinds.one));
+        spellbook.Add(new SpellList("TestInstant", 3, KeyBindManager.keyBinds.two));
     }
 
     void Update()

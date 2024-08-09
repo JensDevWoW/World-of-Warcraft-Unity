@@ -152,6 +152,22 @@ public class Spell : MonoBehaviour
         }
     }
 
+    public void HandleMana()
+    {
+        if (!caster) { return; }
+
+        int manaCost = m_spellInfo.ManaCost;
+
+        if (manaCost == 0 ) { return; }
+
+        if (caster.GetMana() - manaCost > 0)
+            caster.SetMana(caster.GetMana() - (float)manaCost);
+        else
+            caster.SetMana(0);
+
+        print($"{caster.GetMana()} is how much mana he has left.");
+
+    }
     public int GetAmount()
     {
         return m_spellInfo.BasePoints;
@@ -384,6 +400,11 @@ public class Spell : MonoBehaviour
         OnCast();
     }
 
+    public bool IsNegative()
+    {
+        return !m_spellInfo.Positive;
+    }
+
     private void Execute()
     {
         if (!caster)
@@ -406,9 +427,9 @@ public class Spell : MonoBehaviour
         }
 
         SendSpellGo();
-        //HandleMana();
-        //if (IsNegative())
-        //    caster.SetInCombatWith(target);
+        HandleMana();
+        if (IsNegative())
+            caster.SetInCombatWith(target);
 
         /*--Consume a charge if you have charges and set on cooldown that way so we can handle it already being on cooldown
 

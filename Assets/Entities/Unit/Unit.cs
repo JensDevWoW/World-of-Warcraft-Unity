@@ -22,13 +22,20 @@ public class Unit : MonoBehaviour
 
     private List<Spell> spellList = new List<Spell>();
     //private List<Aura> auraList = new List<Aura>();
+    private List<Unit> combatList = new List<Unit>();
+
     // Data
     public string m_name = "Voreli";
     public float m_health = 1000;
     public float m_maxHealth = 1000;
     public float m_mana = 100;
+    public float m_maxMana = 100;
     private float m_manaTickTimer = 1;
+    private float m_manaTickAmount = 7;
+    private float m_manaTickAmountCombat = 3;
     private bool m_isAlive = true;
+    private float m_combatTimer = 0;
+
     public Player player { get; private set; }
     public bool IsCasting { get; protected set; }
 
@@ -48,11 +55,55 @@ public class Unit : MonoBehaviour
        
     }
 
+    public float GetMana()
+    {
+        return m_mana;
+    }
+
+    public void SetMana(float val)
+    {
+        m_mana = val;
+    }
+
+    public float GetMaxMana()
+    {
+        return m_maxMana;
+    }
+
+    public bool IsInCombat()
+    {
+        return m_combatTimer > 0; 
+    }
+
+    public void DropCombat()
+    {
+        m_combatTimer = 0;
+    }
+
+    public void SetInCombat()
+    {
+        m_combatTimer = 6;
+    }
+
+    public void SetInCombatWith(Unit unit)
+    {
+        if (!IsHostileTo(unit))
+            print("ERROR: Unit is not an enemy!");
+
+        SetInCombat();
+        unit.SetInCombat();
+
+        // We add eachother to our combat lists so both go into combat, not just one unit
+        combatList.Add(unit);
+        unit.combatList.Add(this);
+
+    }
+
     public void Update()
     {
         if (GetHealth() <= 0)
         {
-            //SetHealth(0);
+            SetHealth(0);
             m_isAlive = false;
             StopCasting();
             //WipeAuras();
@@ -102,7 +153,7 @@ public class Unit : MonoBehaviour
 
         //ToLocation().Update();
 
-        /* Mana Tick
+        // Mana Tick
         if (GetMana() < GetMaxMana())
         {
             if (m_manaTickTimer > 0)
@@ -139,24 +190,24 @@ public class Unit : MonoBehaviour
                 // Reset the mana tick timer
                 m_manaTickTimer = 1f;
             }
-        }*/
+        }
 
-        /*if (IsInCombat())
+        if (IsInCombat())
         {
             // If there are entries in the combat list
-            if (m_combatList.Count > 0)
+            if (combatList.Count > 0)
             {
                 // Iterate through the combat list
-                for (int i = m_combatList.Count - 1; i >= 0; i--)
+                for (int i = combatList.Count - 1; i >= 0; i--)
                 {
-                    if (!m_combatList[i].IsAlive())
+                    if (!combatList[i].IsAlive())
                     {
-                        m_combatList.RemoveAt(i);
+                        combatList.RemoveAt(i);
                     }
                 }
 
                 // If the combat list is empty after cleaning up
-                if (m_combatList.Count == 0)
+                if (combatList.Count == 0)
                 {
                     DropCombat();
                 }
@@ -169,9 +220,9 @@ public class Unit : MonoBehaviour
             if (m_combatTimer <= 0f)
             {
                 DropCombat();
-                Debug.Log("Out of combat!");
+                print("Out of combat!");
             }
-        }*/
+        }
 
 
 
@@ -189,7 +240,7 @@ public class Unit : MonoBehaviour
         GameObject spellObject = Instantiate(spellPrefab);
 
         // Set the name of the cloned object if needed
-        spellObject.name = "SpellObjectClone";
+        spellObject.name = $"{spellId}";
 
         // Get the Spell component from the instantiated prefab
         Spell newSpell = spellObject.GetComponent<Spell>();

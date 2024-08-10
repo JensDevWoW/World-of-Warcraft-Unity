@@ -95,7 +95,7 @@ public class SpellDataHandler : MonoBehaviour
 
             List<SpellEffect> effects = ParseSpellEffects(spellData.effects);
 
-            SpellInfo spell = new SpellInfo(spellData.id, mask, type, spellData.manaCost, spellData.castTime, 
+            SpellInfo spell = new SpellInfo(spellData.id, spellData.name, mask, type, spellData.manaCost, spellData.castTime, 
                 spellData.spellTime, spellData.speed, spellData.positive, spellData.basepoints, spellData.damageclass, effects, spellData.spellscript);
 
             // If the spell has an aura, create and add it

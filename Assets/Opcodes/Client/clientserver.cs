@@ -1,4 +1,5 @@
 using Mirror;
+using System.Linq;
 using UnityEngine;
 
 public class ClientNetworkManager : MonoBehaviour
@@ -46,8 +47,38 @@ public class ClientNetworkManager : MonoBehaviour
 
         if (casterIdentity.netId == NetworkClient.localPlayer.netId)
         {
-            // This is working
+            // Find the Canvas that holds the CastBar
+            Canvas canvas = FindObjectOfType<Canvas>();
+
+            if (canvas != null)
+            {
+                // Find the CastBar within the Canvas
+                CastBar castBarController = canvas.GetComponentInChildren<CastBar>();
+
+                if (castBarController != null)
+                {
+                    // Start the cast bar with the appropriate duration and spell name
+                    string spellName = GetSpellNameById(spellId); // Assume you have a method to get the spell name by ID
+                    castBarController.StartCast(castTime, spellName);
+                }
+                else
+                {
+                    Debug.LogWarning("CastBar not found in the Canvas.");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("Canvas not found in the scene.");
+            }
         }
+
+    }
+
+    private string GetSpellNameById(int spellId)
+    {
+        // Replace with your actual logic to retrieve the spell name
+        SpellInfo spellInfo = SpellDataHandler.Instance.Spells.FirstOrDefault(spell => spell.Id == spellId);
+        return spellInfo != null ? spellInfo.Name : "Unknown Spell";
     }
 
     private void HandleSpellGo(NetworkReader reader)

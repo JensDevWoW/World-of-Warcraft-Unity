@@ -5,6 +5,8 @@ using UnityEngine;
 public class SpellInfo
 {
     public int Id { get; private set; }
+
+    public string Name { get; private set; }    
     public SpellSchoolMask SchoolMask { get; private set; }
     public SpellType Type { get; private set; }
     public int ManaCost { get; private set; }
@@ -24,9 +26,10 @@ public class SpellInfo
 
     public List<SpellEffect> Effects { get; private set; }
 
-    public SpellInfo(int id, SpellSchoolMask schoolMask, SpellType type, int manaCost, float castTime, bool spellTime, float speed, bool positive, int basePoints, string damageclass, List<SpellEffect> effects, string spellScript)
+    public SpellInfo(int id, string name, SpellSchoolMask schoolMask, SpellType type, int manaCost, float castTime, bool spellTime, float speed, bool positive, int basePoints, string damageclass, List<SpellEffect> effects, string spellScript)
     {
         Id = id;
+        Name = name;
         SchoolMask = schoolMask;
         Type = type;
         ManaCost = manaCost;

@@ -42,8 +42,20 @@
             "positive": true,
             "basepoints": 10,
             "damageclass": "Intellect",
-            "effects": "SPELL_EFFECT_SCHOOL_DAMAGE",
-            "spellscript": "null"
+            "effects": "SPELL_EFFECT_SCHOOL_DAMAGE,SPELL_EFFECT_APPLY_AURA",
+            "spellscript": "null",
+            "aura": {
+                "auraId": 3,
+                "name": "Blessing of Light",
+                "duration": 10,
+                "stacks": 1,
+                "periodic": true,
+                "ticktime": 2,
+                "effects": "AURA_EFFECT_DAMAGE",
+                "positive": true,
+                "type": "Buff",
+                "aurascript": "null"
+            }
         }
     ]
 }

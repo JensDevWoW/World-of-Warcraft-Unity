@@ -33,6 +33,7 @@ public class Spell : MonoBehaviour
     public float m_speed;
     public float m_elapsedTime = 0f;
     public int m_minDistanceToTarget = 3;
+    public int m_manaCost;
     public SpellEffectHandler effectHandler {  get; protected set; }
 
     private SpellScript spellScript;
@@ -53,6 +54,8 @@ public class Spell : MonoBehaviour
 
         this.CastTime = spellInfo.CastTime;
         this.isPositive = spellInfo.Positive;
+
+        this.m_manaCost = spellInfo.ManaCost;
 
         AttachSpellScript(spellId);
 
@@ -348,31 +351,29 @@ public class Spell : MonoBehaviour
 
         NetworkWriter writer = new NetworkWriter();
 
-        // Write the data to the NetworkWriter
-        writer.WriteInt(0); // CastFlags, assuming 0 as in the original script
-        writer.WriteNetworkIdentity(caster.Identity); // Caster's NetworkIdentity
-        writer.WriteNetworkIdentity(target != null ? target.Identity : null); // Target's NetworkIdentity
-        writer.WriteFloat(CastTime); // CastTime from the spell
-        writer.WriteInt(spellId); // Spell ID
-        writer.WriteFloat(m_spellTime); // Assuming SpellTime is another property in your Spell class
-        writer.WriteBool(AnimationEnabled); // Animation enabled flag
-        writer.WriteVector3(AoEPosition); // AoE position
-        writer.WriteInt(0); // Assuming ManaCost is an integer or float property in your Spell class
-        writer.WriteBool(false); // VOC, set to false unless specific conditions are met
+        writer.WriteInt(0); // Cast Flags
+        writer.WriteNetworkIdentity(caster.Identity); 
+        writer.WriteNetworkIdentity(target != null ? target.Identity : null); 
+        writer.WriteFloat(CastTime); 
+        writer.WriteInt(spellId);
+        writer.WriteFloat(m_spellTime); 
+        writer.WriteBool(AnimationEnabled); 
+        writer.WriteVector3(AoEPosition);
+        writer.WriteInt(m_manaCost);
 
         // Determine the VOC value based on spell conditions
         bool voc = false;
-        if (spellId == 48) // Assuming 48 is the spell ID for Ring of Frost
+        if (spellId == 48) // Ring of Frost
         {
-            voc = true; // Set VOC to true for this specific spell
+            voc = true; 
         }
-        writer.WriteBool(voc); // Write the VOC value
+        writer.WriteBool(voc); 
 
         writer.WriteBool(false); // IsToggled flag
 
         OpcodeMessage msg = new OpcodeMessage
         {
-            opcode = Opcodes.SMSG_SPELL_GO,  // Assuming this opcode is defined
+            opcode = Opcodes.SMSG_SPELL_GO,
             payload = writer.ToArray()
         };
 

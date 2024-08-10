@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [System.Serializable] // Allows this class to be serialized in JSON
@@ -17,6 +18,22 @@ public class SpellData
     public string damageclass;
     public string effects;
     public string spellscript;
+    public AuraData aura;
+}
+
+[System.Serializable]
+public class AuraData
+{
+    public int auraId;
+    public string name;
+    public float duration;
+    public bool periodic;
+    public float ticktime;
+    public int stacks;
+    public string effects;
+    public bool isPositive;
+    public string type;
+    public string aurascript;
 }
 
 [System.Serializable]
@@ -31,6 +48,8 @@ public class SpellDataHandler : MonoBehaviour
 {
     public static SpellDataHandler Instance { get; private set; }
     public List<SpellInfo> Spells { get; private set; }
+
+    public List<AuraInfo> Auras { get; private set; }
 
     void Awake()
     {
@@ -67,16 +86,27 @@ public class SpellDataHandler : MonoBehaviour
         }
 
         Spells = new List<SpellInfo>();
+        Auras = new List<AuraInfo>();
 
         foreach (var spellData in spellDataWrapper.spells)
         {
             SpellSchoolMask mask = GetSchoolMaskFromString(spellData.schoolMask);
             SpellType type = GetSpellTypeFromString(spellData.type);
 
-            List<SpellEffect> effects = ParseEffects(spellData.effects);
+            List<SpellEffect> effects = ParseSpellEffects(spellData.effects);
 
             SpellInfo spell = new SpellInfo(spellData.id, mask, type, spellData.manaCost, spellData.castTime, 
                 spellData.spellTime, spellData.speed, spellData.positive, spellData.basepoints, spellData.damageclass, effects, spellData.spellscript);
+
+            // If the spell has an aura, create and add it
+            if (spellData.aura != null && !string.IsNullOrEmpty(spellData.aura.name))
+            {
+                AuraType auratype = GetAuraTypeFromString(spellData.aura.type);
+
+                List<AuraEffect> auraEffects = ParseAuraEffects(spellData.aura.effects);
+                AuraInfo aura = new AuraInfo(spellData.aura.auraId, spellData.aura.name, auratype, spellData.positive, spellData.aura.duration, spellData.aura.periodic, spellData.aura.ticktime, spellData.aura.stacks, spellData.basepoints, spellData.damageclass, auraEffects, spellData.aura.aurascript, spell);
+                Auras.Add(aura);
+            }
 
             Spells.Add(spell);
         }
@@ -84,7 +114,27 @@ public class SpellDataHandler : MonoBehaviour
         Debug.Log("Successfully loaded and parsed spells.");
     }
 
-    List<SpellEffect> ParseEffects(string effectsString)
+    public AuraInfo GetAuraInfo(int auraId)
+    {
+        return Auras.FirstOrDefault(aura => aura.Id == auraId);
+    }
+
+    AuraType GetAuraTypeFromString(string typeName)
+    {
+        Debug.Log($"Parsing AuraType from string: '{typeName}'");
+        typeName = typeName.Trim();  // Trims any extra whitespace
+        switch (typeName)
+        {
+            case "Buff": return AuraType.Buff;
+            case "Debuff": return AuraType.Debuff;
+            // Add other cases as necessary
+            default: throw new System.ArgumentException($"Unknown AuraType: {typeName}");
+        }
+    }
+
+
+
+    List<SpellEffect> ParseSpellEffects(string effectsString)
     {
         List<SpellEffect> effects = new List<SpellEffect>();
 
@@ -119,6 +169,31 @@ public class SpellDataHandler : MonoBehaviour
                     break;
                 case "SPELL_EFFECT_DUMMY":
                     effects.Add(SpellEffect.SPELL_EFFECT_DUMMY);
+                    break;
+                    // Add other cases as necessary
+            }
+        }
+
+        return effects;
+    }
+
+    List<AuraEffect> ParseAuraEffects(string effectsString)
+    {
+        List<AuraEffect> effects = new List<AuraEffect>();
+
+        // Split the string into individual effect names
+        string[] effectNames = effectsString.Split(',');
+
+        // Map the effect names to actual SpellEffect objects
+        foreach (string effectName in effectNames)
+        {
+            switch (effectName.Trim())
+            {
+                case "AURA_EFFECT_DAMAGE":
+                    effects.Add(AuraEffect.AURA_EFFECT_DAMAGE);
+                    break;
+                case "AURA_EFFECT_DUMMY":
+                    effects.Add(AuraEffect.AURA_EFFECT_DUMMY);
                     break;
                     // Add other cases as necessary
             }

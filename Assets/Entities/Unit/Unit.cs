@@ -22,7 +22,7 @@ public class Unit : MonoBehaviour
     public LocationHandler location {  get; private set; }
 
     private List<Spell> spellList = new List<Spell>();
-    //private List<Aura> auraList = new List<Aura>();
+    private List<Aura> auraList = new List<Aura>();
     private List<Unit> combatList = new List<Unit>();
 
     // Data
@@ -344,6 +344,37 @@ public class Unit : MonoBehaviour
         return this;
     }
 
+    public void InitAura(Aura aura)
+    {
+        auraList.Add(aura);
+    }
+
+    public void DestAura(Aura aura)
+    {
+        if (auraList.Contains(aura))
+            auraList.Remove(aura);
+        else
+            print("Aura does not exist!");
+    }
+
+    public void AddAura(int spellId)
+    {
+        // TODO: AddAura
+    }
+
+    public void AddAura(Aura aura)
+    {
+        // TODO: Other add aura
+    }
+    public void RemoveAura(int spellId)
+    {
+        // TODO: Remove aura
+    }
+
+    public void RemoveAura(Aura aura)
+    {
+        // TODO: Remove aura 2
+    }
 
     public void DealDamage(Spell spell, Unit target)
     {
@@ -423,7 +454,7 @@ public class Unit : MonoBehaviour
             target.BreakStealth();
         }*/
 
-        // TODO: Send opcode to client about health loss
+        // Send health opcode
         SendHealthUpdate(target, newHealth, spell.isPositive);
     }
 

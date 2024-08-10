@@ -1,6 +1,7 @@
 using SpellFlags;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class SpellEffectHandler
@@ -67,7 +68,17 @@ public class SpellEffectHandler
     private void HandleApplyAura(Spell spell, Unit target)
     {
         Debug.Log($"Applying aura effect from spell {spell.spellId} to target {target.m_name}");
-        // Implement the logic for applying an aura here
+
+        // Create and initialize the Aura object
+        GameObject auraObject = new GameObject("AuraObject");
+
+        Aura newAura = auraObject.AddComponent<Aura>();
+        AuraInfo auraInfo = SpellDataHandler.Instance.Auras.FirstOrDefault(aura => aura.Id == spell.spellId);
+
+        auraObject.name = $"Aura: {auraInfo.Id}";
+
+        newAura.Initialize(auraInfo, spell.caster, target, spell);
+
     }
 
     private void HandleDispel(Spell spell, Unit target)

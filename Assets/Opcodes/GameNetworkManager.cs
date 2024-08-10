@@ -8,6 +8,7 @@ public class GameNetworkManager : NetworkManager
 {
     private OpcodeHandler opcodeHandler;
     public GameObject spellPrefab;
+
     public override void OnStartServer()
     {
         opcodeHandler = new OpcodeHandler();

@@ -16,7 +16,8 @@ public class GameNetworkManager : NetworkManager
         base.OnStartServer();
 
         // Register opcode handlers
-        opcodeHandler.RegisterHandler(Opcodes.CMSG_CAST_SPELL, HandleCastSpell);
+        opcodeHandler.RegisterHandler(Opcodes.CMSG_CAST_SPELL,          HandleCastSpell);
+        opcodeHandler.RegisterHandler(Opcodes.CMSG_SELECT_TARGET,       HandleSelectTarget);
         //opcodeHandler.RegisterHandler((int)Opcodes.MoveCharacter, HandleMoveCharacter);
 
         NetworkServer.RegisterHandler<OpcodeMessage>(OnOpcodeMessageReceived, true);
@@ -35,6 +36,15 @@ public class GameNetworkManager : NetworkManager
         Spell spell = caster.CreateSpellAndPrepare(spellId, spellPrefab);
     }
 
+    private void HandleSelectTarget(NetworkConnection conn, NetworkReader reader)
+    {
+        NetworkIdentity identity = reader.ReadNetworkIdentity();
+        Unit target = identity.GetComponent<Unit>();
+
+        Unit player = conn.identity.GetComponent<Unit>();
+
+        player.SetTarget(target);
+    }
     private void HandleMoveCharacter(NetworkConnection conn, NetworkReader reader)
     {
         Vector3 position = reader.ReadVector3();

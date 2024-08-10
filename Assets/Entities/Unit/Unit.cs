@@ -314,7 +314,7 @@ public class Unit : MonoBehaviour
     // Check if this unit is hostile to the given target
     public bool IsHostileTo(Unit target)
     {
-        return true; // Replace with actual hostility logic
+        return false; // TODO: Replace with actual hostility logic
     }
 
     // Convert this Unit to a Player if applicable
@@ -436,6 +436,8 @@ public class Unit : MonoBehaviour
         if (!spell.isPositive && damage > 0)
         {
             newHealth = Mathf.Round(target.GetHealth() - damage);
+            if (newHealth < 0)
+                newHealth = 0;
             target.SetHealth(newHealth);
             print($"Hit {target.name} with {spell.name}!");
             print($"{newHealth} is his new health!");
@@ -443,6 +445,8 @@ public class Unit : MonoBehaviour
         else if (spell.isPositive)
         {
             newHealth = Mathf.Round(target.GetHealth() + damage);
+            if (newHealth > target.GetMaxHealth())
+                newHealth = target.GetMaxHealth();
             target.SetHealth(newHealth);
             print($"Hit {target.name} with {spell.name}!");
             print($"{newHealth} is his new health!");

@@ -110,6 +110,7 @@ GameObject:
   - component: {fileID: 6254427956938447325}
   - component: {fileID: 7118163302846509821}
   - component: {fileID: 8708847321321753064}
+  - component: {fileID: 4388284789796336436}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -335,6 +336,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb9da98b378d4d04e8f2dac58ecb2339, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_name: Voreli
+  m_health: 1000
+  m_maxHealth: 1000
+  m_mana: 100
+  m_maxMana: 100
+--- !u!114 &4388284789796336436
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3986798803404752212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8df28c1d6c5930946965842009cc09de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentTarget: {fileID: 0}
 --- !u!1 &6345847328567121960
 GameObject:
   m_ObjectHideFlags: 0

@@ -111,7 +111,6 @@ public class PlayerMovement : MonoBehaviour
                 rotation = 0;
             else
             {
-                Debug.Log("This is working!");
                 rotation = -1;
             }
 

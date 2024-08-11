@@ -12,6 +12,7 @@ public class PlayerInput : NetworkBehaviour
 
         spellbook.Add(new SpellList("Flash of Light", 1, KeyBindManager.keyBinds.one));
         spellbook.Add(new SpellList("TestInstant", 3, KeyBindManager.keyBinds.two));
+        spellbook.Add(new SpellList("Fireball", 4, KeyBindManager.keyBinds.three));
     }
 
     void Update()

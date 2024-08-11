@@ -32,7 +32,7 @@ public class Spell : MonoBehaviour
     public float m_initialSpellTime = 0f;
     public float m_speed;
     public float m_elapsedTime = 0f;
-    public int m_minDistanceToTarget = 3;
+    public int m_minDistanceToTarget = 1;
     public int m_manaCost;
     public SpellEffectHandler effectHandler {  get; protected set; }
 
@@ -54,7 +54,7 @@ public class Spell : MonoBehaviour
 
         this.CastTime = spellInfo.CastTime;
         this.isPositive = spellInfo.Positive;
-
+        this.m_speed = spellInfo.Speed;
         this.m_manaCost = spellInfo.ManaCost;
 
         AttachSpellScript(spellId);
@@ -356,6 +356,7 @@ public class Spell : MonoBehaviour
         writer.WriteNetworkIdentity(target != null ? target.Identity : null); 
         writer.WriteFloat(CastTime); 
         writer.WriteInt(spellId);
+        writer.WriteFloat(m_speed);
         writer.WriteFloat(m_spellTime); 
         writer.WriteBool(AnimationEnabled); 
         writer.WriteVector3(AoEPosition);

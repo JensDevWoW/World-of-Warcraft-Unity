@@ -58,6 +58,7 @@ public class SpellDataHandler : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
             LoadSpellData();
+            LoadVFXSpells();
         }
         else
         {
@@ -221,6 +222,23 @@ public class SpellDataHandler : MonoBehaviour
             case "Heal": return SpellType.Heal;
             // Add other cases as necessary
             default: return SpellType.Utility;
+        }
+    }
+
+    void LoadVFXSpells()
+    {
+        // Load all SpellScriptableObjects from Resources or any specific folder
+        SpellScriptableObject[] loadedSpells = Resources.LoadAll<SpellScriptableObject>("VFXObjects");
+
+        if (loadedSpells.Length > 0)
+        {
+            List<SpellScriptableObject> spellList = new List<SpellScriptableObject>(loadedSpells);
+            VFXManager.Instance.LoadSpells(spellList);
+            Debug.Log("Successfully loaded SpellObjects!");
+        }
+        else
+        {
+            Debug.LogError("No SpellScriptableObjects found.");
         }
     }
 }

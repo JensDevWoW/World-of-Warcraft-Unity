@@ -39,7 +39,7 @@ public class Unit : MonoBehaviour
 
     public Player player { get; private set; }
     public bool IsCasting { get; protected set; }
-
+    public LocationHandler locationHandler { get; protected set; }
     public Unit m_target { get; protected set; }
 
     // Initialize the NetworkIdentity reference
@@ -47,6 +47,7 @@ public class Unit : MonoBehaviour
     {
         // Get the NetworkIdentity component attached to the same GameObject
         Identity = GetComponent<NetworkIdentity>();
+        locationHandler = GetComponent<LocationHandler>();
 
         if (Identity == null)
         {
@@ -151,8 +152,6 @@ public class Unit : MonoBehaviour
         {
             auraList[i].Update();
         }*/
-
-        //ToLocation().Update();
 
         // Mana Tick
         if (GetMana() < GetMaxMana())
@@ -314,7 +313,7 @@ public class Unit : MonoBehaviour
     // Check if this unit is hostile to the given target
     public bool IsHostileTo(Unit target)
     {
-        return false; // TODO: Replace with actual hostility logic
+        return true; // TODO: Replace with actual hostility logic
     }
 
     // Convert this Unit to a Player if applicable
@@ -325,7 +324,7 @@ public class Unit : MonoBehaviour
 
     public LocationHandler ToLocation()
     {
-        return location;
+        return locationHandler;
     }
 
     // Check if this unit is the local player

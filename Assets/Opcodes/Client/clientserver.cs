@@ -89,6 +89,7 @@ public class ClientNetworkManager : MonoBehaviour
         NetworkIdentity targetIdentity = reader.ReadNetworkIdentity();
         float castTime = reader.ReadFloat();
         int spellId = reader.ReadInt();
+        float speed = reader.ReadFloat();
         float spellTime = reader.ReadFloat();
         bool animationEnabled = reader.ReadBool();
         Vector3 aoePosition = reader.ReadVector3();
@@ -104,8 +105,18 @@ public class ClientNetworkManager : MonoBehaviour
 
         if (casterIdentity.netId == NetworkClient.localPlayer.netId)
         {
-            // This is working, process as needed
-            Debug.Log("Caster is the local player, processing spell GO event.");
+            if (spellTime > 0)
+            {
+                Unit target = targetIdentity.GetComponent<Unit>();
+
+                Transform targetTransform = target.transform;
+                Transform casterTransform = caster.transform;
+
+                if (!targetTransform)
+                    Debug.LogError("No transform found for Target!");
+
+                VFXManager.Instance.CastSpell(spellId, speed, casterTransform, targetTransform);
+            }
         }
 
         // Implement additional logic here, such as starting animations, reducing mana, etc.

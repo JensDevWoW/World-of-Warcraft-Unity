@@ -503,7 +503,7 @@ public class Unit : MonoBehaviour
         writer.WriteNetworkIdentity(target.Identity);
         writer.WriteString("health");
         writer.WriteFloat(health);
-        writer.WriteFloat(m_maxHealth);
+        writer.WriteFloat(target.GetMaxHealth());
 
         OpcodeMessage msg = new OpcodeMessage
         {

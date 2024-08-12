@@ -143,7 +143,7 @@ public class ClientNetworkManager : MonoBehaviour
                 if (!healthBarController)
                     Debug.LogError("No Healthbar controller found!");
 
-                healthBarController.ChangeHealth(statValue, maxStatValue);
+                healthBarController.UpdateHealth(statValue, maxStatValue);
             }
         }
     }

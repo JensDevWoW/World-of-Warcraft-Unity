@@ -14,6 +14,7 @@ public class ClientNetworkManager : MonoBehaviour
         opcodeHandler.RegisterHandler(Opcodes.SMSG_SPELL_START,         HandleSpellStart);
         opcodeHandler.RegisterHandler(Opcodes.SMSG_SPELL_GO,            HandleSpellGo);
         opcodeHandler.RegisterHandler(Opcodes.SMSG_SEND_COMBAT_TEXT,    HandleCombatText);
+        opcodeHandler.RegisterHandler(Opcodes.SMSG_UPDATE_STAT,         HandleUpdateStat);
 
         // Register the OpcodeMessage handler on the client
         NetworkClient.RegisterHandler<OpcodeMessage>(OnOpcodeMessageReceived);
@@ -105,21 +106,46 @@ public class ClientNetworkManager : MonoBehaviour
 
         if (casterIdentity.netId == NetworkClient.localPlayer.netId)
         {
-            if (spellTime > 0)
-            {
-                Unit target = targetIdentity.GetComponent<Unit>();
+                
+        }
 
-                Transform targetTransform = target.transform;
-                Transform casterTransform = caster.transform;
+        if (spellTime > 0)
+        {
+            Unit target = targetIdentity.GetComponent<Unit>();
 
-                if (!targetTransform)
-                    Debug.LogError("No transform found for Target!");
+            Transform targetTransform = target.transform;
+            Transform casterTransform = caster.transform;
 
-                VFXManager.Instance.CastSpell(spellId, speed, casterTransform, targetTransform);
-            }
+            if (!targetTransform)
+                Debug.LogError("No transform found for Target!");
+
+            VFXManager.Instance.CastSpell(spellId, speed, casterTransform, targetTransform);
         }
 
         // Implement additional logic here, such as starting animations, reducing mana, etc.
+    }
+
+    private void HandleUpdateStat(NetworkReader reader)
+    {
+        NetworkIdentity networkIdentity = reader.ReadNetworkIdentity();
+        string statChanged = reader.ReadString();
+        float statValue = reader.ReadFloat();
+        float maxStatValue = reader.ReadFloat();
+
+        Unit sender = networkIdentity.GetComponent<Unit>();
+
+        Canvas canvas = FindObjectOfType<Canvas>();
+        if (networkIdentity.netId == NetworkClient.localPlayer.netId)
+        {
+            if (statChanged == "health")
+            {
+                HealthBar healthBarController = canvas.GetComponentInChildren<HealthBar>();
+                if (!healthBarController)
+                    Debug.LogError("No Healthbar controller found!");
+
+                healthBarController.ChangeHealth(statValue, maxStatValue);
+            }
+        }
     }
 
     private void HandleCombatText(NetworkReader reader)

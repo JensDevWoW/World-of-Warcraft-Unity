@@ -6,6 +6,7 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.Android;
 
 public enum Stats
 {
@@ -42,12 +43,18 @@ public class Unit : MonoBehaviour
     public LocationHandler locationHandler { get; protected set; }
     public Unit m_target { get; protected set; }
 
-    // Initialize the NetworkIdentity reference
+    public Creature creature {  get; protected set; }
+    
     void Start()
     {
         // Get the NetworkIdentity component attached to the same GameObject
         Identity = GetComponent<NetworkIdentity>();
         locationHandler = GetComponent<LocationHandler>();
+
+        creature = GetComponent<Creature>();
+
+        if (creature != null)
+            creature.Init();
 
         if (Identity == null)
         {
@@ -375,6 +382,32 @@ public class Unit : MonoBehaviour
         // TODO: Remove aura 2
     }
 
+    public Spell CastSpell(int spellId, Unit target)
+    {
+        GameNetworkManager GNM = FindObjectOfType<GameNetworkManager>();
+        GameObject spellPrefab = GNM.spellPrefab;
+        
+
+        SpellInfo info = SpellDataHandler.Instance.Spells.FirstOrDefault(spell => spell.Id == spellId);
+
+        // Instantiate the prefab instead of creating a new GameObject
+        GameObject spellObject = Instantiate(spellPrefab);
+
+        // Set the name of the cloned object if needed
+        spellObject.name = $"{spellId}";
+
+        // Get the Spell component from the instantiated prefab
+        Spell newSpell = spellObject.GetComponent<Spell>();
+
+        DontDestroyOnLoad(spellObject);
+
+        newSpell.Initialize(spellId, this, info);
+        //SpellManager.Instance.AddSpell(newSpell);
+
+        newSpell.prepare();
+
+        return newSpell;
+    }
     public void DealDamage(Spell spell, Unit target)
     {
         if (spell == null || target == null)
@@ -459,6 +492,7 @@ public class Unit : MonoBehaviour
 
         // Send health opcode
         SendHealthUpdate(target, newHealth, spell.isPositive);
+        // TODO: Send SMSG_SEND_COMBAT_TEXT
     }
 
     public void SendHealthUpdate(Unit target, float health, bool Positive)
@@ -466,13 +500,14 @@ public class Unit : MonoBehaviour
         NetworkWriter writer = new NetworkWriter();
 
         // Writing data to the NetworkWriter
+        writer.WriteNetworkIdentity(target.Identity);
+        writer.WriteString("health");
         writer.WriteFloat(health);
-        writer.WriteBool(Positive);
-        writer.WriteNetworkIdentity(target.Identity); // Use Caster's NetworkIdentity
+        writer.WriteFloat(m_maxHealth);
 
         OpcodeMessage msg = new OpcodeMessage
         {
-            opcode = Opcodes.SMSG_SEND_COMBAT_TEXT,  // Assuming this opcode is defined
+            opcode = Opcodes.SMSG_UPDATE_STAT,  // Assuming this opcode is defined
             payload = writer.ToArray()
         };
 

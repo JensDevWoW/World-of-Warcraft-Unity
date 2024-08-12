@@ -1,12 +1,14 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class LocationHandler : MonoBehaviour
 {
     private Transform unitTransform;
-
+    public Unit unit {  get; private set; }
     void Awake()
     {
         unitTransform = GetComponent<Transform>();
+        unit = GetComponent<Unit>();
     }
 
     // Method to get the current position of the unit
@@ -33,5 +35,31 @@ public class LocationHandler : MonoBehaviour
         unitTransform.position = Vector3.MoveTowards(unitTransform.position, targetPosition, speed * Time.deltaTime);
     }
 
-    // You can add more location-based methods here as needed
+    public Unit GetNearestEnemy()
+    {
+        List<Unit> unitList = new List<Unit>(FindObjectsOfType<Unit>());
+        float closestDistance = 100f;
+        Unit nearestTarget = null;
+        foreach (Unit target in unitList)
+        {
+            if (target != null && target.IsAlive() && target.IsHostileTo(unit) && target != unit)
+            {
+                float distance = GetDistanceFrom(target);
+                if (distance < closestDistance)
+                {
+                    closestDistance = distance;
+                    nearestTarget = target;
+                }
+            }
+        }
+
+        if (nearestTarget != null)
+        {
+            return nearestTarget;
+        }
+        else
+            return null;
+    }
+
+    
 }

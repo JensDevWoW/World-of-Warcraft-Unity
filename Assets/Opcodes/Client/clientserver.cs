@@ -59,7 +59,7 @@ public class ClientNetworkManager : MonoBehaviour
                 if (castBarController != null)
                 {
                     // Start the cast bar with the appropriate duration and spell name
-                    string spellName = GetSpellNameById(spellId); // Assume you have a method to get the spell name by ID
+                    string spellName = GetSpellNameById(spellId);
                     castBarController.StartCast(castTime, spellName);
                 }
                 else

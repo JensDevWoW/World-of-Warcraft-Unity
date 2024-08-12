@@ -11,6 +11,7 @@ using Org.BouncyCastle.Asn1;
 using UnityEditor.UI;
 using Unity.VisualScripting;
 using System;
+
 public class Spell : MonoBehaviour
 {
     public const int SPELL_STATE_PREPARING = 1, SPELL_STATE_DELAYED = 2, SPELL_STATE_FINISHED = 3, SPELL_STATE_CASTING = 4, SPELL_STATE_NULL = 5;
@@ -34,6 +35,9 @@ public class Spell : MonoBehaviour
     public float m_elapsedTime = 0f;
     public int m_minDistanceToTarget = 1;
     public int m_manaCost;
+    public int cooldownTime;
+    public float cooldownLeft;
+
     public SpellEffectHandler effectHandler {  get; protected set; }
 
     private SpellScript spellScript;
@@ -56,6 +60,8 @@ public class Spell : MonoBehaviour
         this.isPositive = spellInfo.Positive;
         this.m_speed = spellInfo.Speed;
         this.m_manaCost = spellInfo.ManaCost;
+        this.cooldownTime = spellInfo.Cooldown;
+        this.cooldownLeft = spellInfo.Cooldown;
 
         AttachSpellScript(spellId);
 
@@ -217,7 +223,10 @@ public class Spell : MonoBehaviour
 
             string canCast = CheckCast();
             if (canCast != "")
-                Debug.Log("OOPS!");
+            {
+                HandleFailed(canCast);
+                return;
+            }
             caster.SetCasting();
 
             m_spellState = SPELL_STATE_PREPARING;
@@ -233,6 +242,10 @@ public class Spell : MonoBehaviour
         return true;
     }
 
+    private void HandleFailed(string reason)
+    {
+        Debug.LogError($"{reason} is why you can't cast, idiot!");
+    }
     private void AttachSpellScript(int spellId)
     {
         // Get the script type from the registry using the spellId
@@ -255,6 +268,13 @@ public class Spell : MonoBehaviour
 
     public string CheckCast()
     {
+
+        if (!caster)
+            return "";
+
+        if (caster.cdHandler.IsCooldownActive(spellId))
+            return "cooldown";
+
         return "";
     }
 
@@ -382,6 +402,20 @@ public class Spell : MonoBehaviour
         NetworkServer.SendToAll(msg);
     }
 
+    private void SetOnCooldown()
+    {
+        if (!caster)
+            return;
+
+        if (HasCooldown())
+            caster.cdHandler.StartCooldown(spellId, cooldownTime);
+    }
+
+    private bool HasCooldown()
+    {
+        return cooldownTime > 0;
+    }
+
     private void Cast()
     {
         if (!caster)
@@ -428,6 +462,21 @@ public class Spell : MonoBehaviour
         if (IsNegative())
             caster.SetInCombatWith(target);
 
+        SetOnCooldown();
+
+        /*if (HasCharge())
+            DropCharge();
+        else if (HasCooldown())
+        {
+            // Toggled spells shouldn't apply cooldown on first cast
+            if (Toggled())
+                return;
+
+            if (!HasFlag("SPELL_FLAG_OVERRIDE"))
+            {
+                SetOnCooldown();
+            }
+        }*/
         /*--Consume a charge if you have charges and set on cooldown that way so we can handle it already being on cooldown
 
             if self:HasCharges() then

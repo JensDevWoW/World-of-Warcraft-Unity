@@ -39,10 +39,13 @@ public class Unit : MonoBehaviour
     private float m_combatTimer = 0;
     private float m_absorbAmount = 0;
 
+    public CooldownHandler cdHandler { get; private set; }
     public Player player { get; private set; }
     public bool IsCasting { get; protected set; }
     public LocationHandler locationHandler { get; protected set; }
     public Unit m_target { get; protected set; }
+
+    public List<int> knownSpells; // List of spell IDs the Unit knows
 
     public Creature creature {  get; protected set; }
     
@@ -61,7 +64,10 @@ public class Unit : MonoBehaviour
         {
             print("NetworkIdentity component is missing on the Unit's GameObject.");
         }
+        cdHandler = new CooldownHandler();
 
+        if (knownSpells == null)
+            knownSpells = new List<int>();
        
     }
 
@@ -131,10 +137,10 @@ public class Unit : MonoBehaviour
               //  ToCreature().Died();
         }
 
-        
+
 
         //DRHandler().Update();
-
+        cdHandler.Update();
         //target stealth update
         /*if (HasTarget())
             if (GetTarget().IsInStealth())

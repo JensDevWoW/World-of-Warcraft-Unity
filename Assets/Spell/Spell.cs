@@ -280,8 +280,10 @@ public class Spell : MonoBehaviour
         if (caster.ToPlayer() != null)
             if (caster.ToPlayer().IsOnGCD())
                 return "global cooldown";
+
         if (caster.IsCasting())
             return "casting";
+
         return "";
     }
 

@@ -228,9 +228,12 @@ public class Spell : MonoBehaviour
                 return;
             }
             caster.SetCasting();
-
             m_spellState = SPELL_STATE_PREPARING;
             SendSpellStartPacket();
+
+            //TODO: Add spell flags to check for GCD immunity
+            if (caster.ToPlayer() != null)
+                caster.ToPlayer().SetOnGCD();
 
             if (IsInstant())
                 Cast();
@@ -268,13 +271,17 @@ public class Spell : MonoBehaviour
 
     public string CheckCast()
     {
-
         if (!caster)
             return "";
 
         if (caster.cdHandler.IsCooldownActive(spellId))
             return "cooldown";
 
+        if (caster.ToPlayer() != null)
+            if (caster.ToPlayer().IsOnGCD())
+                return "global cooldown";
+        if (caster.IsCasting())
+            return "casting";
         return "";
     }
 

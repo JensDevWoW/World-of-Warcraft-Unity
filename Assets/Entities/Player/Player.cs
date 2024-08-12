@@ -5,18 +5,14 @@ public class Player : MonoBehaviour
     public string playerName;
     public int level;
 
+    private float gcdTimer = 0;
+    private float gcdTime = 1.5f;
+
     public Unit unit { get; set; }
 
-    public void SetCasting()
+    public void Start()
     {
-        unit.SetCasting(); // Optionally call the base class implementation
-        Debug.Log($"{playerName} is casting a spell at level {level}.");
-        // Add any additional logic specific to the Player class here
-    }
-
-    public void SetUnit( Unit unit )
-    {
-        this.unit = unit;
+        unit = gameObject.GetComponent<Unit>();
     }
 
     public void StopCasting()
@@ -31,8 +27,23 @@ public class Player : MonoBehaviour
         return unit;
     }
 
-    public void UpdatePlayer()
+    public bool IsOnGCD()
     {
-        // Not important atm
+        return gcdTimer > 0;
+    }
+
+    public void SetOnGCD()
+    {
+        gcdTimer = gcdTime;
+    }
+
+    public void Update()
+    {
+        // Only players have GCD so update in Player object
+        // TODO: Implement haste increase
+        if (gcdTimer > 0)
+            gcdTimer -= Time.deltaTime;
+        else
+            gcdTimer = 0;
     }
 }

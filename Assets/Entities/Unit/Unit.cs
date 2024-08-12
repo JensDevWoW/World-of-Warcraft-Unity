@@ -38,10 +38,9 @@ public class Unit : MonoBehaviour
     private bool m_isAlive = true;
     private float m_combatTimer = 0;
     private float m_absorbAmount = 0;
-
+    private bool m_isCasting;
     public CooldownHandler cdHandler { get; private set; }
     public Player player { get; private set; }
-    public bool IsCasting { get; protected set; }
     public LocationHandler locationHandler { get; protected set; }
     public Unit m_target { get; protected set; }
 
@@ -68,6 +67,8 @@ public class Unit : MonoBehaviour
 
         if (knownSpells == null)
             knownSpells = new List<int>();
+
+        player = GetComponent<Player>();
        
     }
 
@@ -149,21 +150,18 @@ public class Unit : MonoBehaviour
         // Update Schools
 
         bool preparing = false;
-        /*for (int i = 0; i < spellList.Count; i++)
+        for (int i = 0; i < spellList.Count; i++)
         {
-            if (spellList[i].GetSpellState() == SpellManager.SPELL_STATE_PREPARING)
+            if (spellList[i].GetSpellState() == Spell.SPELL_STATE_PREPARING)
             {
                 preparing = true;
-                IsCasting = true;
+                SetCasting();
                 break;
             }
-        }*/
+        }
 
         if (!preparing)
-        {
             StopCasting();
-            IsCasting = false;
-        }
 
         // Creature Update
         /*if (ToCreature())
@@ -276,6 +274,7 @@ public class Unit : MonoBehaviour
 
         newSpell.prepare();
 
+        AddSpellToList(newSpell);
         return newSpell;
 
         // Network-related: If you need the spell object to be networked
@@ -309,15 +308,20 @@ public class Unit : MonoBehaviour
     }
 
     // Method to set the unit as casting
-    public virtual void SetCasting()
+    public void SetCasting()
     {
-        IsCasting = true;
+        m_isCasting = true;
+    }
+
+    public bool IsCasting()
+    {
+        return m_isCasting;
     }
 
     // Method to stop the unit from casting
-    public virtual void StopCasting()
+    public void StopCasting()
     {
-        IsCasting = false;
+        m_isCasting = false;
     }
 
     // Get the target unit (this can be adapted based on your actual target acquisition logic)

@@ -18,6 +18,7 @@ public class SpellData
     public string damageclass;
     public string effects;
     public string spellscript;
+    public int cooldown;
     public AuraData aura;
 }
 
@@ -57,13 +58,17 @@ public class SpellDataHandler : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            LoadSpellData();
-            LoadVFXSpells();
         }
         else
         {
             Destroy(gameObject);
         }
+    }
+
+    private void Start()
+    {
+        LoadSpellData();
+        LoadVFXSpells();
     }
 
     void LoadSpellData()
@@ -97,7 +102,7 @@ public class SpellDataHandler : MonoBehaviour
             List<SpellEffect> effects = ParseSpellEffects(spellData.effects);
 
             SpellInfo spell = new SpellInfo(spellData.id, spellData.name, mask, type, spellData.manaCost, spellData.castTime, 
-                spellData.spellTime, spellData.speed, spellData.positive, spellData.basepoints, spellData.damageclass, effects, spellData.spellscript);
+                spellData.spellTime, spellData.speed, spellData.positive, spellData.basepoints, spellData.damageclass, effects, spellData.spellscript, spellData.cooldown);
 
             // If the spell has an aura, create and add it
             if (spellData.aura != null && !string.IsNullOrEmpty(spellData.aura.name))

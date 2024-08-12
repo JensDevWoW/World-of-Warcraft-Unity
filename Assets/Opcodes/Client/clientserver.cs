@@ -54,7 +54,7 @@ public class ClientNetworkManager : MonoBehaviour
             if (canvas != null)
             {
                 // Find the CastBar within the Canvas
-                CastBar castBarController = canvas.GetComponentInChildren<CastBar>();
+                CastBar castBarController = canvas.GetComponent<CastBar>();
 
                 if (castBarController != null)
                 {
@@ -135,11 +135,13 @@ public class ClientNetworkManager : MonoBehaviour
         Unit sender = networkIdentity.GetComponent<Unit>();
 
         Canvas canvas = FindObjectOfType<Canvas>();
+        if (!canvas)
+            Debug.LogError("CANNOT FIND CANVAS!");
         if (networkIdentity.netId == NetworkClient.localPlayer.netId)
         {
             if (statChanged == "health")
             {
-                HealthBar healthBarController = canvas.GetComponentInChildren<HealthBar>();
+                HealthBar healthBarController = canvas.GetComponent<HealthBar>();
                 if (!healthBarController)
                     Debug.LogError("No Healthbar controller found!");
 

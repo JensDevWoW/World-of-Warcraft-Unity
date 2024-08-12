@@ -11,8 +11,8 @@ public class TrainingDummy : CreatureScript
     {
         if (castTimer <= 0)
         {
-            unit.SetTarget(unit.ToLocation().GetNearestEnemy());
-            unit.CastSpell(4, unit.GetTarget());
+            //unit.SetTarget(unit.ToLocation().GetNearestEnemy());
+            //unit.CastSpell(4, unit.GetTarget());
             castTimer = 10;
         }
         else

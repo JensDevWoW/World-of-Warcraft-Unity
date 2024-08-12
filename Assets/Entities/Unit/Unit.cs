@@ -37,6 +37,7 @@ public class Unit : MonoBehaviour
     private float m_manaTickAmountCombat = 3;
     private bool m_isAlive = true;
     private float m_combatTimer = 0;
+    private float m_absorbAmount = 0;
 
     public Player player { get; private set; }
     public bool IsCasting { get; protected set; }
@@ -87,6 +88,16 @@ public class Unit : MonoBehaviour
     public void DropCombat()
     {
         m_combatTimer = 0;
+    }
+
+    public void SetAbsorbAmount(float amount)
+    {
+        m_absorbAmount = amount;
+    }
+
+    public float GetAbsorbAmount()
+    {
+        return m_absorbAmount;
     }
 
     public void SetInCombat()
@@ -440,13 +451,13 @@ public class Unit : MonoBehaviour
 
         // Calculate the damage and check if it's a critical hit
         bool crit;
-        float damage = SpellDamageBonusDone(target, spell, m_spellInfo, out crit);
+        float damage = Mathf.Round(SpellDamageBonusDone(target, spell, m_spellInfo, out crit));
 
         bool absorb = false;
 
         // target.RemoveAurasWithInterruptFlags(SD.SpellAuraInterruptFlags.Damage, spell);
 
-        /*float abamt = target.GetAbsorbAmount();
+        float abamt = target.GetAbsorbAmount();
         if (abamt > 0)
         {
             if (abamt >= damage)
@@ -461,13 +472,13 @@ public class Unit : MonoBehaviour
                 abamt = 0;
             }
             target.SetAbsorbAmount(abamt);
-        }*/
+        }
 
         float newHealth = 0;
 
         if (!spell.isPositive && damage > 0)
         {
-            newHealth = Mathf.Round(target.GetHealth() - damage);
+            newHealth = target.GetHealth() - damage;
             if (newHealth < 0)
                 newHealth = 0;
             target.SetHealth(newHealth);
@@ -476,13 +487,15 @@ public class Unit : MonoBehaviour
         }
         else if (spell.isPositive)
         {
-            newHealth = Mathf.Round(target.GetHealth() + damage);
+            newHealth = target.GetHealth() + damage;
             if (newHealth > target.GetMaxHealth())
                 newHealth = target.GetMaxHealth();
             target.SetHealth(newHealth);
             print($"Hit {target.name} with {spell.name}!");
             print($"{newHealth} is his new health!");
         }
+        else
+            newHealth = target.GetHealth(); // Damage must be 0 so must be absorb 
 
         /* TODO: Handle stealth removal
         if (target.IsInStealth())

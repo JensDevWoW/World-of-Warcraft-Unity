@@ -30,7 +30,6 @@ public class Aura : MonoBehaviour
         this.auraInfo = auraInfo;
         this.target = target;
         this.duration = auraInfo.Duration;
-        print($"HIS DURATION IS: {this.duration}");
         this.caster = caster;
         this.spell = spell;
         this.m_stacks = auraInfo.Stacks;
@@ -48,6 +47,8 @@ public class Aura : MonoBehaviour
 
         // Apply initial effects if necessary
         HandleEffects();
+        if (!m_isPeriodic)
+            m_effectHit = true;
     }
 
     private void HandleEffects()
@@ -135,7 +136,10 @@ public class Aura : MonoBehaviour
             if (duration <= 0)
             {
                 DropStacks();
-                HandleEffects();
+                if (!m_effectHit)
+                    HandleEffects();
+
+                m_effectHit = true;
                 Finish();
             }
         }

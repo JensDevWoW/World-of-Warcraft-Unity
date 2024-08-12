@@ -1,3 +1,4 @@
+using Org.BouncyCastle.Asn1;
 using SpellFlags;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,7 @@ public class AuraEffectHandler
 
         // Register handlers for each spell effect
         RegisterHandler(AuraEffect.AURA_EFFECT_DAMAGE, HandleSchoolDamage);
+        RegisterHandler(AuraEffect.AURA_EFFECT_APPLY_ABSORB, HandleApplyAbsorb);
         RegisterHandler(AuraEffect.AURA_EFFECT_DUMMY, HandleDummyEffect);
     }
 
@@ -50,6 +52,12 @@ public class AuraEffectHandler
     private void HandleSchoolDamage(Aura aura, Unit target)
     {
         aura.caster.DealDamage(aura.ToSpell(), target);
+    }
+
+    private void HandleApplyAbsorb(Aura aura, Unit target)
+    {
+        target.SetAbsorbAmount(aura.ToSpell().m_spellInfo.BasePoints);
+        Debug.Log($"Set Absorb Amount: {target.GetAbsorbAmount()}!");
     }
 
     private void HandleDummyEffect(Aura aura, Unit target)

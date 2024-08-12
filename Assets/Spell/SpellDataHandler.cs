@@ -193,6 +193,9 @@ public class SpellDataHandler : MonoBehaviour
                 case "AURA_EFFECT_DAMAGE":
                     effects.Add(AuraEffect.AURA_EFFECT_DAMAGE);
                     break;
+                case "AURA_EFFECT_APPLY_ABSORB":
+                    effects.Add(AuraEffect.AURA_EFFECT_APPLY_ABSORB);
+                    break;
                 case "AURA_EFFECT_DUMMY":
                     effects.Add(AuraEffect.AURA_EFFECT_DUMMY);
                     break;

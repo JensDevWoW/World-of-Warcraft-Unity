@@ -7,7 +7,9 @@ That said, however, I'm using a package called Mirror that allows for client/ser
 
 Spells are created and modified in the SpellData.json file.
 
-Core Systems
+***Core Systems***
+
+
 Spell System: Handles the creation, casting, and management of spells, including attributes and effects.
 
 

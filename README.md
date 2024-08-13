@@ -43,6 +43,10 @@ Spell System: Handles the creation, casting, and management of spells, including
 **Unit.cs:** Base class for all game units, including players and NPCs, handling health, mana, and interactions.
 
 
-Data Files
-SpellData.json: JSON file containing all spell data, including effects, attributes, and cooldowns.
-ScriptableObjects: Used to store prefab references and configurations for spells and VFX.
+***Data Files***
+
+
+**SpellData.json:** JSON file containing all spell data, including effects, attributes, and cooldowns.
+
+
+**ScriptableObjects:** Used to store prefab references and configurations for spells and VFX.

@@ -14,7 +14,9 @@
             "damageclass": "Intellect",
             "effects": "SPELL_EFFECT_SCHOOL_DAMAGE",
             "spellscript": "null",
-            "cooldown": 0
+            "cooldown": 0,
+            "attributes": "",
+            "flags": "SPELL_FLAG_NEEDS_TARGET"
         },
         {
             "id": 2,
@@ -30,7 +32,9 @@
             "damageclass": "Intellect",
             "effects": "SPELL_EFFECT_SCHOOL_DAMAGE",
             "spellscript": "null",
-            "cooldown": 0
+            "cooldown": 0,
+            "attributes": "",
+            "flags": "SPELL_FLAG_NEEDS_TARGET"
         },
         {
             "id": 3,
@@ -47,6 +51,8 @@
             "effects": "SPELL_EFFECT_SCHOOL_DAMAGE,SPELL_EFFECT_APPLY_AURA",
             "spellscript": "null",
             "cooldown": 0,
+            "attributes": "",
+            "flags": "SPELL_FLAG_NEEDS_TARGET",
             "aura": {
                 "auraId": 3,
                 "name": "Blessing of Light",
@@ -74,7 +80,9 @@
             "damageclass": "Intellect",
             "effects": "SPELL_EFFECT_SCHOOL_DAMAGE",
             "spellscript": "null",
-            "cooldown": 0
+            "cooldown": 0,
+            "attributes": "",
+            "flags": "SPELL_FLAG_NEEDS_TARGET"
         },
         {
             "id": 5,
@@ -91,6 +99,8 @@
             "effects": "SPELL_EFFECT_APPLY_AURA",
             "spellscript": "null",
             "cooldown": 15,
+            "attributes": "",
+            "flags": "SPELL_FLAG_NEEDS_TARGET",
             "aura": {
                 "auraId": 5,
                 "name": "Power Word: Shield",

@@ -4,7 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting.Dependencies.Sqlite;
 using UnityEngine;
-using SpellFlags;
 using Mirror;
 using static UnityEditor.PlayerSettings;
 using Org.BouncyCastle.Asn1;
@@ -65,7 +64,7 @@ public class Spell : MonoBehaviour
 
         AttachSpellScript(spellId);
 
-        if (spellInfo.HasFlag("SPELL_FLAG_NEEDS_TARGET"))
+        if (spellInfo.HasFlag(SpellFlags.SPELL_FLAG_NEEDS_TARGET))
         {
             if (spellInfo.SpellTime == true && target != null)
             {

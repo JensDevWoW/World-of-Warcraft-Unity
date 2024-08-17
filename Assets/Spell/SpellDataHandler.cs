@@ -1,8 +1,48 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 [System.Serializable] // Allows this class to be serialized in JSON
+
+[System.Flags] // Add the Flags attribute to allow bitwise operations
+public enum SpellAttributes
+{
+    SPELL_ATTR_NONE = 0, // No attributes, default value
+    SPELL_ATTR_PASSIVE = 1 << 0, // 1 << 0 is 0000 0001
+    SPELL_ATTR_IS_CHANNELED = 1 << 1, // 1 << 1 is 0000 0010
+    SPELL_ATTR_ALLOW_WHILE_STEALTHED = 1 << 2, // 1 << 2 is 0000 0100
+    SPELL_ATTR_PREVENTS_ANIM = 1 << 3, // 1 << 3 is 0000 1000
+    SPELL_ATTR_IGNORE_LINE_OF_SIGHT = 1 << 4, // 1 << 4 is 0001 0000
+    SPELL_ATTR_NOT_AN_ACTION = 1 << 5, // 1 << 5 is 0010 0000
+    SPELL_ATTR_CANT_CRIT = 1 << 6, // 1 << 6 is 0100 0000
+    SPELL_ATTR_ALLOW_AURA_WHILE_DEAD = 1 << 7, // 1 << 7 is 1000 0000
+    SPELL_ATTR_ALLOW_CAST_WHILE_CASTING = 1 << 8,
+    SPELL_ATTR_AURA_IS_BUFF = 1 << 9,
+    SPELL_ATTR_NOT_IN_SPELLBOOK = 1 << 10,
+    SPELL_ATTR_REMOVE_ENTERING_ARENA = 1 << 11,
+    SPELL_ATTR_ALLOW_WHILE_FLEEING = 1 << 12,
+    SPELL_ATTR_ALLOW_WHILE_CONFUSED = 1 << 13,
+    SPELL_ATTR_HASTE_AFFECTS_DURATION = 1 << 14,
+    SPELL_ATTR_NOT_IN_BG_OR_ARENA = 1 << 15,
+    SPELL_ATTR_NOT_USABLE_IN_ARENA = 1 << 16,
+    SPELL_ATTR_REACTIVE_DAMAGE_PROC = 1 << 17,
+    SPELL_ATTR_IGNORE_GCD = 1 << 18,
+    SPELL_ATTR_BREAKABLE_BY_DAMAGE = 1 << 19
+    // Add more attributes as needed
+}
+
+[System.Flags]
+public enum SpellFlags
+{
+    SPELL_FLAG_NONE = 0, // No attributes, default value
+    SPELL_FLAG_CAST_WHILE_MOVING = 1 << 0,
+    SPELL_FLAG_AOE = 1 << 1,
+    SPELL_FLAG_NEEDS_TARGET = 1 << 2,
+
+}
+
+[System.Serializable]
 public class SpellData
 {
     public int id;
@@ -19,6 +59,8 @@ public class SpellData
     public string effects;
     public string spellscript;
     public int cooldown;
+    public string attributes;
+    public string flags;
     public AuraData aura;
 }
 
@@ -73,7 +115,6 @@ public class SpellDataHandler : MonoBehaviour
 
     void LoadSpellData()
     {
-        // Load the JSON file from the Resources folder
         TextAsset jsonData = Resources.Load<TextAsset>("SpellData");
 
         if (jsonData == null)
@@ -81,6 +122,8 @@ public class SpellDataHandler : MonoBehaviour
             Debug.LogError("Failed to load SpellData.json from Resources.");
             return;
         }
+
+        Debug.Log("Loaded JSON: " + jsonData.text);  // Print JSON content
 
         // Deserialize the JSON data into a SpellDataWrapper object
         SpellDataWrapper spellDataWrapper = JsonUtility.FromJson<SpellDataWrapper>(jsonData.text);
@@ -101,10 +144,12 @@ public class SpellDataHandler : MonoBehaviour
 
             List<SpellEffect> effects = ParseSpellEffects(spellData.effects);
 
-            SpellInfo spell = new SpellInfo(spellData.id, spellData.name, mask, type, spellData.manaCost, spellData.castTime, 
-                spellData.spellTime, spellData.speed, spellData.positive, spellData.basepoints, spellData.damageclass, effects, spellData.spellscript, spellData.cooldown);
+            SpellAttributes attributes = ParseSpellAttributes(spellData.attributes);
+            SpellFlags flags = ParseSpellFlags(spellData.flags);
 
-            // If the spell has an aura, create and add it
+            SpellInfo spell = new SpellInfo(spellData.id, spellData.name, mask, type, spellData.manaCost, spellData.castTime,
+                spellData.spellTime, spellData.speed, spellData.positive, spellData.basepoints, spellData.damageclass, effects, spellData.spellscript, spellData.cooldown, attributes, flags);
+
             if (spellData.aura != null && !string.IsNullOrEmpty(spellData.aura.name))
             {
                 AuraType auratype = GetAuraTypeFromString(spellData.aura.type);
@@ -118,6 +163,59 @@ public class SpellDataHandler : MonoBehaviour
         }
 
         Debug.Log("Successfully loaded and parsed spells.");
+    }
+
+
+    SpellAttributes ParseSpellAttributes(string attributesString)
+    {
+        SpellAttributes attributes = SpellAttributes.SPELL_ATTR_NONE;
+
+        if (!string.IsNullOrEmpty(attributesString))
+        {
+            string[] attributeNames = attributesString.Split(',');
+
+            foreach (var attribute in attributeNames)
+            {
+                string trimmedAttributeName = attribute.Trim();  // Use a new variable for the trimmed value
+
+                if (Enum.TryParse(trimmedAttributeName, out SpellAttributes parsedAttribute))
+                {
+                    attributes |= parsedAttribute;
+                }
+                else
+                {
+                    Debug.LogWarning($"Unknown SpellAttribute: {trimmedAttributeName}");
+                }
+            }
+        }
+
+        return attributes;
+    }
+
+    SpellFlags ParseSpellFlags(string flagsString)
+    {
+        SpellFlags flags = SpellFlags.SPELL_FLAG_NONE;
+
+        if (!string.IsNullOrEmpty(flagsString))
+        {
+            string[] flagNames = flagsString.Split(',');
+
+            foreach (var flag in flagNames)
+            {
+                string trimmedFlagName = flag.Trim();  // Use a new variable for the trimmed value
+
+                if (Enum.TryParse(trimmedFlagName, out SpellFlags parsedFlag))
+                {
+                    flags |= parsedFlag;
+                }
+                else
+                {
+                    Debug.LogWarning($"Unknown SpellAttribute: {trimmedFlagName}");
+                }
+            }
+        }
+
+        return flags;
     }
 
     public AuraInfo GetAuraInfo(int auraId)

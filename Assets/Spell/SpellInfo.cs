@@ -28,7 +28,9 @@ public class SpellInfo
 
     public List<SpellEffect> Effects { get; private set; }
 
-    public SpellInfo(int id, string name, SpellSchoolMask schoolMask, SpellType type, int manaCost, float castTime, bool spellTime, float speed, bool positive, int basePoints, string damageclass, List<SpellEffect> effects, string spellScript, int cooldown)
+    public SpellAttributes Attributes { get; private set; }
+    public SpellFlags Flags { get; private set; }
+    public SpellInfo(int id, string name, SpellSchoolMask schoolMask, SpellType type, int manaCost, float castTime, bool spellTime, float speed, bool positive, int basePoints, string damageclass, List<SpellEffect> effects, string spellScript, int cooldown, SpellAttributes attributes, SpellFlags flags)
     {
         Id = id;
         Name = name;
@@ -44,11 +46,16 @@ public class SpellInfo
         Effects = effects;
         SpellScript = spellScript;
         Cooldown = cooldown;
+        Attributes = attributes;
+        Flags = flags;
     }
 
-    public bool HasFlag(string flag)
+    public bool HasFlag(SpellFlags flag)
     {
-        return true;
+        if (Flags.HasFlag(flag))
+            return true;
+
+        return false;
     }
 
 }

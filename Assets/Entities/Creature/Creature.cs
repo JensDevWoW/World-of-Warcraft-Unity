@@ -15,7 +15,7 @@ public class Creature : MonoBehaviour
     public void Init()
     {
         unit = GetComponent<Unit>();
-        Unit target = unit.ToLocation().GetNearestEnemy();
+        Unit target = LocationHandler.Instance.GetNearestEnemy(unit);
         unit.SetTarget(target);
         AttachCreatureScript(creatureId);
     }

@@ -55,29 +55,34 @@ public class SpellEffectHandler
     // Example handler functions for different spell effects
     private void HandleSchoolDamage(Spell spell, Unit target)
     {
-        spell.caster.DealDamage(spell, target);
+        List<Unit> targets = spell.GetTargets();
+        foreach (Unit tar in targets)
+        {
+            spell.caster.DealDamage(spell, tar);
+        }
     }
 
     private void HandleCreateAreaTrigger(Spell spell, Unit target)
     {
-        Debug.Log($"Creating area trigger effect from spell {spell.spellId} at target {target.m_name}'s location.");
-        // Implement the logic for handling area triggers here
+        spell.caster.CreateAreaTriggerAndActivate(spell, target, spell.spellId, spell.trigger);
     }
 
     private void HandleApplyAura(Spell spell, Unit target)
     {
         Debug.Log($"Applying aura effect from spell {spell.spellId} to target {target.m_name}");
+        List<Unit> targets = spell.GetTargets();
+        foreach (Unit tar in targets)
+        {
+            // Create and initialize the Aura object
+            GameObject auraObject = new GameObject("AuraObject");
 
-        // Create and initialize the Aura object
-        GameObject auraObject = new GameObject("AuraObject");
+            Aura newAura = auraObject.AddComponent<Aura>();
+            AuraInfo auraInfo = SpellDataHandler.Instance.Auras.FirstOrDefault(aura => aura.Id == spell.spellId);
 
-        Aura newAura = auraObject.AddComponent<Aura>();
-        AuraInfo auraInfo = SpellDataHandler.Instance.Auras.FirstOrDefault(aura => aura.Id == spell.spellId);
+            auraObject.name = $"Aura: {auraInfo.Id}";
 
-        auraObject.name = $"Aura: {auraInfo.Id}";
-
-        newAura.Initialize(auraInfo, spell.caster, target, spell);
-
+            newAura.Initialize(auraInfo, spell.caster, tar, spell);
+        }
     }
 
     private void HandleDispel(Spell spell, Unit target)
@@ -106,7 +111,6 @@ public class SpellEffectHandler
 
     private void HandleDummyEffect(Spell spell, Unit target)
     {
-        Debug.Log($"Executing dummy effect from spell {spell.spellId} on target {target.m_name}");
-        // Implement the logic for dummy effect here
+        // Handled in SpellScripts
     }
 }

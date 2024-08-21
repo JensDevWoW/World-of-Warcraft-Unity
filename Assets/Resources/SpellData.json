@@ -16,7 +16,8 @@
             "spellscript": "null",
             "cooldown": 0,
             "attributes": "",
-            "flags": "SPELL_FLAG_NEEDS_TARGET"
+            "flags": "SPELL_FLAG_NEEDS_TARGET",
+            "range": 0
         },
         {
             "id": 2,
@@ -34,7 +35,8 @@
             "spellscript": "null",
             "cooldown": 0,
             "attributes": "",
-            "flags": "SPELL_FLAG_NEEDS_TARGET"
+            "flags": "SPELL_FLAG_NEEDS_TARGET",
+            "range": 0
         },
         {
             "id": 3,
@@ -53,6 +55,7 @@
             "cooldown": 0,
             "attributes": "",
             "flags": "SPELL_FLAG_NEEDS_TARGET",
+            "range": 0,
             "aura": {
                 "auraId": 3,
                 "name": "Blessing of Light",
@@ -82,7 +85,8 @@
             "spellscript": "null",
             "cooldown": 0,
             "attributes": "",
-            "flags": "SPELL_FLAG_NEEDS_TARGET"
+            "flags": "SPELL_FLAG_NEEDS_TARGET",
+            "range": 0
         },
         {
             "id": 5,
@@ -101,6 +105,58 @@
             "cooldown": 15,
             "attributes": "",
             "flags": "SPELL_FLAG_NEEDS_TARGET",
+            "range": 0,
+            "aura": {
+                "auraId": 5,
+                "name": "Power Word: Shield",
+                "duration": 15,
+                "stacks": 1,
+                "periodic": false,
+                "ticktime": 0,
+                "effects": "AURA_EFFECT_APPLY_ABSORB",
+                "positive": true,
+                "type": "Buff",
+                "aurascript": "null"
+            }
+        },
+        {
+            "id": 6,
+            "name": "Flamestrike",
+            "schoolMask": "Fire",
+            "type": "Damage",
+            "manaCost": 10,
+            "castTime": 1,
+            "spellTime": false,
+            "speed": 0,
+            "positive": false,
+            "basepoints": 15,
+            "damageclass": "Intellect",
+            "effects": "SPELL_EFFECT_SCHOOL_DAMAGE",
+            "spellscript": "Flamestrike",
+            "cooldown": 0,
+            "attributes": "",
+            "flags": "SPELL_FLAG_MOUSE_TARGET,SPELL_FLAG_MOUSE,SPELL_FLAG_AOE",
+            "range": 10
+
+        },
+        {
+            "id": 7,
+            "name": "Flamestrike",
+            "schoolMask": "Fire",
+            "type": "Aura",
+            "manaCost": 0,
+            "castTime": 0,
+            "spellTime": false,
+            "speed": 0,
+            "positive": false,
+            "basepoints": 5,
+            "damageclass": "Intellect",
+            "effects": "SPELL_EFFECT_APPLY_AURA",
+            "spellscript": "null",
+            "cooldown": 15,
+            "attributes": "SPELL_ATTR_ALLOW_CAST_WHILE_CASTING,SPELL_ATTR_NOT_IN_SPELLBOOK,SPELL_ATTR_IGNORE_GCD",
+            "flags": "SPELL_FLAG_NEEDS_TARGET",
+            "range": 0,
             "aura": {
                 "auraId": 5,
                 "name": "Power Word: Shield",

@@ -39,6 +39,9 @@ public enum SpellFlags
     SPELL_FLAG_CAST_WHILE_MOVING = 1 << 0,
     SPELL_FLAG_AOE = 1 << 1,
     SPELL_FLAG_NEEDS_TARGET = 1 << 2,
+    SPELL_FLAG_MOUSE = 1 << 3,
+    SPELL_FLAG_CONE = 1 << 4,
+    SPELL_FLAG_MOUSE_TARGET = 1 << 5,
 
 }
 
@@ -61,6 +64,7 @@ public class SpellData
     public int cooldown;
     public string attributes;
     public string flags;
+    public int range;
     public AuraData aura;
 }
 
@@ -123,8 +127,6 @@ public class SpellDataHandler : MonoBehaviour
             return;
         }
 
-        Debug.Log("Loaded JSON: " + jsonData.text);  // Print JSON content
-
         // Deserialize the JSON data into a SpellDataWrapper object
         SpellDataWrapper spellDataWrapper = JsonUtility.FromJson<SpellDataWrapper>(jsonData.text);
 
@@ -148,7 +150,7 @@ public class SpellDataHandler : MonoBehaviour
             SpellFlags flags = ParseSpellFlags(spellData.flags);
 
             SpellInfo spell = new SpellInfo(spellData.id, spellData.name, mask, type, spellData.manaCost, spellData.castTime,
-                spellData.spellTime, spellData.speed, spellData.positive, spellData.basepoints, spellData.damageclass, effects, spellData.spellscript, spellData.cooldown, attributes, flags);
+                spellData.spellTime, spellData.speed, spellData.positive, spellData.basepoints, spellData.damageclass, effects, spellData.spellscript, spellData.cooldown, attributes, flags, spellData.range);
 
             if (spellData.aura != null && !string.IsNullOrEmpty(spellData.aura.name))
             {
@@ -225,7 +227,6 @@ public class SpellDataHandler : MonoBehaviour
 
     AuraType GetAuraTypeFromString(string typeName)
     {
-        Debug.Log($"Parsing AuraType from string: '{typeName}'");
         typeName = typeName.Trim();  // Trims any extra whitespace
         switch (typeName)
         {

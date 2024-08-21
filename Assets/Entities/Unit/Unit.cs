@@ -25,6 +25,7 @@ public class Unit : MonoBehaviour
     private List<Spell> spellList = new List<Spell>();
     private List<Aura> auraList = new List<Aura>();
     private List<Unit> combatList = new List<Unit>();
+    private List<AreaTrigger> areaTriggers = new List<AreaTrigger>();
 
     // Data
     public string m_name = "Voreli";
@@ -52,7 +53,7 @@ public class Unit : MonoBehaviour
     {
         // Get the NetworkIdentity component attached to the same GameObject
         Identity = GetComponent<NetworkIdentity>();
-        locationHandler = GetComponent<LocationHandler>();
+        locationHandler = LocationHandler.Instance;
 
         creature = GetComponent<Creature>();
 
@@ -112,6 +113,10 @@ public class Unit : MonoBehaviour
         m_combatTimer = 6;
     }
 
+    public int GetMap()
+    {
+        return 1;
+    }
     public void SetInCombatWith(Unit unit)
     {
         if (!IsHostileTo(unit))
@@ -162,18 +167,6 @@ public class Unit : MonoBehaviour
 
         if (!preparing)
             StopCasting();
-
-        // Creature Update
-        /*if (ToCreature())
-        {
-            ToCreature().Update();
-        }*/
-
-        /* Aura Update
-        for (int i = 0; i < auraList.Count; i++)
-        {
-            auraList[i].Update();
-        }*/
 
         // Mana Tick
         if (GetMana() < GetMaxMana())
@@ -254,7 +247,7 @@ public class Unit : MonoBehaviour
         spellList.Add(spell);
     }
 
-    public Spell CreateSpellAndPrepare(int spellId, GameObject spellPrefab)
+    public Spell CreateSpellAndPrepare(int spellId, GameObject spellPrefab, GameObject triggerPrefab)
     {
         SpellInfo info = SpellDataHandler.Instance.Spells.FirstOrDefault(spell => spell.Id == spellId);
 
@@ -269,7 +262,7 @@ public class Unit : MonoBehaviour
 
         DontDestroyOnLoad(spellObject);
 
-        newSpell.Initialize(spellId, this, info);
+        newSpell.Initialize(spellId, this, info, triggerPrefab);
         //SpellManager.Instance.AddSpell(newSpell);
 
         newSpell.prepare();
@@ -279,6 +272,61 @@ public class Unit : MonoBehaviour
 
         // Network-related: If you need the spell object to be networked
         //NetworkServer.Spawn(spellObject);
+    }
+
+    public Spell CreateSpellAndPrepare(int spellId, GameObject spellPrefab, GameObject triggerPrefab, Vector3 position)
+    {
+        SpellInfo info = SpellDataHandler.Instance.Spells.FirstOrDefault(spell => spell.Id == spellId);
+
+        // Instantiate the prefab instead of creating a new GameObject
+        GameObject spellObject = Instantiate(spellPrefab);
+
+        // Set the name of the cloned object if needed
+        spellObject.name = $"{spellId}";
+
+        // Get the Spell component from the instantiated prefab
+        Spell newSpell = spellObject.GetComponent<Spell>();
+
+        DontDestroyOnLoad(spellObject);
+
+        newSpell.Initialize(spellId, this, info, triggerPrefab);
+        newSpell.position = position;
+
+        newSpell.prepare();
+
+        AddSpellToList(newSpell);
+        return newSpell;
+
+        // Network-related: If you need the spell object to be networked
+        //NetworkServer.Spawn(spellObject);
+    }
+
+    public void CreateAreaTriggerAndActivate(Spell spell, Unit target, int spellId, GameObject triggerPrefab)
+    {
+        AreaTriggerInfo info = AreaTriggerDataHandler.Instance.AreaTriggers.FirstOrDefault(spell => spell.Id == spellId);
+
+        // Instantiate the prefab instead of creating a new GameObject
+        GameObject triggerObject = Instantiate(triggerPrefab);
+
+        // Set the name of the cloned object if needed
+        triggerObject.name = $"{spellId}";
+
+        // Get the Spell component from the instantiated prefab
+        AreaTrigger newTrigger = triggerObject.GetComponent<AreaTrigger>();
+
+        DontDestroyOnLoad(triggerObject);
+
+        newTrigger.Initialize(spell.caster, spell, info);
+        //SpellManager.Instance.AddSpell(newSpell);
+
+        newTrigger.Activate();
+
+        spell.caster.AddTriggerToList(newTrigger);
+    }
+
+    public void AddTriggerToList(AreaTrigger newTrigger)
+    {
+        areaTriggers.Add(newTrigger);
     }
     public float GetHealth()
     {
@@ -422,7 +470,7 @@ public class Unit : MonoBehaviour
 
         DontDestroyOnLoad(spellObject);
 
-        newSpell.Initialize(spellId, this, info);
+        newSpell.Initialize(spellId, this, info, GNM.triggerPrefab);
         //SpellManager.Instance.AddSpell(newSpell);
 
         newSpell.prepare();

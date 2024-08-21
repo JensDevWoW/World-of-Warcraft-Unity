@@ -26,7 +26,7 @@ public class Spell : MonoBehaviour
     public float GCD = 1.5f;
     public bool AnimationEnabled = true;
     public bool IsSpellQueueSpell;
-    public Vector3 AoEPosition;
+    public Vector3 position;
     public bool VOC;
     public float m_spellTime = 0f;
     public float m_initialSpellTime = 0f;
@@ -36,12 +36,13 @@ public class Spell : MonoBehaviour
     public int m_manaCost;
     public int cooldownTime;
     public float cooldownLeft;
-
+    public GameObject trigger;
     public SpellEffectHandler effectHandler {  get; protected set; }
 
     private SpellScript spellScript;
 
-    public void Initialize(int spellId, Unit caster, SpellInfo spellInfo)
+    private List<Unit> targetList;
+    public void Initialize(int spellId, Unit caster, SpellInfo spellInfo, GameObject triggerObject)
     {
         if (spellInfo == null || caster == null)
         {
@@ -51,8 +52,12 @@ public class Spell : MonoBehaviour
 
         this.spellId = spellId;
         this.caster = caster;
+        this.targetList = new List<Unit>();
         if (caster.HasTarget())
+        {
             this.target = caster.GetTarget();
+            targetList.Add(target);
+        }
         this.m_spellInfo = spellInfo;
 
         this.CastTime = spellInfo.CastTime;
@@ -61,6 +66,7 @@ public class Spell : MonoBehaviour
         this.m_manaCost = spellInfo.ManaCost;
         this.cooldownTime = spellInfo.Cooldown;
         this.cooldownLeft = spellInfo.Cooldown;
+        this.trigger = triggerObject;
 
         AttachSpellScript(spellId);
 
@@ -68,7 +74,7 @@ public class Spell : MonoBehaviour
         {
             if (spellInfo.SpellTime == true && target != null)
             {
-                float distance = caster.ToLocation().GetDistanceFrom(target);
+                float distance = LocationHandler.Instance.GetDistanceFrom(caster,target);
                 float travelTime = distance / spellInfo.Speed;
 
                 this.m_spellTime = travelTime;
@@ -122,7 +128,7 @@ public class Spell : MonoBehaviour
 
                     m_elapsedTime += Time.deltaTime;
                     float distanceTraveled = m_speed * m_elapsedTime;
-                    float totalDistance = caster.ToLocation().GetDistanceFrom(target);
+                    float totalDistance = LocationHandler.Instance.GetDistanceFrom(caster, target);
                     float remainingDistance = totalDistance - distanceTraveled;
 
                     if (remainingDistance <= m_minDistanceToTarget)
@@ -213,10 +219,15 @@ public class Spell : MonoBehaviour
                 if (caster.IsHostileTo(target))
                     if (isPositive) { target = caster; }
             }
-            else // We have no target, check if positive spell, cast on self
-                if (isPositive) { target = caster; }
+            else
+            {// We have no target, check if positive spell, cast on self
+                if (isPositive)
+                {
+                    target = caster;
+                }
+            }
         
-        if (caster && target)
+        if (caster)
         {
             isPreparing = true;
 
@@ -241,7 +252,12 @@ public class Spell : MonoBehaviour
 
     public bool NeedsTarget()
     {
-        return true;
+        return HasFlag(SpellFlags.SPELL_FLAG_NEEDS_TARGET);
+    }
+
+    public bool HasFlag(SpellFlags flag)
+    {
+        return m_spellInfo.HasFlag(flag);
     }
 
     private void HandleFailed(string reason)
@@ -282,6 +298,9 @@ public class Spell : MonoBehaviour
 
         if (caster.IsCasting())
             return "casting";
+
+        if (NeedsTarget() && target == null)
+            return "target";
 
         return "";
     }
@@ -326,6 +345,61 @@ public class Spell : MonoBehaviour
         return m_spellState;
     }
 
+    public List<Unit> GetTargets()
+    {
+        return targetList;
+    }
+
+    public List<Unit> SelectSpellTargets()
+    {
+        bool needsTarget = NeedsTarget();
+        bool posNeg = isPositive;
+
+        // Add the primary target if needed
+        if (needsTarget && target != null && target.IsAlive())
+        {
+            targetList.Add(target);
+        }
+
+        // Add the caster if the spell is positive (buff or self-cast)
+        if (posNeg)
+        {
+            targetList.Add(caster);
+        }
+
+        // Check for AoE, mouse targeting, and cone targeting flags
+        bool hasAoE = HasFlag(SpellFlags.SPELL_FLAG_AOE);
+        bool hasMouse = HasFlag(SpellFlags.SPELL_FLAG_MOUSE);
+        bool hasCone = HasFlag(SpellFlags.SPELL_FLAG_CONE);
+        Vector3 pos = position;
+        int range = m_spellInfo.Range;
+        LocationHandler LH = LocationHandler.Instance;
+        if (hasAoE)
+        {
+            if (hasMouse)
+            {
+                // Get enemies near the specified position (mouse-click position)
+                targetList = LH.GetNearestEnemiesFromPosition(caster, pos, range);
+            }
+            else if (needsTarget)
+            {
+                // Get enemies near the primary target
+                targetList = LH.GetNearestEnemyUnitsFromUnit(caster, target, range);
+            }
+            else
+            {
+                // Get enemies near the caster
+                targetList = LH.GetNearestEnemyUnitList(caster, range);
+            }
+        }
+        else if (hasCone)
+        {
+            // Get enemies in a cone in front of the caster
+            targetList = LH.GetEnemiesInCone(caster, 30, range);
+        }
+
+        return targetList;
+    }
     private void SendSpellStartPacket()
     {
         // Ensure Caster and Target are not null before proceeding
@@ -351,7 +425,7 @@ public class Spell : MonoBehaviour
         writer.WriteInt(spellId);
         writer.WriteBool(AnimationEnabled);
         writer.WriteBool(IsSpellQueueSpell);
-        writer.WriteVector3(AoEPosition);
+        writer.WriteVector3(position);
         writer.WriteBool(VOC);
 
         OpcodeMessage msg = new OpcodeMessage
@@ -387,7 +461,7 @@ public class Spell : MonoBehaviour
         writer.WriteFloat(m_speed);
         writer.WriteFloat(m_spellTime); 
         writer.WriteBool(AnimationEnabled); 
-        writer.WriteVector3(AoEPosition);
+        writer.WriteVector3(position);
         writer.WriteInt(m_manaCost);
 
         // Determine the VOC value based on spell conditions
@@ -428,7 +502,7 @@ public class Spell : MonoBehaviour
     {
         if (!caster)
             { return; }
-        //SelectSpellTargets();
+        SelectSpellTargets();
 
         if (HasHitDelay())
             m_spellState = SPELL_STATE_DELAYED;
@@ -449,15 +523,25 @@ public class Spell : MonoBehaviour
         if (!caster)
             { return; }
 
-        if ((NeedsTarget() && !target)) // || !caster.IsWithinLOS(target))
+        if (NeedsTarget())
         {
-            //HandleFailed("target");
-            //m_spellState = SPELL_STATE_FAILED;
-            //caster.CancelCast(this);
-            //return;
+            if (!target) // || !caster.IsWithinLOS(target))
+            {
+                //HandleFailed("target");
+                //m_spellState = SPELL_STATE_FAILED;
+                //caster.CancelCast(this);
+                //return;
+            }
+            else if(!target.IsAlive())
+            {
+                //HandleFailed("dead_target");
+                //m_spellState = SPELL_STATE_FAILED;
+                //caster.CancelCast(this);
+                //return;
+            }
         }
 
-        if (!target.IsAlive() || !caster.IsAlive())
+        if (!caster.IsAlive())
         {
             //HandleFailed("dead_target");
             //m_spellState = SPELL_STATE_FAILED;

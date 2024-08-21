@@ -3,7 +3,12 @@ guid: 49c1de344b939ad4dab16b95b9309154
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - transport: {instanceID: 0}
+  - authenticator: {instanceID: 0}
+  - playerPrefab: {instanceID: 0}
+  - spellPrefab: {fileID: 1353114717283006080, guid: 01e1422d3bb62cd45afc9d8dd8d83afd, type: 3}
+  - triggerPrefab: {fileID: 3920085043327381962, guid: 09f6fe6dc687b6d458d70a442b9cd681, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

@@ -8,7 +8,7 @@ public class GameNetworkManager : NetworkManager
 {
     private OpcodeHandler opcodeHandler;
     public GameObject spellPrefab;
-
+    public GameObject triggerPrefab;
     public override void OnStartServer()
     {
         opcodeHandler = new OpcodeHandler();
@@ -33,8 +33,27 @@ public class GameNetworkManager : NetworkManager
         int spellId = reader.ReadInt();
         Unit caster = conn.identity.GetComponent<Unit>();
 
-        Spell spell = caster.CreateSpellAndPrepare(spellId, spellPrefab);
+        // Read each component of the Vector3 position
+        float x = reader.ReadFloat();
+        float y = reader.ReadFloat();
+        float z = reader.ReadFloat();
+
+        // Reconstruct the Vector3 position
+        Vector3 position = new Vector3(x, y, z);
+
+        Debug.Log($"Received AoE Spell: ID={spellId}, Position=({x}, {y}, {z})");
+
+        if (position != Vector3.zero)
+        {
+            caster.CreateSpellAndPrepare(spellId, spellPrefab, triggerPrefab, position);
+        }
+        else
+        {
+            Debug.LogWarning("Invalid position received from client.");
+            caster.CreateSpellAndPrepare(spellId, spellPrefab, triggerPrefab);
+        }
     }
+
 
     private void HandleSelectTarget(NetworkConnection conn, NetworkReader reader)
     {

@@ -1,0 +1,12 @@
+{
+    "areaTriggers": [
+        {
+            "id": 6,
+            "name": "Trigger1",
+            "distance": 5.0,
+            "duration": 10.0,
+            "attributes": "AREA_TRIGGER_ATTR_PERSISTENT, AREA_TRIGGER_ATTR_VISIBLE",
+            "flags": "AREA_TRIGGER_FLAG_TRIGGERS_ON_ENTER"
+        }
+    ]
+}

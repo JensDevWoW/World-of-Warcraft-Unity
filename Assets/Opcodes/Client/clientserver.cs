@@ -49,7 +49,7 @@ public class ClientNetworkManager : MonoBehaviour
         if (casterIdentity.netId == NetworkClient.localPlayer.netId)
         {
             // Find the Canvas that holds the CastBar
-            Canvas canvas = FindObjectOfType<Canvas>();
+            GameObject canvas = GameObject.FindWithTag("Canvas");
 
             if (canvas != null)
             {
@@ -134,9 +134,11 @@ public class ClientNetworkManager : MonoBehaviour
 
         Unit sender = networkIdentity.GetComponent<Unit>();
 
-        Canvas canvas = FindObjectOfType<Canvas>();
+        GameObject canvas = GameObject.FindWithTag("Canvas");
+
         if (!canvas)
             Debug.LogError("CANNOT FIND CANVAS!");
+
         if (networkIdentity.netId == NetworkClient.localPlayer.netId)
         {
             if (statChanged == "health")

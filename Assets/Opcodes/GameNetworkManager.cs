@@ -32,26 +32,14 @@ public class GameNetworkManager : NetworkManager
     {
         int spellId = reader.ReadInt();
         Unit caster = conn.identity.GetComponent<Unit>();
-
-        // Read each component of the Vector3 position
-        float x = reader.ReadFloat();
-        float y = reader.ReadFloat();
-        float z = reader.ReadFloat();
-
-        // Reconstruct the Vector3 position
-        Vector3 position = new Vector3(x, y, z);
-
-        Debug.Log($"Received AoE Spell: ID={spellId}, Position=({x}, {y}, {z})");
-
-        if (position != Vector3.zero)
+        Vector3 position = reader.ReadVector3();
+        if (position != null)
         {
             caster.CreateSpellAndPrepare(spellId, spellPrefab, triggerPrefab, position);
+            return;
         }
-        else
-        {
-            Debug.LogWarning("Invalid position received from client.");
-            caster.CreateSpellAndPrepare(spellId, spellPrefab, triggerPrefab);
-        }
+
+        Spell spell = caster.CreateSpellAndPrepare(spellId, spellPrefab, triggerPrefab);
     }
 
 

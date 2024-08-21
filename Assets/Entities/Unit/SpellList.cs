@@ -7,11 +7,13 @@ public class SpellList
     public KeyCode KeyCode { get; }
     public bool IsAoE { get; } // Add this property to identify AoE spells
 
-    public SpellList(string name, int spellId, KeyCode keyCode, bool isAoE = false)
+    public Vector3 Position;
+    public SpellList(string name, int spellId, KeyCode keyCode, bool isAoE = false, Vector3 position = default)
     {
         Name = name;
         SpellId = spellId;
         KeyCode = keyCode;
         IsAoE = isAoE;
+        Position = position;
     }
 }

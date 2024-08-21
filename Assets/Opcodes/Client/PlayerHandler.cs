@@ -7,7 +7,6 @@ public class PlayerInput : NetworkBehaviour
     private List<SpellList> spellbook = new List<SpellList>();  // List to store spells
     private bool awaitingAoETarget = false;
     private SpellList currentAoESpell;
-
     void Start()
     {
         KeyBindManager.LoadKeyBinds();
@@ -27,11 +26,12 @@ public class PlayerInput : NetworkBehaviour
         if (awaitingAoETarget && Input.GetMouseButtonDown(0))
         {
             // Handle mouse click for AoE spell target position
-            Vector3 targetPosition = GetMousePositionOnGround();
-            Debug.Log($"Casting AoE {currentAoESpell.Name} with ID {currentAoESpell.SpellId} at position {targetPosition}");
-            SendAoESpell(currentAoESpell, targetPosition);
+            Vector3 position = GetMousePositionOnGround();
+            currentAoESpell.Position = position;
+            SendOpcode(currentAoESpell);
             awaitingAoETarget = false;
             currentAoESpell = null;
+            return;
         }
 
         foreach (var spell in spellbook)
@@ -72,59 +72,26 @@ public class PlayerInput : NetworkBehaviour
 
 
 
-    private void SendAoESpell(SpellList spell, Vector3 position)
+    private void SendOpcode(SpellList spell)
     {
         NetworkWriter writer = new NetworkWriter();
 
-        // Serialize data dynamically
         writer.WriteInt(spell.SpellId);
-        writer.WriteString(spell.Name);
+        writer.WriteVector3(spell.Position);
 
-        // Write each component of the Vector3 position
-        float x = position.x;
-        float y = position.y;
-        float z = position.z;
-        writer.WriteFloat(x);
-        writer.WriteFloat(y);
-        writer.WriteFloat(z);
-
-        Debug.Log($"Sending AoE Spell: ID={spell.SpellId}, Name={spell.Name}, Position=({x}, {y}, {z})");
-
-        // Create the opcode message
         OpcodeMessage msg = new OpcodeMessage
         {
             opcode = Opcodes.CMSG_CAST_SPELL,
             payload = writer.ToArray()
         };
 
-        // Send the message to the server
-        NetworkClient.Send(msg);
-    }
-
-
-    private void SendOpcode(SpellList spell)
-    {
-        NetworkWriter writer = new NetworkWriter();
-
-        // Serialize data dynamically
-        writer.WriteInt(spell.SpellId);
-        writer.WriteString(spell.Name);
-
-        // Create the opcode message
-        OpcodeMessage msg = new OpcodeMessage
-        {
-            opcode = Opcodes.CMSG_CAST_SPELL, // Example opcode, define your opcode logic
-            payload = writer.ToArray()
-        };
-
-        // Send the message to the server
         CmdSendOpcode(msg);
     }
+
 
     [Command]
     private void CmdSendOpcode(OpcodeMessage msg)
     {
-        // Send the opcode message to the server
         NetworkClient.Send(msg);
     }
 

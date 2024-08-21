@@ -53,11 +53,6 @@ public class Spell : MonoBehaviour
         this.spellId = spellId;
         this.caster = caster;
         this.targetList = new List<Unit>();
-        if (caster.HasTarget())
-        {
-            this.target = caster.GetTarget();
-            targetList.Add(target);
-        }
         this.m_spellInfo = spellInfo;
 
         this.CastTime = spellInfo.CastTime;
@@ -409,11 +404,6 @@ public class Spell : MonoBehaviour
             return;
         }
 
-        if (target == null || target.Identity == null)
-        {
-            Debug.LogWarning("Target or Target's NetworkIdentity is null. Sending spell start packet without a target.");
-        }
-
         NetworkWriter writer = new NetworkWriter();
 
         // Writing data to the NetworkWriter
@@ -444,11 +434,6 @@ public class Spell : MonoBehaviour
         {
             Debug.LogError("Caster or Caster's NetworkIdentity is null. Cannot send spell go packet.");
             return;
-        }
-
-        if (target == null || target.Identity == null)
-        {
-            Debug.LogWarning("Target or Target's NetworkIdentity is null. Sending spell go packet without a target.");
         }
 
         NetworkWriter writer = new NetworkWriter();
@@ -552,7 +537,16 @@ public class Spell : MonoBehaviour
         SendSpellGo();
         HandleMana();
         if (IsNegative())
-            caster.SetInCombatWith(target);
+        {
+            foreach (Unit target in targetList)
+            {
+                if (target != null)
+                {
+                    caster.SetInCombatWith(target);
+                }
+            }
+        }
+            
 
         SetOnCooldown();
 

@@ -10,6 +10,7 @@ using Org.BouncyCastle.Asn1;
 using UnityEditor.UI;
 using Unity.VisualScripting;
 using System;
+using UnityEngine.UIElements;
 
 public class Spell : MonoBehaviour
 {
@@ -54,7 +55,7 @@ public class Spell : MonoBehaviour
         this.caster = caster;
         this.targetList = new List<Unit>();
         this.m_spellInfo = spellInfo;
-
+        this.target = caster.GetTarget();
         this.CastTime = spellInfo.CastTime;
         this.isPositive = spellInfo.Positive;
         this.m_speed = spellInfo.Speed;
@@ -345,6 +346,14 @@ public class Spell : MonoBehaviour
         return targetList;
     }
 
+    public Unit GetTarget()
+    {
+        if (targetList.Count == 1)
+            return targetList[0];
+        else
+            return null;
+    }
+
     public List<Unit> SelectSpellTargets()
     {
         bool needsTarget = NeedsTarget();
@@ -409,6 +418,7 @@ public class Spell : MonoBehaviour
         // Writing data to the NetworkWriter
         writer.WriteInt(CastFlags);
         writer.WriteNetworkIdentity(caster.Identity); // Use Caster's NetworkIdentity
+        // TODO: Somehow put an array in this bith
         writer.WriteNetworkIdentity(target != null ? target.Identity : null); // Use Target's NetworkIdentity, if available
         writer.WriteFloat(CastTime);
         writer.WriteFloat(GCD);
@@ -512,26 +522,26 @@ public class Spell : MonoBehaviour
         {
             if (!target) // || !caster.IsWithinLOS(target))
             {
-                //HandleFailed("target");
-                //m_spellState = SPELL_STATE_FAILED;
+                HandleFailed("target");
+                m_spellState = SPELL_STATE_NULL;
                 //caster.CancelCast(this);
-                //return;
+                return;
             }
             else if(!target.IsAlive())
             {
-                //HandleFailed("dead_target");
-                //m_spellState = SPELL_STATE_FAILED;
+                HandleFailed("dead_target");
+                m_spellState = SPELL_STATE_NULL;
                 //caster.CancelCast(this);
-                //return;
+                return;
             }
         }
 
         if (!caster.IsAlive())
         {
-            //HandleFailed("dead_target");
-            //m_spellState = SPELL_STATE_FAILED;
+            HandleFailed("dead_target");
+            m_spellState = SPELL_STATE_NULL;
             //caster.CancelCast(this);
-            //return;
+            return;
         }
 
         SendSpellGo();

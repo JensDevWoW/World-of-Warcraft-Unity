@@ -10,5 +10,6 @@ public class Opcodes
     public const int SMSG_SEND_COMBAT_TEXT = 3;
     public const int CMSG_SELECT_TARGET = 4;
     public const int SMSG_UPDATE_STAT = 5;
+    public const int SMSG_AURA_UPDATE = 6;
 }
 

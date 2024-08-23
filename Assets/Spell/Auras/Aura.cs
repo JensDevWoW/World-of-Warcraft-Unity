@@ -18,7 +18,9 @@ public class Aura : MonoBehaviour
 
     public float m_tickTime { get; private set; }
 
-    public float m_stacks { get; private set; }
+    public int m_stacks { get; private set; }
+    public int m_maxStacks { get; private set; }
+    public bool m_stackable = false;
     private float m_timeBetweenTicks;
     private bool finished = false;
     public bool m_effectHit = false;
@@ -33,7 +35,9 @@ public class Aura : MonoBehaviour
         this.caster = caster;
         this.spell = spell;
         this.m_stacks = auraInfo.Stacks;
-
+        this.m_maxStacks = auraInfo.Stacks;
+        if (auraInfo.Stacks > 1)
+            this.m_stackable = true;
         this.m_isPeriodic = auraInfo.Periodic;
         this.m_hasTimer = duration < 9999;
         this.m_tickTime = auraInfo.TickTime;
@@ -64,13 +68,14 @@ public class Aura : MonoBehaviour
             CancelEffects();
 
             // TODO: Handle OnRemove aurascript
-            // auraInfo.AuraScript.OnRemove();
+            //auraInfo.AuraScript.OnRemove();
             finished = true;
             // Remove the aura from the target's aura list
             target.DestAura(this);
 
             // Destroy the aura object
             Destroy(gameObject);
+            UpdateClient();
             print("Aura has dropped off!");
         }
 
@@ -86,7 +91,15 @@ public class Aura : MonoBehaviour
     {
         // Reset the duration to the original value
         duration = auraInfo.Duration;
-        Debug.Log($"{auraInfo.Name} refreshed for {target.name}");
+        UpdateClient();
+    }
+
+    public void AddStack()
+    {
+        if (m_stacks < m_maxStacks)
+            m_stacks++;
+
+        Refresh();
     }
 
     public void DropStack()
@@ -94,6 +107,7 @@ public class Aura : MonoBehaviour
         // drop stacks by 1
         if (m_stacks > 0)
             m_stacks--;
+        UpdateClient();
     }
 
     public void DropStacks()
@@ -101,12 +115,40 @@ public class Aura : MonoBehaviour
         // drop stacks by 1
         if (m_stacks > 0)
             m_stacks = 0;
+        UpdateClient();
     }
 
     public Spell ToSpell()
     {
         return spell;
     }
+
+    public void UpdateClient()
+    {
+        // Ensure Caster is not null before proceeding
+        if (caster == null || caster.Identity == null)
+        {
+            Debug.LogError("Caster or Caster's NetworkIdentity is null. Cannot send spell start packet.");
+            return;
+        }
+
+        NetworkWriter writer = new NetworkWriter();
+
+        writer.WriteNetworkIdentity(caster.Identity); // Caster
+        writer.WriteNetworkIdentity(target.Identity); // Target
+        writer.WriteInt(auraInfo.Id);
+        writer.WriteFloat(duration);
+        writer.WriteInt(m_stacks);
+
+        OpcodeMessage packet = new OpcodeMessage
+        {
+            opcode = Opcodes.SMSG_AURA_UPDATE,
+            payload = writer.ToArray()
+        };
+
+        NetworkServer.SendToAll(packet);
+    }
+
     void Update()
     {
         if (finished)
@@ -128,6 +170,10 @@ public class Aura : MonoBehaviour
             {
                 HandleEffects();
                 m_timeBetweenTicks = m_tickTime; // Reset tick timer;
+
+                // Custom handle for Agony, stacks will continue up to 10
+                if (m_stacks < 10 && auraInfo.Id == 100 /* agony ID placeholder */)
+                    AddStack();
             }
         }
         if (duration > 0)

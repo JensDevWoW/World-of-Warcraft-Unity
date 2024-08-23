@@ -1,5 +1,6 @@
 using Mirror;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class ClientNetworkManager : MonoBehaviour
@@ -15,7 +16,7 @@ public class ClientNetworkManager : MonoBehaviour
         opcodeHandler.RegisterHandler(Opcodes.SMSG_SPELL_GO,            HandleSpellGo);
         opcodeHandler.RegisterHandler(Opcodes.SMSG_SEND_COMBAT_TEXT,    HandleCombatText);
         opcodeHandler.RegisterHandler(Opcodes.SMSG_UPDATE_STAT,         HandleUpdateStat);
-
+        opcodeHandler.RegisterHandler(Opcodes.SMSG_AURA_UPDATE,         HandleAuraUpdate);
         // Register the OpcodeMessage handler on the client
         NetworkClient.RegisterHandler<OpcodeMessage>(OnOpcodeMessageReceived);
     }
@@ -48,29 +49,7 @@ public class ClientNetworkManager : MonoBehaviour
 
         if (casterIdentity.netId == NetworkClient.localPlayer.netId)
         {
-            // Find the Canvas that holds the CastBar
-            GameObject canvas = GameObject.FindWithTag("Canvas");
-
-            if (canvas != null)
-            {
-                // Find the CastBar within the Canvas
-                CastBar castBarController = canvas.GetComponent<CastBar>();
-
-                if (castBarController != null)
-                {
-                    // Start the cast bar with the appropriate duration and spell name
-                    string spellName = GetSpellNameById(spellId);
-                    castBarController.StartCast(castTime, spellName);
-                }
-                else
-                {
-                    Debug.LogWarning("CastBar not found in the Canvas.");
-                }
-            }
-            else
-            {
-                Debug.LogWarning("Canvas not found in the scene.");
-            }
+            UIHandler.Instance.StartCast(castTime, GetSpellNameById(spellId));
         }
 
     }
@@ -143,13 +122,32 @@ public class ClientNetworkManager : MonoBehaviour
         {
             if (statChanged == "health")
             {
-                HealthBar healthBarController = canvas.GetComponent<HealthBar>();
-                if (!healthBarController)
-                    Debug.LogError("No Healthbar controller found!");
-
-                healthBarController.UpdateHealth(statValue, maxStatValue);
+                UIHandler.Instance.UpdateHealth(statValue, maxStatValue);
             }
         }
+    }
+
+    private void HandleAuraUpdate(NetworkReader reader)
+    {
+        NetworkIdentity casterIdentity = reader.ReadNetworkIdentity();
+        NetworkIdentity targetIdentity = reader.ReadNetworkIdentity();
+        
+
+        Unit caster = casterIdentity.GetComponent<Unit>();
+        Unit target = targetIdentity.GetComponent<Unit>();
+
+        if (casterIdentity.netId == NetworkClient.localPlayer.netId)
+        {
+            // We are caster
+        }
+        else if (targetIdentity.netId == NetworkClient.localPlayer.netId)
+        {
+            // We are target
+        }
+        
+
+        // This stuff needs to be run regardless
+        
     }
 
     private void HandleCombatText(NetworkReader reader)

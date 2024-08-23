@@ -33,7 +33,7 @@ public class GameNetworkManager : NetworkManager
         int spellId = reader.ReadInt();
         Unit caster = conn.identity.GetComponent<Unit>();
         Vector3 position = reader.ReadVector3();
-        if (position != null)
+        if (position != Vector3.zero)
         {
             caster.CreateSpellAndPrepare(spellId, spellPrefab, triggerPrefab, position);
             return;

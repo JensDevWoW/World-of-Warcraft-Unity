@@ -17,7 +17,7 @@ public class AuraInfo
 
     public float TickTime { get; private set; }
 
-    public float Stacks { get; private set; }
+    public int Stacks { get; private set; }
 
     public int BasePoints { get; private set; }
 

@@ -524,14 +524,14 @@ public class Spell : MonoBehaviour
             {
                 HandleFailed("target");
                 m_spellState = SPELL_STATE_NULL;
-                //caster.CancelCast(this);
+                caster.CancelCast(this);
                 return;
             }
             else if(!target.IsAlive())
             {
                 HandleFailed("dead_target");
                 m_spellState = SPELL_STATE_NULL;
-                //caster.CancelCast(this);
+                caster.CancelCast(this);
                 return;
             }
         }
@@ -540,7 +540,7 @@ public class Spell : MonoBehaviour
         {
             HandleFailed("dead_target");
             m_spellState = SPELL_STATE_NULL;
-            //caster.CancelCast(this);
+            caster.CancelCast(this);
             return;
         }
 

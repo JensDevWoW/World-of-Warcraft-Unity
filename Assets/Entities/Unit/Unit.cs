@@ -88,6 +88,33 @@ public class Unit : MonoBehaviour
         return m_maxMana;
     }
 
+    public void CancelCast(Spell spell)
+    {
+        foreach (Spell sp in spellList)
+        {
+            if (sp == spell)
+                spellList.Remove(sp);
+            StopCasting();
+            SendCancelCastOpcode(spell);
+        }
+    }
+
+    public void SendCancelCastOpcode(Spell spell)
+    {
+        NetworkWriter writer = new NetworkWriter();
+
+        writer.WriteNetworkIdentity(Identity);
+        writer.WriteInt(spell.m_spellInfo.Id);
+
+        OpcodeMessage packet = new OpcodeMessage
+        {
+            opcode = Opcodes.SMSG_CAST_CANCELED,
+            payload = writer.ToArray()
+        };
+
+        NetworkServer.SendToAll(packet);
+    }
+
     public bool IsInCombat()
     {
         return m_combatTimer > 0; 

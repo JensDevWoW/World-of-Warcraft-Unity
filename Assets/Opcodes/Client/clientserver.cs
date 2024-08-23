@@ -17,6 +17,7 @@ public class ClientNetworkManager : MonoBehaviour
         opcodeHandler.RegisterHandler(Opcodes.SMSG_SEND_COMBAT_TEXT,    HandleCombatText);
         opcodeHandler.RegisterHandler(Opcodes.SMSG_UPDATE_STAT,         HandleUpdateStat);
         opcodeHandler.RegisterHandler(Opcodes.SMSG_AURA_UPDATE,         HandleAuraUpdate);
+        opcodeHandler.RegisterHandler(Opcodes.SMSG_CAST_CANCELED,       HandleCancelCast);
         // Register the OpcodeMessage handler on the client
         NetworkClient.RegisterHandler<OpcodeMessage>(OnOpcodeMessageReceived);
     }
@@ -82,6 +83,7 @@ public class ClientNetworkManager : MonoBehaviour
 
         // Retrieve the Unit component associated with the caster
         Unit caster = casterIdentity.GetComponent<Unit>();
+        Unit target = targetIdentity.GetComponent<Unit>();
 
         if (casterIdentity.netId == NetworkClient.localPlayer.netId)
         {
@@ -90,7 +92,6 @@ public class ClientNetworkManager : MonoBehaviour
 
         if (spellTime > 0)
         {
-            Unit target = targetIdentity.GetComponent<Unit>();
 
             Transform targetTransform = target.transform;
             Transform casterTransform = caster.transform;
@@ -157,6 +158,18 @@ public class ClientNetworkManager : MonoBehaviour
         NetworkIdentity identity = reader.ReadNetworkIdentity();
 
         Unit target = identity.GetComponent<Unit>();
+
+        if (identity.netId == NetworkClient.localPlayer.netId)
+        {
+            // This is working
+        }
+    }
+
+    private void HandleCastCanceled(NetworkReader reader)
+    {
+        NetworkIdentity identity = reader.ReadNetworkIdentity();
+        int spellId = reader.ReadInt();
+        Unit caster = identity.GetComponent<Unit>();
 
         if (identity.netId == NetworkClient.localPlayer.netId)
         {

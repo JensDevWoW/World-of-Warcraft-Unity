@@ -9,6 +9,7 @@ TagManager:
   - AreaTrigger
   - CastBar
   - HealthBar
+  - ActionBar
   layers:
   - Default
   - TransparentFX

@@ -51,6 +51,12 @@ public class ClientNetworkManager : MonoBehaviour
         if (casterIdentity.netId == NetworkClient.localPlayer.netId)
         {
             UIHandler.Instance.StartCast(castTime, GetSpellNameById(spellId));
+
+            // ActionBar stuff
+            if (gcd > 0)
+            {
+                UIHandler.Instance.StartGlobalCooldown(gcd);
+            }
         }
 
     }
@@ -165,7 +171,7 @@ public class ClientNetworkManager : MonoBehaviour
         }
     }
 
-    private void HandleCastCanceled(NetworkReader reader)
+    private void HandleCancelCast(NetworkReader reader)
     {
         NetworkIdentity identity = reader.ReadNetworkIdentity();
         int spellId = reader.ReadInt();

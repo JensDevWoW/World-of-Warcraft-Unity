@@ -10,12 +10,8 @@ public class PlayerInput : NetworkBehaviour
     void Start()
     {
         KeyBindManager.LoadKeyBinds();
-
-        spellbook.Add(new SpellList("Flash of Light", 1, KeyBindManager.keyBinds.one));
-        spellbook.Add(new SpellList("TestInstant", 3, KeyBindManager.keyBinds.two));
         spellbook.Add(new SpellList("Fireball", 4, KeyBindManager.keyBinds.three));
-        spellbook.Add(new SpellList("Power Word: Shield", 5, KeyBindManager.keyBinds.four));
-        spellbook.Add(new SpellList("Flamestrike", 6, KeyBindManager.keyBinds.five, true)); // Example AoE spell
+        spellbook.Add(new SpellList("Flamestrike", 6, KeyBindManager.keyBinds.one, true)); // Example AoE spell
     }
 
     void Update()

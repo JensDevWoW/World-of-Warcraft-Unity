@@ -10,9 +10,7 @@ public class UIHandler : MonoBehaviour
     [Header("UI Elements")]
     public CastBar castBar;
     public HealthBar healthBar;
-    //public CooldownManager cooldownManager;
-    //public GameObject actionBar;
-    //public GameObject buffDebuffContainer;
+    public List<ActionButton> actionButtons; // List of all ActionButton instances
     public Text combatText;
 
     private void Awake()
@@ -34,7 +32,8 @@ public class UIHandler : MonoBehaviour
         castBar = canvas.GetComponent<CastBar>();
         healthBar = canvas.GetComponent<HealthBar>();
 
-
+        // Initialize the list of action buttons
+        actionButtons = new List<ActionButton>(canvas.GetComponentsInChildren<ActionButton>());
     }
 
     public void StartCast(float castTime, string name)
@@ -53,27 +52,27 @@ public class UIHandler : MonoBehaviour
         }
     }
 
-    /*public void UpdateCooldowns(int spellId, float cooldownTime)
+    public void UpdateCooldown(int spellId, float cooldownTime)
     {
-        if (cooldownManager != null)
+        foreach (var button in actionButtons)
         {
-            cooldownManager.SetCooldown(spellId, cooldownTime);
+            if (button.spellId == spellId)
+            {
+                button.StartCooldown(cooldownTime);
+            }
         }
-    }*/
+    }
 
-    /*public void ShowBuff(int buffId, Sprite buffIcon)
+    public void StartGlobalCooldown(float gcdDuration)
     {
-        // Instantiate or show buff icon in buffDebuffContainer
-        GameObject buffIconObj = new GameObject("BuffIcon");
-        Image iconImage = buffIconObj.AddComponent<Image>();
-        iconImage.sprite = buffIcon;
-        buffIconObj.transform.SetParent(buffDebuffContainer.transform);
-    }*/
-
-    public void RemoveBuff(int buffId)
-    {
-        // Remove the specific buff icon from buffDebuffContainer
-        // Implementation depends on how you are tracking the buffs
+        foreach (var button in actionButtons)
+        {
+            // Only start the GCD if the button isn't already on cooldown
+            if (!button.IsOnCooldown())
+            {
+                button.StartCooldown(gcdDuration);
+            }
+        }
     }
 
     public void DisplayCombatText(string text, Color color)
@@ -83,6 +82,21 @@ public class UIHandler : MonoBehaviour
             combatText.text = text;
             combatText.color = color;
             // Add additional animations or fading effects if needed
+        }
+    }
+
+    public void UpdateButtonId(GameObject buttonObj, int spellId)
+    {
+        if (buttonObj != null)
+        {
+            foreach (var button in actionButtons)
+            {
+                if (button.gameObject == buttonObj)
+                {
+                    button.spellId = spellId;
+                    return;
+                }
+            }
         }
     }
 

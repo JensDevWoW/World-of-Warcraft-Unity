@@ -1,43 +1,69 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
-using Mirror;
 
 public class ActionButton : MonoBehaviour
 {
     public KeyCode keybind = KeyCode.Space; // Set your default keybind here
-    private RectTransform rectTransform;
+    public int spellId; // Add a spellId to link to the correct spell
 
-    private Vector3 originalScale;
-    private Unit localPlayerUnit;
+    public Image buttonImage;
+    public Image cooldownImage; // The background image to show the cooldown effect
+    private Color originalColor = new Color32(255, 255, 255, 255);
+    private Color darkColor = new Color32(119, 104, 104, 255); // The dark color to change to
+
+    private float cooldownTime;
+    private float cooldownTimer;
 
     void Start()
     {
-        rectTransform = GetComponent<RectTransform>();
-        originalScale = rectTransform.localScale;
+        
     }
 
     void Update()
     {
         if (Input.GetKeyDown(keybind))
         {
-            CompressButton();
+            DarkenButton();
         }
         else if (Input.GetKeyUp(keybind))
         {
-            ReleaseButton();
+            RestoreButton();
+        }
+
+        if (cooldownTimer > 0)
+        {
+            cooldownTimer -= Time.deltaTime;
+            cooldownImage.fillAmount = Mathf.Clamp01(cooldownTimer / cooldownTime);
         }
     }
 
-    // Compress the button down visually
-    private void CompressButton()
+    // Darken the button visually
+    private void DarkenButton()
     {
-        rectTransform.localScale = originalScale * 0.9f;
+        if (buttonImage != null)
+        {
+            buttonImage.color = darkColor;
+        }
     }
 
-    // Release the button to its original size
-    private void ReleaseButton()
+    // Restore the button to its original color
+    private void RestoreButton()
     {
-        rectTransform.localScale = originalScale;
+        if (buttonImage != null)
+        {
+            buttonImage.color = originalColor;
+        }
+    }
+
+    public void StartCooldown(float duration)
+    {
+        cooldownTime = duration;
+        cooldownTimer = duration;
+        cooldownImage.fillAmount = 1f;
+    }
+
+    public bool IsOnCooldown()
+    {
+        return cooldownTimer > 0;
     }
 }

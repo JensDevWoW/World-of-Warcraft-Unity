@@ -161,7 +161,9 @@ public class ClientNetworkManager : MonoBehaviour
     {
         NetworkIdentity casterIdentity = reader.ReadNetworkIdentity();
         NetworkIdentity targetIdentity = reader.ReadNetworkIdentity();
-        
+        int auraId = reader.ReadInt();
+        float duration = reader.ReadFloat();
+        int stacks = reader.ReadInt();
 
         Unit caster = casterIdentity.GetComponent<Unit>();
         Unit target = targetIdentity.GetComponent<Unit>();
@@ -170,9 +172,9 @@ public class ClientNetworkManager : MonoBehaviour
         {
             // We are caster
         }
-        else if (targetIdentity.netId == NetworkClient.localPlayer.netId)
+        if (targetIdentity.netId == NetworkClient.localPlayer.netId)
         {
-            // We are target
+            UIHandler.Instance.UpdateAura(auraId, duration, stacks);
         }
         
 

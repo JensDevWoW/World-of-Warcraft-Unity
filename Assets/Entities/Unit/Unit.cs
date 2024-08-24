@@ -481,7 +481,9 @@ public class Unit : MonoBehaviour
         }
 
         if (auraToRemove != null)
-            DestAura(auraToRemove);
+        {
+            auraToRemove.Finish();
+        }
     }
 
     public void RemoveAura(Aura aura)

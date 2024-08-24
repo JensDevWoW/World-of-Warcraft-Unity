@@ -61,25 +61,18 @@ public class Aura : MonoBehaviour
         effectHandler.HandleEffects(this);
     }
 
-    private void Finish()
+    public void Finish()
     {
-        if (m_stacks == 0)
-        {
-            CancelEffects();
-
-            // TODO: Handle OnRemove aurascript
-            //auraInfo.AuraScript.OnRemove();
-            finished = true;
-            // Remove the aura from the target's aura list
-            target.DestAura(this);
-
-            // Destroy the aura object
-            Destroy(gameObject);
-            UpdateClient();
-            print("Aura has dropped off!");
-        }
-
-        
+        CancelEffects();
+        this.duration = 0;
+        // TODO: Handle OnRemove aurascript
+        //auraInfo.AuraScript.OnRemove();
+        finished = true;
+        // Remove the aura from the target's aura list
+        target.DestAura(this);
+        UpdateClient();
+        // Destroy the aura object
+        Destroy(gameObject);
     }
 
     public void CancelEffects()

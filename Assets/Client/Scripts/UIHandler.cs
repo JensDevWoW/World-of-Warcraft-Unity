@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using UnityEditor.Build.Content;
 
 public class UIHandler : MonoBehaviour
 {
@@ -136,5 +137,28 @@ public class UIHandler : MonoBehaviour
         buffDebuff.gameObject.SetActive(true);
         // Add to the list of active buffs
         activeBuffs.Add(newBuff);
+    }
+
+    public void UpdateAura(int spellId, float duration, int stacks)
+    {
+        GameObject buffToRemove = null;
+        foreach (var buff in activeBuffs)
+        {
+            BuffDebuff buffdebuff = buff.GetComponent<BuffDebuff>();
+            if (buffdebuff != null)
+            {
+                if (buffdebuff.spellId == spellId)
+                {
+                    if (duration == 0) // UI needs to delete the buff from the list if we're updating it's duration to 0 (meaning we remove it)
+                        buffToRemove = buff;
+                    else
+                    {
+                        buffdebuff.UpdateData(duration, stacks);
+                        return;
+                    }
+                }
+            }
+        }
+        activeBuffs.Remove(buffToRemove);
     }
 }

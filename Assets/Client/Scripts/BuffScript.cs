@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Mirror;
 
 public class BuffDebuff : MonoBehaviour
 {
@@ -28,6 +29,18 @@ public class BuffDebuff : MonoBehaviour
             }
             textBox.text = Mathf.Ceil(currentTime).ToString();
         }
+    }
+
+    public void UpdateData(float duration, int stacks)
+    {
+        if (duration > 0)
+        {
+            this.timer = duration;
+            currentTime = duration;
+            textBox.text = Mathf.Ceil(duration).ToString();
+        }
+        else
+            Destroy(gameObject);
     }
 
     // This function allows setting up the buff/debuff with the icon and duration

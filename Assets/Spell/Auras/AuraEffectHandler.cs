@@ -15,7 +15,6 @@ public class AuraEffectHandler
         // Register handlers for each spell effect
         RegisterHandler(AuraEffect.AURA_EFFECT_DAMAGE, HandleSchoolDamage);
         RegisterHandler(AuraEffect.AURA_EFFECT_APPLY_ABSORB, HandleApplyAbsorb);
-        RegisterHandler(AuraEffect.AURA_EFFECT_DUMMY, HandleDummyEffect);
     }
 
     private void RegisterHandler(AuraEffect effect, Action<Aura, Unit> handler)
@@ -57,11 +56,5 @@ public class AuraEffectHandler
     {
         target.SetAbsorbAmount(aura.ToSpell().m_spellInfo.BasePoints);
         Debug.Log($"Set Absorb Amount: {target.GetAbsorbAmount()}!");
-    }
-
-    private void HandleDummyEffect(Aura aura, Unit target)
-    {
-        Debug.Log($"Executing dummy effect from aura {aura.auraInfo.Id} on target {target.m_name}");
-        // Implement the logic for dummy effect here
     }
 }

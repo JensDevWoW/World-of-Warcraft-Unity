@@ -169,6 +169,58 @@
                 "type": "Buff",
                 "aurascript": "null"
             }
+        },
+        {
+            "id": 10,
+            "name": "Fireblast",
+            "schoolMask": "Fire",
+            "type": "Damage",
+            "manaCost": 5,
+            "castTime": 0,
+            "spellTime": false,
+            "speed": 0,
+            "positive": false,
+            "basepoints": 10,
+            "damageclass": "Intellect",
+            "effects": "SPELL_EFFECT_SCHOOL_DAMAGE",
+            "spellscript": "null",
+            "cooldown": 6,
+            "attributes": "SPELL_ATTR_ALLOW_CAST_WHILE_CASTING",
+            "flags": "SPELL_FLAG_ALWAYS_CRIT,SPELL_FLAG_CAST_WHILE_CASTING,SPELL_FLAG_CAST_WHILE_MOVING,SPELL_FLAG_CUSTOM_GCD,SPELL_FLAG_NEEDS_TARGET",
+            "range": 40
+
+        },
+        {
+            "id": 11,
+            "name": "Heating Up",
+            "schoolMask": "Fire",
+            "type": "Buff",
+            "manaCost": 0,
+            "castTime": 0,
+            "spellTime": false,
+            "speed": 0,
+            "positive": true,
+            "basepoints": 0,
+            "damageclass": "Intellect",
+            "effects": "SPELL_EFFECT_APPLY_AURA",
+            "spellscript": "null",
+            "cooldown": 6,
+            "attributes": "SPELL_ATTR_ALLOW_CAST_WHILE_CASTING,SPELL_ATTR_PASSIVE",
+            "flags": "SPELL_FLAG_CAST_WHILE_CASTING,SPELL_FLAG_CAST_WHILE_MOVING,SPELL_FLAG_NEEDS_TARGET,SPELL_FLAG_IGNORES_GCD",
+            "range": 1000,
+            "aura": {
+                "auraId": 11,
+                "name": "Heating Up",
+                "duration": 10,
+                "stacks": 1,
+                "periodic": false,
+                "ticktime": 0,
+                "effects": "AURA_EFFECT_DUMMY",
+                "positive": true,
+                "type": "Buff",
+                "aurascript": "null"
+            }
+
         }
     ]
 }

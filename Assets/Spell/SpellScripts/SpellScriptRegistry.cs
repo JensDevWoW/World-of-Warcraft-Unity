@@ -7,7 +7,7 @@ public class SpellScriptRegistry
     // A dictionary to map spell IDs to SpellScript types
     private static readonly Dictionary<int, Type> spellScriptMap = new Dictionary<int, Type>
     {
-        //{ 6, typeof(Flamestrike) },
+        //{ 10, typeof(FireBlast) },
         // Add more mappings as needed
     };
 

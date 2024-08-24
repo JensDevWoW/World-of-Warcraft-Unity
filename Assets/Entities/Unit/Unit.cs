@@ -470,12 +470,24 @@ public class Unit : MonoBehaviour
     }
     public void RemoveAura(int spellId)
     {
-        // TODO: Remove aura
+        Aura auraToRemove = null;
+        foreach (Aura aura in auraList)
+        {
+            if (aura.auraInfo.Id == spellId)
+            {
+                auraToRemove = aura;
+                break;
+            }
+        }
+
+        if (auraToRemove != null)
+            DestAura(auraToRemove);
     }
 
     public void RemoveAura(Aura aura)
     {
-        // TODO: Remove aura 2
+        if (auraList.Contains(aura))
+            auraList.Remove(aura);
     }
 
     public Spell CastSpell(int spellId, Unit target)
@@ -612,6 +624,16 @@ public class Unit : MonoBehaviour
         NetworkServer.SendToAll(msg);
     }
 
+    public string GetClass()
+    {
+        return "Mage"; // TODO: Create class system
+    }
+
+    public string GetSpecialization()
+    {
+        return "Fire"; // TODO: Create Spec system
+    }
+
     public float SpellDamageBonusDone(Unit victim, Spell spell, SpellInfo m_spellInfo, out bool crit)
     {
         crit = false;
@@ -653,11 +675,11 @@ public class Unit : MonoBehaviour
             }
         }*/
 
-        /* TODO: Crit Handler
-        float critPercentage = spell.GetCritChance();
-        if (spell.HasFlag("SPELL_FLAG_ALWAYS_CRIT") ||
-            HasAura(24) || // Combustion hard check
-            (victim.IsFrozen() && GetClass() == "Mage" && GetSpecialization() == "Frost"))
+        // Crit Handler
+        float critPercentage = 100f; // TODO: Add in dynamic crit chance
+        if (spell.HasFlag(SpellFlags.SPELL_FLAG_ALWAYS_CRIT)) //||
+           // HasAura(24)) || Combustion hard check
+            //(victim.IsFrozen() && GetClass() == "Mage" && GetSpecialization() == "Frost"))
         {
             doneTotal *= 2f;
             crit = true;
@@ -669,7 +691,7 @@ public class Unit : MonoBehaviour
                 doneTotal *= 2f;
                 crit = true;
             }
-        }*/
+        }
 
         /* TODO: We don't want DoTs to trigger crit procs
         bool isDot = false;
@@ -677,17 +699,17 @@ public class Unit : MonoBehaviour
         if (auraInfo != null && auraInfo.Periodic)
         {
             isDot = true;
-        }
+        }*/
 
         // Handle Crit Procs
         if (crit)
         {
             if (GetClass() == "Mage" && GetSpecialization() == "Fire")
             {
-                if (!isDot && spell.GetSchool() == "Fire")
+                if (spell.m_spellInfo.SchoolMask == SpellSchoolMask.Fire)
                 {
-                    const int SPELL_MAGE_HEATING_UP = 21;
-                    const int SPELL_MAGE_HOT_STREAK = 22;
+                    const int SPELL_MAGE_HEATING_UP = 11;
+                    const int SPELL_MAGE_HOT_STREAK = 12;
 
                     if (HasAura(SPELL_MAGE_HEATING_UP))
                     {
@@ -707,11 +729,11 @@ public class Unit : MonoBehaviour
         }
         else
         {
-            if (!isDot && HasAura(21)) // Assuming 21 is SPELL_MAGE_HEATING_UP
+            if (/*!isDot &&*/ HasAura(21)) // Assuming 21 is SPELL_MAGE_HEATING_UP
             {
                 RemoveAura(21);
             }
-        }*/
+        }
 
         float tmpDamage = doneTotal * doneTotalMod;
         /* TODO: if (spell.m_customPCT != null)
@@ -722,5 +744,15 @@ public class Unit : MonoBehaviour
         return tmpDamage;
     }
 
-
+    public bool HasAura(int spellId)
+    {
+        foreach (Aura aura in auraList)
+        {
+            if (aura.auraInfo.Id == spellId)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 }

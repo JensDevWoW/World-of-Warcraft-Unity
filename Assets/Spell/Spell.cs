@@ -24,7 +24,7 @@ public class Spell : MonoBehaviour
     public SpellInfo m_spellInfo { get; protected set; }
     public int CastFlags;
     public float CastTime;
-    public float GCD = 1.5f;
+    public float GCD;
     public bool AnimationEnabled = true;
     public bool IsSpellQueueSpell;
     public Vector3 position;
@@ -63,7 +63,7 @@ public class Spell : MonoBehaviour
         this.cooldownTime = spellInfo.Cooldown;
         this.cooldownLeft = spellInfo.Cooldown;
         this.trigger = triggerObject;
-
+        this.GCD = HasFlag(SpellFlags.SPELL_FLAG_IGNORES_GCD) ? 0f : 1.5f;
         AttachSpellScript(spellId);
 
         if (spellInfo.HasFlag(SpellFlags.SPELL_FLAG_NEEDS_TARGET))
@@ -238,7 +238,7 @@ public class Spell : MonoBehaviour
             SendSpellStartPacket();
 
             //TODO: Add spell flags to check for GCD immunity
-            if (caster.ToPlayer() != null)
+            if (caster.ToPlayer() != null && (!HasFlag(SpellFlags.SPELL_FLAG_IGNORES_GCD)))
                 caster.ToPlayer().SetOnGCD();
 
             if (IsInstant())
@@ -360,7 +360,7 @@ public class Spell : MonoBehaviour
         bool posNeg = isPositive;
 
         // Add the primary target if needed
-        if (needsTarget && target != null && target.IsAlive())
+        if (needsTarget && target != null && target.IsAlive() && target != caster)
         {
             targetList.Add(target);
         }

@@ -12,6 +12,10 @@ public class UIHandler : MonoBehaviour
     public HealthBar healthBar;
     public List<ActionButton> actionButtons; // List of all ActionButton instances
     public Text combatText;
+    public Transform buffCanvas; // Reference to the Buff Canvas
+    public GameObject buffTemplate; // Reference to the Buff Template object
+    public float buffSpacing = 10f; // Spacing between buffs
+    private List<GameObject> activeBuffs = new List<GameObject>();
 
     private void Awake()
     {
@@ -34,6 +38,9 @@ public class UIHandler : MonoBehaviour
 
         // Initialize the list of action buttons
         actionButtons = new List<ActionButton>(canvas.GetComponentsInChildren<ActionButton>());
+
+        // Assign the Buff Canvas
+        buffCanvas = GameObject.FindWithTag("Buffs").transform;
     }
 
     public void StartCast(float castTime, string name)
@@ -109,5 +116,25 @@ public class UIHandler : MonoBehaviour
     public void HideAoETargetingIndicator()
     {
         // Hide the AoE targeting UI element
+    }
+
+    public void AddBuff(int spellId, Sprite icon, float duration)
+    {
+        // Clone the BuffTemplate and add it to the buffCanvas
+        GameObject newBuff = Instantiate(buffTemplate, buffCanvas);
+
+        // Get the BuffDebuff component and initialize it
+        BuffDebuff buffDebuff = newBuff.GetComponent<BuffDebuff>();
+        buffDebuff.InitializeBuff(spellId, icon, duration);
+
+        // Position the new buff correctly in the UI
+        int row = activeBuffs.Count / 10; // 10 buffs per row, adjust as needed
+        int column = activeBuffs.Count % 10;
+
+        RectTransform buffRectTransform = newBuff.GetComponent<RectTransform>();
+        buffRectTransform.anchoredPosition = new Vector2(column * (buffRectTransform.sizeDelta.x + buffSpacing), -row * (buffRectTransform.sizeDelta.y + buffSpacing));
+        buffDebuff.gameObject.SetActive(true);
+        // Add to the list of active buffs
+        activeBuffs.Add(newBuff);
     }
 }

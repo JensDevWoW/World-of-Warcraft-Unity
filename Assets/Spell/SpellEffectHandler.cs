@@ -1,3 +1,4 @@
+using Mirror;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -82,6 +83,23 @@ public class SpellEffectHandler
             auraObject.name = $"Aura: {auraInfo.Id}";
 
             newAura.Initialize(auraInfo, spell.caster, tar, spell);
+
+
+            // Send opcode
+            NetworkWriter writer = new NetworkWriter();
+
+            writer.WriteNetworkIdentity(spell.caster.Identity);
+            writer.WriteNetworkIdentity(tar.Identity);
+            writer.WriteInt(auraInfo.Id);
+            writer.WriteFloat(auraInfo.Duration);
+
+            OpcodeMessage packet = new OpcodeMessage
+            {
+                opcode = Opcodes.SMSG_APPLY_AURA,
+                payload = writer.ToArray()
+            };
+
+            NetworkServer.SendToAll(packet);
         }
     }
 

@@ -25,4 +25,10 @@ public abstract class SpellScript : MonoBehaviour
     {
         // Default behavior
     }
+
+    // Called early on to change based on situations, rather than hard-coding it
+    public virtual void Modify(Unit caster, Unit target)
+    {
+        // Default behaviour
+    }
 }

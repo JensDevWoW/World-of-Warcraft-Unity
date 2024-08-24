@@ -18,6 +18,7 @@ public class ClientNetworkManager : MonoBehaviour
         opcodeHandler.RegisterHandler(Opcodes.SMSG_UPDATE_STAT,         HandleUpdateStat);
         opcodeHandler.RegisterHandler(Opcodes.SMSG_AURA_UPDATE,         HandleAuraUpdate);
         opcodeHandler.RegisterHandler(Opcodes.SMSG_CAST_CANCELED,       HandleCancelCast);
+        opcodeHandler.RegisterHandler(Opcodes.SMSG_APPLY_AURA,          HandleApplyAura);
         // Register the OpcodeMessage handler on the client
         NetworkClient.RegisterHandler<OpcodeMessage>(OnOpcodeMessageReceived);
     }
@@ -50,13 +51,12 @@ public class ClientNetworkManager : MonoBehaviour
 
         if (casterIdentity.netId == NetworkClient.localPlayer.netId)
         {
-            UIHandler.Instance.StartCast(castTime, GetSpellNameById(spellId));
+            if (castTime > 0f)
+                UIHandler.Instance.StartCast(castTime, GetSpellNameById(spellId));
 
             // ActionBar stuff
-            if (gcd > 0)
-            {
+            if (gcd > 0f)
                 UIHandler.Instance.StartGlobalCooldown(gcd);
-            }
         }
 
     }
@@ -93,7 +93,7 @@ public class ClientNetworkManager : MonoBehaviour
 
         if (casterIdentity.netId == NetworkClient.localPlayer.netId)
         {
-                
+            
         }
 
         if (spellTime > 0)
@@ -131,6 +131,29 @@ public class ClientNetworkManager : MonoBehaviour
             {
                 UIHandler.Instance.UpdateHealth(statValue, maxStatValue);
             }
+        }
+    }
+    int num = 0;
+    private void HandleApplyAura(NetworkReader reader)
+    {
+        NetworkIdentity casterIdentity = reader.ReadNetworkIdentity();
+        NetworkIdentity targetIdentity = reader.ReadNetworkIdentity();
+        int auraId = reader.ReadInt();
+        float duration = reader.ReadFloat();
+
+        Unit caster = casterIdentity.GetComponent<Unit>();
+        Unit target = targetIdentity.GetComponent<Unit>();
+
+        if (casterIdentity.netId == NetworkClient.localPlayer.netId)
+        {
+
+        }
+        if (targetIdentity.netId == NetworkClient.localPlayer.netId)
+        {
+            // We are the target, apply the aura to our list
+            this.num++;
+            print(num);
+            UIHandler.Instance.AddBuff(auraId, IconManager.GetSpellIcon(auraId), duration);
         }
     }
 

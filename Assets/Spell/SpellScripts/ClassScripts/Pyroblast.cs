@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class FireBlast : SpellScript
+public class PyroblastScript : SpellScript
 {
     public override void OnCast(Spell spell, Unit caster, Unit target)
     {
@@ -10,8 +10,14 @@ public class FireBlast : SpellScript
 
     public override void OnHit(Spell spell, Unit caster, Unit target)
     {
-        Debug.Log($"{target.name} is hit by Fireball!");
-        // Additional logic for when Fireball hits
-        //target.TakeDamage(50); // Example damage application
+        // Hot Streak
+        if (caster.HasAura(12))
+            caster.RemoveAura(12);
+    }
+
+    public override void Modify(Spell spell, Unit caster, Unit target)
+    {
+        if (caster.HasAura(12))
+            spell.SetCastTime(0);
     }
 }

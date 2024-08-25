@@ -251,6 +251,25 @@
                 "type": "Buff",
                 "aurascript": "null"
             }
+        },
+        {
+            "id": 13,
+            "name": "Pyroblast",
+            "schoolMask": "Fire",
+            "type": "Damage",
+            "manaCost": 10,
+            "castTime": 3,
+            "spellTime": false,
+            "speed": 30,
+            "positive": false,
+            "basepoints": 35,
+            "damageclass": "Intellect",
+            "effects": "SPELL_EFFECT_SCHOOL_DAMAGE",
+            "spellscript": "Pyroblast",
+            "cooldown": 0,
+            "attributes": "",
+            "flags": "SPELL_FLAG_NEEDS_TARGET",
+            "range": 40
         }
     ]
 }

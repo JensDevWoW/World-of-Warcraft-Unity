@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7f5a548aafdc1c48b9f50bd0f76d55e, type: 3}
+  m_Name: Pyroblast
+  m_EditorClassIdentifier: 
+  spellId: 13
+  spellName: Pyroblast
+  spellPrefabs:
+  - {fileID: 8206069506531030451, guid: c310b4fdd137c9747baa7eca2a66836a, type: 3}

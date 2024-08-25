@@ -65,12 +65,12 @@ public class Aura : MonoBehaviour
     {
         CancelEffects();
         this.duration = 0;
+        UpdateClient();
         // TODO: Handle OnRemove aurascript
         //auraInfo.AuraScript.OnRemove();
         finished = true;
         // Remove the aura from the target's aura list
         target.DestAura(this);
-        UpdateClient();
         // Destroy the aura object
         Destroy(gameObject);
     }
@@ -105,7 +105,7 @@ public class Aura : MonoBehaviour
 
     public void DropStacks()
     {
-        // drop stacks by 1
+        // drop stacks
         if (m_stacks > 0)
             m_stacks = 0;
         UpdateClient();

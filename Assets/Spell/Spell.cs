@@ -187,7 +187,7 @@ public class Spell : MonoBehaviour
     {
         if (spellScript != null)
         {
-            spellScript.OnHit(caster, target);
+            spellScript.OnHit(this, caster, target);
         }
     }
 
@@ -195,8 +195,21 @@ public class Spell : MonoBehaviour
     {
         if (spellScript != null)
         {
-            spellScript.OnCast(caster, target);
+            spellScript.OnCast(this, caster, target);
         }
+    }
+
+    public void Modify()
+    {
+        if (spellScript != null)
+        {
+            spellScript.Modify(this, caster, target);
+        }
+    }
+
+    public void SetCastTime(float time)
+    {
+        this.CastTime = time;
     }
 
     private void HandleEffects()
@@ -226,6 +239,9 @@ public class Spell : MonoBehaviour
         if (caster)
         {
             isPreparing = true;
+
+            // Load SpellScript Mods
+            Modify();
 
             string canCast = CheckCast();
             if (canCast != "")

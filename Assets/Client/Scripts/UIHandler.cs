@@ -144,20 +144,25 @@ public class UIHandler : MonoBehaviour
         GameObject buffToRemove = null;
         foreach (var buff in activeBuffs)
         {
-            BuffDebuff buffdebuff = buff.GetComponent<BuffDebuff>();
-            if (buffdebuff != null)
+            if (buff != null)
             {
-                if (buffdebuff.spellId == spellId)
+                BuffDebuff buffdebuff = buff.GetComponent<BuffDebuff>();
+                if (buffdebuff != null)
                 {
-                    if (duration == 0) // UI needs to delete the buff from the list if we're updating it's duration to 0 (meaning we remove it)
-                        buffToRemove = buff;
-                    else
+                    if (buffdebuff.spellId == spellId)
                     {
-                        buffdebuff.UpdateData(duration, stacks);
-                        return;
+                        if (duration == 0) // UI needs to delete the buff from the list if we're updating it's duration to 0 (meaning we remove it)
+                            buffToRemove = buff;
+                        else
+                        {
+                            buffdebuff.UpdateData(duration, stacks);
+                            return;
+                        }
                     }
                 }
             }
+            else
+                buffToRemove = buff; break;
         }
         activeBuffs.Remove(buffToRemove);
     }

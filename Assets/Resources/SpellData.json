@@ -259,7 +259,7 @@
             "type": "Damage",
             "manaCost": 10,
             "castTime": 3,
-            "spellTime": false,
+            "spellTime": true,
             "speed": 30,
             "positive": false,
             "basepoints": 35,

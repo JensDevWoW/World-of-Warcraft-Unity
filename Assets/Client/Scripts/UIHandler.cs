@@ -164,6 +164,10 @@ public class UIHandler : MonoBehaviour
             else
                 buffToRemove = buff; break;
         }
-        activeBuffs.Remove(buffToRemove);
+        if (buffToRemove != null)
+        {
+            Destroy(buffToRemove);
+            activeBuffs.Remove(buffToRemove);
+        }
     }
 }

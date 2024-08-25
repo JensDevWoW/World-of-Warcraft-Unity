@@ -470,6 +470,9 @@ public class Unit : MonoBehaviour
     }
     public void RemoveAura(int spellId)
     {
+        if (spellId == 12)
+            print("Hi");
+
         Aura auraToRemove = null;
         foreach (Aura aura in auraList)
         {

@@ -174,6 +174,8 @@ public class ClientNetworkManager : MonoBehaviour
         }
         if (targetIdentity.netId == NetworkClient.localPlayer.netId)
         {
+            if (auraId == 12)
+                print("Hla");
             UIHandler.Instance.UpdateAura(auraId, duration, stacks);
         }
         

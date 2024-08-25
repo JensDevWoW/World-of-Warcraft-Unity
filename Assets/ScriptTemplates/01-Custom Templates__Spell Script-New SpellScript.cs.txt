@@ -1,0 +1,23 @@
+using UnityEngine;
+
+public class #SCRIPTNAME#: SpellScript
+{
+    public override void OnCast(Spell spell, Unit caster, Unit target)
+    {
+        //Debug.Log($"{caster.name} casts spell at {target.name}!");
+        // Additional logic for when spell is cast
+	#NOTRIM#
+    }
+
+    public override void OnHit(Spell spell, Unit caster, Unit target)
+    {
+        // Additional logic for when spell hits.
+	#NOTRIM#
+    }
+
+    public override void Modify(Spell spell, Unit caster, Unit target)
+    {
+        // Additional logic for changes to the spell if certain buffs/aruas are applied.
+	#NOTRIM#
+    }
+}

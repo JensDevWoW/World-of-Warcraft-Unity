@@ -13,6 +13,7 @@ public class PlayerInput : NetworkBehaviour
         spellbook.Add(new SpellList("Fireball", 4, KeyBindManager.keyBinds.three));
         spellbook.Add(new SpellList("Pyroblast", 13, KeyBindManager.keyBinds.two));
         spellbook.Add(new SpellList("Flamestrike", 6, KeyBindManager.keyBinds.one, true)); // Example AoE spell
+        spellbook.Add(new SpellList("Combustion", 14, KeyBindManager.keyBinds.four));
     }
 
     void Update()

@@ -467,7 +467,8 @@ public class Spell : MonoBehaviour
         writer.WriteInt(0); // Cast Flags
         writer.WriteNetworkIdentity(caster.Identity); 
         writer.WriteNetworkIdentity(target != null ? target.Identity : null); 
-        writer.WriteFloat(CastTime); 
+        writer.WriteFloat(CastTime);
+        writer.WriteFloat(cooldownTime);
         writer.WriteInt(spellId);
         writer.WriteFloat(m_speed);
         writer.WriteFloat(m_spellTime); 

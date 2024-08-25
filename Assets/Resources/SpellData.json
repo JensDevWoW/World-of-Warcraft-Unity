@@ -270,6 +270,37 @@
             "attributes": "",
             "flags": "SPELL_FLAG_NEEDS_TARGET",
             "range": 40
+        },
+        {
+            "id": 14,
+            "name": "Combustion",
+            "schoolMask": "Fire",
+            "type": "Buff",
+            "manaCost": 10,
+            "castTime": 0,
+            "spellTime": false,
+            "speed": 1.0,
+            "positive": true,
+            "basepoints": 0,
+            "damageclass": "Intellect",
+            "effects": "SPELL_EFFECT_APPLY_AURA",
+            "spellscript": "null",
+            "cooldown": 60,
+            "attributes": "",
+            "flags": "SPELL_FLAG_IGNORES_GCD,SPELL_FLAG_CAST_WHILE_CASTING,SPELL_FLAG_CAST_WHILE_MOVING",
+            "range": 0,
+            "aura": {
+                "auraId": 14,
+                "name": "Combustion",
+                "duration": 10,
+                "stacks": 1,
+                "periodic": false,
+                "ticktime": 0,
+                "effects": "AURA_EFFECT_DUMMY",
+                "positive": true,
+                "type": "Buff",
+                "aurascript": "null"
+            }
         }
     ]
 }

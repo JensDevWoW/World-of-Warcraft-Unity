@@ -13,6 +13,8 @@ public class ActionButton : MonoBehaviour
 
     private float cooldownTime;
     private float cooldownTimer;
+    private float gcdTime;
+    private float gcdTimer;
 
     void Start()
     {
@@ -32,8 +34,14 @@ public class ActionButton : MonoBehaviour
 
         if (cooldownTimer > 0)
         {
+            gcdTimer = 0;
             cooldownTimer -= Time.deltaTime;
             cooldownImage.fillAmount = Mathf.Clamp01(cooldownTimer / cooldownTime);
+        }
+        else if (gcdTimer > 0)
+        {
+            gcdTimer -= Time.deltaTime;
+            cooldownImage.fillAmount = Mathf.Clamp01(gcdTimer / gcdTime);
         }
     }
 
@@ -62,8 +70,18 @@ public class ActionButton : MonoBehaviour
         cooldownImage.fillAmount = 1f;
     }
 
+    public void StartGlobalCooldown(float duration)
+    {
+        gcdTime = duration;
+        gcdTimer = duration;
+        cooldownImage.fillAmount = 1f;
+    }
+
     public bool IsOnCooldown()
     {
         return cooldownTimer > 0;
     }
+
+    public bool IsOnGlobalCooldown()
+    { return gcdTimer > 0; }
 }

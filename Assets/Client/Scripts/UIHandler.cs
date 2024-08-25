@@ -61,7 +61,7 @@ public class UIHandler : MonoBehaviour
         }
     }
 
-    public void UpdateCooldown(int spellId, float cooldownTime)
+    public void StartCooldown(int spellId, float cooldownTime)
     {
         foreach (var button in actionButtons)
         {
@@ -79,7 +79,7 @@ public class UIHandler : MonoBehaviour
             // Only start the GCD if the button isn't already on cooldown
             if (!button.IsOnCooldown())
             {
-                button.StartCooldown(gcdDuration);
+                button.StartGlobalCooldown(gcdDuration);
             }
         }
     }

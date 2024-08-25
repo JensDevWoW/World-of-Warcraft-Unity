@@ -55,7 +55,6 @@ public class ClientNetworkManager : MonoBehaviour
             if (castTime > 0f)
                 UIHandler.Instance.StartCast(castTime, GetSpellNameById(spellId));
 
-            // ActionBar stuff
             if (gcd > 0f)
                 UIHandler.Instance.StartGlobalCooldown(gcd);
         }
@@ -76,6 +75,7 @@ public class ClientNetworkManager : MonoBehaviour
         NetworkIdentity casterIdentity = reader.ReadNetworkIdentity();
         NetworkIdentity targetIdentity = reader.ReadNetworkIdentity();
         float castTime = reader.ReadFloat();
+        float cooldownTime = reader.ReadFloat();
         int spellId = reader.ReadInt();
         float speed = reader.ReadFloat();
         float spellTime = reader.ReadFloat();
@@ -94,7 +94,9 @@ public class ClientNetworkManager : MonoBehaviour
 
         if (casterIdentity.netId == NetworkClient.localPlayer.netId)
         {
-            
+            // We need to tell the client that the cooldown is now set
+            if (cooldownTime > 0)
+                UIHandler.Instance.StartCooldown(spellId, cooldownTime);
         }
 
         if (spellTime > 0)

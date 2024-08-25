@@ -702,9 +702,9 @@ public class Unit : MonoBehaviour
         }*/
 
         // Crit Handler
-        float critPercentage = 100f; // TODO: Add in dynamic crit chance
-        if (spell.HasFlag(SpellFlags.SPELL_FLAG_ALWAYS_CRIT)) //||
-           // HasAura(24)) || Combustion hard check
+        float critPercentage = 15f; // TODO: Add in dynamic crit chance
+        if (spell.HasFlag(SpellFlags.SPELL_FLAG_ALWAYS_CRIT) ||
+            HasAura(14)) // Combustion hard check
             //(victim.IsFrozen() && GetClass() == "Mage" && GetSpecialization() == "Frost"))
         {
             doneTotal *= 2f;

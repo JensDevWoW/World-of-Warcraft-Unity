@@ -405,9 +405,33 @@ public class Unit : MonoBehaviour
         return m_target;
     }
 
-    public Unit SetTarget(Unit target)
+    public void SetTarget(Unit target)
     {
-        return m_target = target; 
+        this.m_target = target;
+        UpdateTargetClient();
+    }
+
+    public void UpdateTargetClient()
+    {
+        if (m_target != null)
+        {
+            NetworkWriter writer = new NetworkWriter();
+
+            writer.WriteNetworkIdentity(this.Identity);
+            writer.WriteNetworkIdentity(m_target.Identity);
+            writer.WriteFloat(m_target.GetHealth());
+            writer.WriteFloat(m_target.GetMaxHealth());
+            writer.WriteFloat(0f); // TODO: Mana
+            writer.WriteFloat(0f); // TODO: MaxMana
+
+            OpcodeMessage packet = new OpcodeMessage
+            {
+                opcode = Opcodes.SMSG_UPDATE_TARGET,
+                payload = writer.ToArray()
+            };
+
+            NetworkServer.SendToAll(packet);
+        }
     }
 
     public bool HasTarget()

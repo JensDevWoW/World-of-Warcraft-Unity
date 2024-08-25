@@ -11,6 +11,7 @@ TagManager:
   - HealthBar
   - ActionBar
   - Buffs
+  - UnitHealthBar
   layers:
   - Default
   - TransparentFX

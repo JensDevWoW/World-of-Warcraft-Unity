@@ -19,6 +19,7 @@ public class ClientNetworkManager : MonoBehaviour
         opcodeHandler.RegisterHandler(Opcodes.SMSG_AURA_UPDATE,         HandleAuraUpdate);
         opcodeHandler.RegisterHandler(Opcodes.SMSG_CAST_CANCELED,       HandleCancelCast);
         opcodeHandler.RegisterHandler(Opcodes.SMSG_APPLY_AURA,          HandleApplyAura);
+        opcodeHandler.RegisterHandler(Opcodes.SMSG_UPDATE_TARGET,       HandleUpdateTarget);
         // Register the OpcodeMessage handler on the client
         NetworkClient.RegisterHandler<OpcodeMessage>(OnOpcodeMessageReceived);
     }
@@ -207,6 +208,23 @@ public class ClientNetworkManager : MonoBehaviour
         }
     }
 
+    private void HandleUpdateTarget(NetworkReader reader)
+    {
+        NetworkIdentity sender = reader.ReadNetworkIdentity();
+        NetworkIdentity targetIdentity = reader.ReadNetworkIdentity();
+        float health = reader.ReadFloat();
+        float maxHealth = reader.ReadFloat();
+        float mana = reader.ReadFloat();
+        float maxMana = reader.ReadFloat();
+
+        if (sender.netId == NetworkClient.localPlayer.netId)
+        {
+            Unit target = targetIdentity.GetComponent<Unit>();
+            // We are the person whose target needs updating
+            UIHandler.Instance.UpdateTarget(target);
+            UIHandler.Instance.UpdateTargetHealth(health, maxHealth);
+        }
+    }
     private void HandleCancelCast(NetworkReader reader)
     {
         NetworkIdentity identity = reader.ReadNetworkIdentity();

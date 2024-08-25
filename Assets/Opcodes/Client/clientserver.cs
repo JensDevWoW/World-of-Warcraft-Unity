@@ -132,6 +132,17 @@ public class ClientNetworkManager : MonoBehaviour
                 UIHandler.Instance.UpdateHealth(statValue, maxStatValue);
             }
         }
+
+        if (statChanged == "health")
+        {
+            // Check if we are targetting that unit
+            if (UIHandler.Instance.GetTarget() == sender)
+            {
+                // We are targetting that person, adjust his health
+                UIHandler.Instance.UpdateTargetHealth(statValue, maxStatValue);
+            }
+        }
+
     }
     int num = 0;
     private void HandleApplyAura(NetworkReader reader)
@@ -174,8 +185,6 @@ public class ClientNetworkManager : MonoBehaviour
         }
         if (targetIdentity.netId == NetworkClient.localPlayer.netId)
         {
-            if (auraId == 12)
-                print("Hla");
             UIHandler.Instance.UpdateAura(auraId, duration, stacks);
         }
         

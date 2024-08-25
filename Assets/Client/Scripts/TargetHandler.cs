@@ -23,6 +23,7 @@ public class TargetHandler : MonoBehaviour
 
                     // Send the selected target to the server for validation
                     SendTargetToServer(unit);
+                    UIHandler.Instance.UpdateTarget(unit);
                 }
             }
         }

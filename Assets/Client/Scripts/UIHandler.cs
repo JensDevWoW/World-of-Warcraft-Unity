@@ -17,7 +17,8 @@ public class UIHandler : MonoBehaviour
     public GameObject buffTemplate; // Reference to the Buff Template object
     public float buffSpacing = 10f; // Spacing between buffs
     private List<GameObject> activeBuffs = new List<GameObject>();
-
+    public Unit target;
+    private GameObject targetHealthBar;
     private void Awake()
     {
         if (Instance == null)
@@ -117,6 +118,59 @@ public class UIHandler : MonoBehaviour
     public void HideAoETargetingIndicator()
     {
         // Hide the AoE targeting UI element
+    }
+
+    public void SetTarget(Unit unit)
+    {
+        this.target = unit;
+    }
+
+    public void UpdateTargetHealth(float health, float maxHealth)
+    {
+        if (targetHealthBar != null)
+        {
+            Image image = targetHealthBar.GetComponent<Image>();
+            if (image != null)
+            {
+                image.fillAmount = Mathf.Clamp01(health / maxHealth);
+            }
+        }
+    }
+
+    public Unit GetTarget()
+    {
+        return this.target;
+    }
+
+    public void UpdateTarget(Unit unit)
+    {
+        if (unit == null)
+            return;
+
+        Transform healthBarTransform = unit.transform.Find("HealthBarVisual");
+
+        if (healthBarTransform != null)
+        {
+            GameObject healthBarObj = null;
+            foreach (Transform child in healthBarTransform)
+            {
+                if (child.CompareTag("UnitHealthBar"))
+                {
+                    healthBarObj = child.gameObject;
+                    break;
+                }
+            }
+            if (healthBarObj != null)
+            {
+                healthBarTransform.gameObject.SetActive(true);
+                this.targetHealthBar = healthBarObj;
+                SetTarget(unit);
+            }
+        }
+        else
+        {
+            Debug.LogWarning("HealthBarVisual object not found as a child of the unit.");
+        }
     }
 
     public void AddBuff(int spellId, Sprite icon, float duration)

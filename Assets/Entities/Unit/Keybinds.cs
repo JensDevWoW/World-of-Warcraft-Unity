@@ -10,10 +10,12 @@ public class KeyBinds
     public KeyCode three;
     public KeyCode four;
     public KeyCode five;
+    public KeyCode six;
+    public KeyCode seven;
 
-    public KeyBinds(KeyCode one, KeyCode two, KeyCode three, KeyCode four, KeyCode five)
+    public KeyBinds(KeyCode one, KeyCode two, KeyCode three, KeyCode four, KeyCode five, KeyCode six, KeyCode seven)
     {
-        this.one = one; this.two = two; this.three = three; this.four = four; this.five = five;
+        this.one = one; this.two = two; this.three = three; this.four = four; this.five = five; this.six = six; this.seven = seven;
     }
 
     public KeyBinds()
@@ -28,5 +30,7 @@ public class KeyBinds
         three = KeyCode.Alpha3;
         four = KeyCode.Alpha4;
         five = KeyCode.Alpha5;
+        six = KeyCode.Alpha6;
+        seven = KeyCode.Alpha7;
     }
 }

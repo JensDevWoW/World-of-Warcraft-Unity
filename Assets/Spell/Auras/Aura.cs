@@ -77,7 +77,31 @@ public class Aura : MonoBehaviour
 
     public void CancelEffects()
     {
-        //TODO: Cancel effects
+        // first we get the effect
+        // Since some spells have multiple, we might have to make a list
+        List<AuraEffect> auraEffects = new List<AuraEffect>();
+        foreach (AuraEffect effect in auraInfo.Effects)
+        {
+            auraEffects.Add(effect);
+        }
+
+        // Now we can just find out which each one does. We have a choice here, we can either handle it here or in Aura.cs
+        // To handle it here, it's as simple as:
+
+        foreach (AuraEffect effect in auraEffects)
+        {
+            if (effect == AuraEffect.AURA_EFFECT_ROOT)
+            {
+                // So we know the target is being rooted, so we just have to cancel that root for that target
+                if (!target)
+                    return;
+
+                if (target.HasUnitState(UnitState.UNIT_STATE_ROOTED))
+                    target.RemoveUnitState(UnitState.UNIT_STATE_ROOTED);
+
+                // And that's literally it
+            }
+        }
     }
 
     public void Refresh()

@@ -8,6 +8,8 @@ public class SpellScriptRegistry
     private static readonly Dictionary<int, Type> spellScriptMap = new Dictionary<int, Type>
     {
         { 13, typeof(PyroblastScript) },
+        { 15, typeof(IceLance) },
+        { 2, typeof(Frostbolt) },
         // Add more mappings as needed
     };
 

@@ -15,7 +15,8 @@ public class AuraEffect
 
     public static readonly AuraEffect AURA_EFFECT_DAMAGE = new AuraEffect("AURA_EFFECT_DAMAGE", 1);
     public static readonly AuraEffect AURA_EFFECT_APPLY_ABSORB = new AuraEffect("AURA_EFFECT_APPLY_ABSORB", 2);
-    public static readonly AuraEffect AURA_EFFECT_DUMMY = new AuraEffect("AURA_EFFECT_DUMMY", 3);
+    public static readonly AuraEffect AURA_EFFECT_ROOT = new AuraEffect("AURA_EFFECT_ROOT", 4);
+    public static readonly AuraEffect AURA_EFFECT_DUMMY = new AuraEffect("AURA_EFFECT_DUMMY", 100);
 
 
     public static AuraEffect operator |(AuraEffect a, AuraEffect b)

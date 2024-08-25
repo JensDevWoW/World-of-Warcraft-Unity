@@ -37,6 +37,7 @@ public class Spell : MonoBehaviour
     public int m_manaCost;
     public int cooldownTime;
     public float cooldownLeft;
+    public float modBasePoints = 0;
     public GameObject trigger;
     public SpellEffectHandler effectHandler {  get; protected set; }
 
@@ -181,6 +182,11 @@ public class Spell : MonoBehaviour
     public int GetAmount()
     {
         return m_spellInfo.BasePoints;
+    }
+
+    public void ModBasePoints(float amount)
+    {
+        this.modBasePoints = m_spellInfo.BasePoints * amount;
     }
 
     public void OnHit()

@@ -16,6 +16,10 @@ public enum Stats
     Agility = 2
 }
 
+public class UnitState
+{
+    public const int UNIT_STATE_ROOTED = 1;
+}
 public class Unit : MonoBehaviour
 {
     // Reference to the NetworkIdentity component
@@ -40,6 +44,8 @@ public class Unit : MonoBehaviour
     private float m_combatTimer = 0;
     private float m_absorbAmount = 0;
     private bool m_isCasting;
+    private List<int> unitStates;
+
     public CooldownHandler cdHandler { get; private set; }
     public Player player { get; private set; }
     public LocationHandler locationHandler { get; protected set; }
@@ -70,7 +76,27 @@ public class Unit : MonoBehaviour
             knownSpells = new List<int>();
 
         player = GetComponent<Player>();
-       
+
+        unitStates = new List<int>(); // Need to add the class, gotta wait for it to load, slow pc
+
+
+    }
+
+    public void AddUnitState(int state)
+    {
+        if (!unitStates.Contains(state))
+            unitStates.Add(state);
+    }
+
+    public void RemoveUnitState(int state)
+    {
+        if (unitStates.Contains(state))
+            unitStates.Remove(state); // I love the autocomplete sometimes
+    }
+
+    public bool HasUnitState(int state)
+    {
+        return unitStates.Contains(state);
     }
 
     public float GetMana()
@@ -551,26 +577,19 @@ public class Unit : MonoBehaviour
             else if (target == null)
                 print("targetNull");
 
-            print("Nope1"); 
             return; 
         }
 
         SpellInfo m_spellInfo = spell.m_spellInfo; // Assuming spell has a spellInfo property
         if (m_spellInfo == null)
-        {
-            print("Nope2");
             return;
-        }
 
         SpellSchoolMask spellClass = m_spellInfo.SchoolMask;
 
         SpellType spellType = m_spellInfo.Type;
 
         if (spellType != SpellType.Damage)
-        {
-            print("Nope3");
             return;
-        }
 
         // Calculate the damage and check if it's a critical hit
         bool crit;
@@ -673,11 +692,21 @@ public class Unit : MonoBehaviour
             return 0f;
 
         // TODO: Check for immunities
-       // if (victim.m_immunities.ContainsKey(spell.m_school) && victim.m_immunities[spell.m_school])
+        // if (victim.m_immunities.ContainsKey(spell.m_school) && victim.m_immunities[spell.m_school])
         //    return 0f;
 
         // Default damage calculation
-        doneTotal = UnityEngine.Random.Range(spell.GetAmount(), spell.GetAmount() * 1.5f);
+        bool modPoints = false;
+        float newPoints = 0;
+        if (spell.modBasePoints > 0)
+        {
+            modPoints = true;
+            newPoints = spell.modBasePoints;
+        }
+        if (modPoints)
+            doneTotal = UnityEngine.Random.Range(newPoints, newPoints * 1.5f);
+        else
+            doneTotal = UnityEngine.Random.Range(newPoints, newPoints * 1.5f);
 
         // Damage modifiers based on damage class
         string damageClass = m_spellInfo.damageClass;

@@ -94,8 +94,8 @@ public class Spell : MonoBehaviour
                 break;
             case SPELL_STATE_PREPARING:
                 bool shouldCancel =
-                    !caster.IsAlive(); /* ||
-                    (caster.IsMoving() && !HasFlag("SPELL_FLAG_CAST_WHILE_MOVING")) ||
+                    !caster.IsAlive() ||
+                    (caster.IsMoving() && !HasFlag(SpellFlags.SPELL_FLAG_CAST_WHILE_MOVING)); /* ||
                     caster.HasState("UNIT_STATE_SILENCED") ||
                     caster.HasState("UNIT_STATE_STUNNED") ||
                     caster.HasState("UNIT_STATE_FEARED");*/
@@ -309,7 +309,6 @@ public class Spell : MonoBehaviour
             m_spellState = SPELL_STATE_PREPARING;
             SendSpellStartPacket();
 
-            //TODO: Add spell flags to check for GCD immunity
             if (caster.ToPlayer() != null && (!HasFlag(SpellFlags.SPELL_FLAG_IGNORES_GCD)))
                 caster.ToPlayer().SetOnGCD();
 
@@ -340,6 +339,22 @@ public class Spell : MonoBehaviour
 
     private void HandleFailed(string reason)
     {
+        NetworkWriter writer = new NetworkWriter();
+
+        writer.WriteNetworkIdentity(caster.Identity);
+        writer.WriteInt(m_spellInfo.Id);
+        writer.WriteString(reason);
+
+        OpcodeMessage packet = new OpcodeMessage
+        {
+            opcode = Opcodes.SMSG_SPELL_FAILED,
+            payload = writer.ToArray()
+        };
+
+        NetworkServer.SendToAll(packet);
+
+        isPreparing = false;
+
         Debug.LogError($"{reason} is why you can't cast, idiot!");
     }
     private void AttachSpellScript(int spellId)
@@ -380,6 +395,9 @@ public class Spell : MonoBehaviour
         if (NeedsTarget() && target == null)
             return "target";
 
+        if (caster.IsMoving() && !HasFlag(SpellFlags.SPELL_FLAG_CAST_WHILE_MOVING))
+            return "moving";
+
         return "";
     }
 
@@ -401,6 +419,8 @@ public class Spell : MonoBehaviour
             case SPELL_STATE_CASTING:
                 break;
         }
+
+        HandleFailed("cancelled");
     }
 
     public void CancelGlobalCooldown()

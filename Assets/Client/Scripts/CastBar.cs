@@ -1,20 +1,22 @@
 using UnityEngine;
 using UnityEngine.UI;
-
+using System.Collections;
 public class CastBar : MonoBehaviour
 {
-    public Image bar;              // Reference to the Slider component
-    public Text spellNameText;      // Reference to the Text component for the spell name
+    public Image bar;              // Reference to the Image component
+    public Text spellNameText;     // Reference to the Text component for the spell name
     public GameObject castbar;
 
-    private float duration;         // Duration of the spell cast
-    private float timeRemaining;    // Time remaining for the cast to complete
-    private bool isCasting;         // Whether a spell is currently being cast
+    private float duration;        // Duration of the spell cast
+    private float timeRemaining;   // Time remaining for the cast to complete
+    private bool isCasting;        // Whether a spell is currently being cast
+    private Color originalColor;   // Original color of the cast bar
 
     void Start()
     {
         // Hide the cast bar at the start
         castbar.gameObject.SetActive(false);
+        originalColor = bar.color; // Store the original color of the bar
     }
 
     void Update()
@@ -56,10 +58,41 @@ public class CastBar : MonoBehaviour
         castbar.gameObject.SetActive(false);
     }
 
-    // Optionally, call this method to cancel a cast
+    // Method to cancel a cast
     public void CancelCast()
     {
         isCasting = false;
         FinishCast();
+    }
+
+    // Method to indicate a failed cast
+    public void CastFailed()
+    {
+        isCasting = false;
+        StartCoroutine(FadeOutCastBar());
+    }
+
+    // Coroutine to fade the cast bar out after a failed cast
+    private IEnumerator FadeOutCastBar()
+    {
+        // Set the cast bar color to red
+        bar.color = Color.red;
+
+        // Set the duration of the fade out
+        float fadeDuration = 0.5f;
+        float elapsedTime = 0f;
+
+        // While loop to fade out the bar
+        while (elapsedTime < fadeDuration)
+        {
+            elapsedTime += Time.deltaTime;
+            float alpha = Mathf.Lerp(1f, 0f, elapsedTime / fadeDuration);
+            bar.color = new Color(bar.color.r, bar.color.g, bar.color.b, alpha);
+            yield return null;
+        }
+
+        // After fading out, reset the bar and hide it
+        bar.color = originalColor; // Reset to original color
+        castbar.gameObject.SetActive(false);
     }
 }

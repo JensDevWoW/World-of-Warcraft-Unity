@@ -14,5 +14,6 @@ public class Opcodes
     public const int SMSG_CAST_CANCELED = 7;
     public const int SMSG_APPLY_AURA = 8;
     public const int SMSG_UPDATE_TARGET = 9;
+    public const int SMSG_SPELL_FAILED = 10;
 }
 

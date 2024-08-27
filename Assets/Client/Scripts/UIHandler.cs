@@ -61,6 +61,17 @@ public class UIHandler : MonoBehaviour
         }
     }
 
+    public void HandleSpellFailed(int spellId, string reason)
+    {
+        if (reason == "cancelled")
+        {
+            if (castBar != null)
+            {
+                castBar.CastFailed();
+            }
+        }
+    }
+
     public void StartCooldown(int spellId, float cooldownTime)
     {
         foreach (var button in actionButtons)

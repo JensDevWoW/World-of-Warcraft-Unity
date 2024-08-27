@@ -45,7 +45,9 @@ public class Unit : MonoBehaviour
     private float m_absorbAmount = 0;
     private bool m_isCasting;
     private List<int> unitStates;
-
+    private Vector3 lastPosition;
+    private bool isMoving;
+    private float movementThreshold = 0.1f; // The threshold for detecting movement
     public CooldownHandler cdHandler { get; private set; }
     public Player player { get; private set; }
     public LocationHandler locationHandler { get; protected set; }
@@ -62,6 +64,8 @@ public class Unit : MonoBehaviour
         locationHandler = LocationHandler.Instance;
 
         creature = GetComponent<Creature>();
+
+        lastPosition = transform.position;
 
         if (creature != null)
             creature.Init();
@@ -224,6 +228,7 @@ public class Unit : MonoBehaviour
 
         //DRHandler().Update();
         cdHandler.Update();
+        CheckMovement();
         //target stealth update
         /*if (HasTarget())
             if (GetTarget().IsInStealth())
@@ -471,8 +476,8 @@ public class Unit : MonoBehaviour
             writer.WriteNetworkIdentity(m_target.Identity);
             writer.WriteFloat(m_target.GetHealth());
             writer.WriteFloat(m_target.GetMaxHealth());
-            writer.WriteFloat(0f); // TODO: Mana
-            writer.WriteFloat(0f); // TODO: MaxMana
+            writer.WriteFloat(m_mana); // TODO: Mana client-side
+            writer.WriteFloat(m_maxMana);
 
             OpcodeMessage packet = new OpcodeMessage
             {
@@ -535,12 +540,12 @@ public class Unit : MonoBehaviour
 
     public void AddAura(int spellId)
     {
-        // TODO: AddAura
+        CastSpell(spellId, this);
     }
 
     public void AddAura(Aura aura)
     {
-        // TODO: Other add aura
+        CastSpell(aura.auraInfo.Id, this);
     }
     public void RemoveAura(int spellId)
     {
@@ -691,6 +696,24 @@ public class Unit : MonoBehaviour
         };
 
         NetworkServer.SendToAll(msg);
+    }
+
+    private void CheckMovement()
+    {
+        // Calculate the distance moved since the last frame
+        float distanceMoved = Vector3.Distance(transform.position, lastPosition);
+
+        // If the distance moved is greater than the threshold, consider the unit to be moving
+        isMoving = distanceMoved > movementThreshold;
+
+        // Update the last position for the next check
+        lastPosition = transform.position;
+    }
+
+    // This function returns true if the unit is currently moving
+    public bool IsMoving()
+    {
+        return isMoving;
     }
 
     public string GetClass()

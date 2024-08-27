@@ -14,7 +14,7 @@ using UnityEngine.UIElements;
 
 public class Spell : MonoBehaviour
 {
-    public const int SPELL_STATE_PREPARING = 1, SPELL_STATE_DELAYED = 2, SPELL_STATE_FINISHED = 3, SPELL_STATE_CASTING = 4, SPELL_STATE_NULL = 5;
+    public const int SPELL_STATE_PREPARING = 1, SPELL_STATE_DELAYED = 2, SPELL_STATE_FINISHED = 3, SPELL_STATE_CASTING = 4, SPELL_STATE_NULL = 5, SPELL_STATE_QUEUED = 6;
 
     public int spellId;
     public Unit caster, target;
@@ -88,6 +88,10 @@ public class Spell : MonoBehaviour
     {
         switch (m_spellState)
         {
+            case SPELL_STATE_QUEUED:
+                if (!caster.IsCasting() && caster.GetGCDTime() == 0)
+                    prepare();
+                break;
             case SPELL_STATE_PREPARING:
                 bool shouldCancel =
                     !caster.IsAlive(); /* ||
@@ -252,9 +256,55 @@ public class Spell : MonoBehaviour
             string canCast = CheckCast();
             if (canCast != "")
             {
+                // Only players have spell queue of course
+                if (caster.ToPlayer() == null)
+                {
+                    HandleFailed(canCast);
+                    return;
+                }
+
+                float queueTime = 0.4f; // TODO: Make this adjustable later client-side
+                if (canCast == "global cooldown")
+                {
+                    //we must first overlap any other queued spell we have
+                    foreach (Spell spell in caster.GetSpellList())
+                    {
+                        if (spell.GetSpellState() == SPELL_STATE_QUEUED)
+                            spell.SetSpellState(SPELL_STATE_NULL);
+                    }
+
+                    // Check if the time left on our gcd is less than our spell queue time
+                    if (caster.GetGCDTime() < queueTime)
+                    {
+                        m_spellState = SPELL_STATE_QUEUED;
+                        isPreparing = false;
+                        HandleFailed(canCast);
+                        return;
+                    }
+                }
+                else if (canCast == "casting")
+                {
+                    // same as before, overwrite any queued spell
+                    foreach (Spell spell in caster.GetSpellList())
+                    {
+                        if (spell.GetSpellState() == SPELL_STATE_QUEUED)
+                            spell.SetSpellState(SPELL_STATE_NULL);
+                    }
+
+                    // Check if the time left on our gcd is less than our spell queue time
+                    if (caster.GetCastedSpellTimeLeft() < queueTime)
+                    {
+                        m_spellState = SPELL_STATE_QUEUED;
+                        isPreparing = false;
+                        HandleFailed(canCast);
+                        return;
+                    }
+                }
+
                 HandleFailed(canCast);
                 return;
             }
+
             caster.SetCasting();
             m_spellState = SPELL_STATE_PREPARING;
             SendSpellStartPacket();
@@ -266,6 +316,16 @@ public class Spell : MonoBehaviour
             if (IsInstant())
                 Cast();
         }
+    }
+
+    public float GetCastTimeLeft()
+    {
+        return CastTime;
+    }
+
+    public void SetSpellState(int state)
+    {
+        m_spellState = state;
     }
 
     public bool NeedsTarget()

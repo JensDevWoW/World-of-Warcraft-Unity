@@ -88,6 +88,14 @@ public class Unit : MonoBehaviour
             unitStates.Add(state);
     }
 
+    public float GetGCDTime()
+    {
+        Player plr = ToPlayer();
+        if (!player)
+            return 99f; // Not a player
+
+        return plr.GetGCDTime();
+    }
     public void RemoveUnitState(int state)
     {
         if (unitStates.Contains(state))
@@ -107,6 +115,11 @@ public class Unit : MonoBehaviour
     public void SetMana(float val)
     {
         m_mana = val;
+    }
+
+    public List<Spell> GetSpellList()
+    {
+        return spellList;
     }
 
     public float GetMaxMana()
@@ -170,6 +183,17 @@ public class Unit : MonoBehaviour
     {
         return 1;
     }
+
+    public float GetCastedSpellTimeLeft()
+    {
+        foreach (Spell spell in spellList)
+        {
+            if (spell.GetSpellState() == Spell.SPELL_STATE_PREPARING)
+                return spell.GetCastTimeLeft();
+        }
+        return 0f;
+    }
+
     public void SetInCombatWith(Unit unit)
     {
         if (!IsHostileTo(unit))

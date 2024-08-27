@@ -37,6 +37,10 @@ public class Player : MonoBehaviour
         gcdTimer = gcdTime;
     }
 
+    public float GetGCDTime()
+    {
+        return gcdTimer;
+    }
     public void Update()
     {
         // Only players have GCD so update in Player object

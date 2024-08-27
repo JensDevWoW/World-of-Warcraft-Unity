@@ -288,7 +288,6 @@ GameObject:
   - component: {fileID: 9087809450349509563}
   - component: {fileID: 1323267072464308574}
   - component: {fileID: 4085889976682173191}
-  - component: {fileID: 5826980742188553568}
   - component: {fileID: 3600276960106289242}
   - component: {fileID: 7060717139799016360}
   - component: {fileID: 6254427956938447325}
@@ -376,29 +375,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &5826980742188553568
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3986798803404752212}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 0
-  serializedVersion: 2
-  m_Radius: 0.35
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!143 &3600276960106289242
 CharacterController:
   m_ObjectHideFlags: 0
@@ -588,7 +564,7 @@ MonoBehaviour:
     m_Bits: 0
   moveState: 0
   baseSpeed: 1
-  runSpeed: 4
+  runSpeed: 12
   rotateSpeed: 2
   mount: 0
   mountType: 0
@@ -597,6 +573,8 @@ MonoBehaviour:
   flyingSpeed: 2.5
   jumping: 0
   canJump: 1
+  swimSpeed: 2
+  swimLevel: 1.25
   waterSurface: 0
   d_fromWaterSurface: 0
   inWater: 0

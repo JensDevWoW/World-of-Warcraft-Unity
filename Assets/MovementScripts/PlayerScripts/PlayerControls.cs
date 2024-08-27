@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Sirenix.OdinInspector;
+
 
 public class PlayerControls : MonoBehaviour
 {
@@ -18,15 +20,41 @@ public class PlayerControls : MonoBehaviour
 
     public MoveState moveState = MoveState.locomotion;
 
+
     //velocity
     Vector3 velocity;
     float gravity = -18, velocityY, terminalVelocity = -25;
     float fallMult;
 
-    //Running
+
+
+    [BoxGroup("Speed Configurations", centerLabel: true)]
+    [InfoBox("All variables controlling the speed for the player controller is located in this group.")]
+    [PropertyTooltip("Changing this will change the walk speed of the player.")]
+    public float baseSpeed = 1;
+
+    [BoxGroup("Speed Configurations", centerLabel: true)]
+    [PropertyTooltip("Changing this will change the run speed of the player.")]
+    public float runSpeed = 4;
+
+    [BoxGroup("Speed Configurations", centerLabel: true)]
+    [PropertyTooltip("Changing this will change the speed of player rotating.")]
+    public float rotateSpeed = 2;
+
+    [BoxGroup("Speed Configurations", centerLabel: true)]
+    [PropertyTooltip("Changing this will change the swim speed of the player.")]
+    public float swimSpeed = 2;
+
+    [BoxGroup("Speed Configurations", centerLabel: true)]
+    [PropertyTooltip("Changing this will change the mounted speed of the player.")]
+    public float mountedSpeed = 1.6f;
+
+    [BoxGroup("Speed Configurations", centerLabel: true)]
+    [PropertyTooltip("Changing this will change the flying speed of the player.")]
+    public float flyingSpeed = 2.5f;
+
     float currentSpeed;
-    [HideInInspector]
-    public float baseSpeed = 1, runSpeed = 4, rotateSpeed = 2;
+    
 
     //ground
     Vector3 forwardDirection, collisionPoint;
@@ -36,33 +64,35 @@ public class PlayerControls : MonoBehaviour
     RaycastHit groundHit;
 
     //Mounted
+    [BoxGroup("Mount Configurations", centerLabel: true)]
     public bool mount;
-    //[HideInInspector]
+    [BoxGroup("Mount Configurations", centerLabel: true)]
     public MountType mountType;
-    [HideInInspector]
+    [BoxGroup("Mount Configurations", centerLabel: true)]
     public MountedState mountedState = MountedState.unmounted;
-    [HideInInspector]
-    public float mountedSpeed = 1.6f, flyingSpeed = 2.5f;
 
     //Jumping
-    [SerializeField]
-    bool jumping, canJump = true;
+    [BoxGroup("Jumping Configurations", centerLabel: true)]
+    public bool jumping, canJump = true;
     float jumpStartPosY;
     float jumpSpeed, jumpHeight = 3;
     Vector3 jumpDirection;
 
     //swimming
-    float swimSpeed = 2, swimLevel = 1.25f;
-    [HideInInspector]
+    [BoxGroup("Swimming Configurations", centerLabel: true)]
+    public float swimLevel = 1.25f;
+    [BoxGroup("Swimming Configurations", centerLabel: true)]
     public float waterSurface, d_fromWaterSurface;
-    [HideInInspector]
+    [BoxGroup("Swimming Configurations", centerLabel: true)]
     public bool inWater;
 
     //Debug
+    [BoxGroup("Debugging", centerLabel: true)]
     public bool showGroundRay, showMoveDirection, showForwardDirection, showStrafeDirection, showFallNormal, showSwimNormal;
 
     //references
     CharacterController controller;
+    [BoxGroup("References", centerLabel: true)]
     public Transform groundDirection, moveDirection, fallDirection, swimDirection;
     [HideInInspector]
     public CameraController mainCam;

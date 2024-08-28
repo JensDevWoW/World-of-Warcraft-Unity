@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using UnityEditor.Build.Content;
+using System.Runtime.Versioning;
 
 public class UIHandler : MonoBehaviour
 {
@@ -11,6 +12,10 @@ public class UIHandler : MonoBehaviour
     [Header("UI Elements")]
     public CastBar castBar;
     public HealthBar healthBar;
+    public TargetHealthBar targetHealthBar;
+    public GameObject targetFrame;
+    public GameObject thbObject;
+    public GameObject tmbObject;
     public List<ActionButton> actionButtons; // List of all ActionButton instances
     public Text combatText;
     public Transform buffCanvas; // Reference to the Buff Canvas
@@ -18,7 +23,6 @@ public class UIHandler : MonoBehaviour
     public float buffSpacing = 10f; // Spacing between buffs
     private List<GameObject> activeBuffs = new List<GameObject>();
     public Unit target;
-    private GameObject targetHealthBar;
     private void Awake()
     {
         if (Instance == null)
@@ -37,7 +41,7 @@ public class UIHandler : MonoBehaviour
         GameObject canvas = GameObject.FindWithTag("Canvas");
         castBar = canvas.GetComponent<CastBar>();
         healthBar = canvas.GetComponent<HealthBar>();
-
+        targetHealthBar = canvas.GetComponent<TargetHealthBar>();
         // Initialize the list of action buttons
         actionButtons = new List<ActionButton>(canvas.GetComponentsInChildren<ActionButton>());
 
@@ -58,6 +62,14 @@ public class UIHandler : MonoBehaviour
         if (healthBar != null)
         {
             healthBar.UpdateHealth(currentHealth, maxHealth);
+        }
+    }
+
+    public void TargetHealthUpdate(float currentHealth, float maxHealth)
+    {
+        if (targetHealthBar != null)
+        {
+            targetHealthBar.UpdateHealth(currentHealth, maxHealth);
         }
     }
 
@@ -136,18 +148,6 @@ public class UIHandler : MonoBehaviour
         this.target = unit;
     }
 
-    public void UpdateTargetHealth(float health, float maxHealth)
-    {
-        if (targetHealthBar != null)
-        {
-            Image image = targetHealthBar.GetComponent<Image>();
-            if (image != null)
-            {
-                image.fillAmount = Mathf.Clamp01(health / maxHealth);
-            }
-        }
-    }
-
     public Unit GetTarget()
     {
         return this.target;
@@ -158,6 +158,9 @@ public class UIHandler : MonoBehaviour
         if (unit == null)
             return;
 
+        thbObject.SetActive(true);
+        targetFrame.SetActive(true);
+        tmbObject.SetActive(true);
         Transform healthBarTransform = unit.transform.Find("HealthBarVisual");
 
         if (healthBarTransform != null)
@@ -174,7 +177,6 @@ public class UIHandler : MonoBehaviour
             if (healthBarObj != null)
             {
                 healthBarTransform.gameObject.SetActive(true);
-                this.targetHealthBar = healthBarObj;
                 SetTarget(unit);
             }
         }

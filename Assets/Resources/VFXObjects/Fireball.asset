@@ -15,4 +15,4 @@ MonoBehaviour:
   spellId: 4
   spellName: Fireball
   spellPrefabs:
-  - {fileID: 1947871717301538, guid: a990e3ac1318b834488c784d851f42a9, type: 3}
+  - {fileID: 7663661476658743825, guid: cd71ba387c354494db9e4b8a3e9c0244, type: 3}

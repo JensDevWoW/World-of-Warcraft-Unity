@@ -143,7 +143,7 @@ public class ClientNetworkManager : MonoBehaviour
             if (UIHandler.Instance.GetTarget() == sender)
             {
                 // We are targetting that person, adjust his health
-                UIHandler.Instance.UpdateTargetHealth(statValue, maxStatValue);
+                UIHandler.Instance.TargetHealthUpdate(statValue, maxStatValue);
             }
         }
 
@@ -237,7 +237,7 @@ public class ClientNetworkManager : MonoBehaviour
             Unit target = targetIdentity.GetComponent<Unit>();
             // We are the person whose target needs updating
             UIHandler.Instance.UpdateTarget(target);
-            UIHandler.Instance.UpdateTargetHealth(health, maxHealth);
+            UIHandler.Instance.TargetHealthUpdate(health, maxHealth);
             //TODO: Add mana
         }
     }

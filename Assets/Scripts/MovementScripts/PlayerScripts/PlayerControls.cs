@@ -17,10 +17,10 @@ public class PlayerControls : MonoBehaviour
     [HideInInspector]
     public bool steer, autoRun;
     public LayerMask groundMask;
-
+    public Animator animator;
+    public GameObject characterModel;
     public MoveState moveState = MoveState.locomotion;
-
-
+    private bool wasGrounded;
     //velocity
     Vector3 velocity;
     float gravity = -18, velocityY, terminalVelocity = -25;
@@ -54,7 +54,8 @@ public class PlayerControls : MonoBehaviour
     public float flyingSpeed = 2.5f;
 
     float currentSpeed;
-    
+
+    private bool isLanding;  // Flag to control landing animation state
 
     //ground
     Vector3 forwardDirection, collisionPoint;
@@ -100,12 +101,20 @@ public class PlayerControls : MonoBehaviour
     void Start()
     {
         controller = GetComponent<CharacterController>();
+        animator = characterModel.GetComponent<Animator>();
     }
 
     void Update()
     {
         GetInputs();
         GetSwimDirection();
+
+        // Update animator parameters based on movement
+        animator.SetBool("IsRunning", inputNormalized.y > 0 && !jumping);  // Forward movement
+        animator.SetBool("IsRunningBack", inputNormalized.y < 0 && !jumping);  // Backward movement
+        animator.SetBool("IsStanding", inputNormalized.magnitude == 0 && !jumping);  // Idle
+        animator.SetBool("IsFalling", !controller.isGrounded && velocityY < 0);  // Falling
+        animator.SetBool("IsJumpingStart", jumping);  // Jumping Start
 
         if (inWater)
             GetWaterlevel();
@@ -145,11 +154,15 @@ public class PlayerControls : MonoBehaviour
         }
     }
 
+    public void OnLandingComplete()
+    {
+        isLanding = false;
+    }
     void Locomotion()
     {
         GroundDirection();
 
-        //running and walking
+        // Running and walking logic
         if (controller.isGrounded && slopeAngle <= controller.slopeLimit)
         {
             currentSpeed = baseSpeed;
@@ -165,28 +178,33 @@ public class PlayerControls : MonoBehaviour
                     currentSpeed = currentSpeed / 2;
             }
         }
-        else if(!controller.isGrounded || slopeAngle > controller.slopeLimit)
+        else if (!controller.isGrounded || slopeAngle > controller.slopeLimit)
         {
             inputNormalized = Vector2.Lerp(inputNormalized, Vector2.zero, 0.025f);
             currentSpeed = Mathf.Lerp(currentSpeed, 0, 0.025f);
         }
 
-        //Rotating
+        // Rotating
         Vector3 characterRotation = transform.eulerAngles + new Vector3(0, rotation * rotateSpeed, 0);
         transform.eulerAngles = characterRotation;
 
-        //Press space to Jump
+        // Jump Logic
         if (jump && controller.isGrounded && slopeAngle <= controller.slopeLimit && !jumping && canJump)
+        {
             Jump();
+            animator.SetTrigger("Jump");  // Trigger Jump animation
+            isLanding = false;  // Interrupt landing animation if jumping
+        }
 
-        //apply gravity if not grounded
+        // Apply gravity if not grounded
         if (!controller.isGrounded)
         {
-            switch(mountedState)
+            isLanding = false;  // Interrupt landing animation if falling
+            switch (mountedState)
             {
                 case MountedState.unmounted:
                 case MountedState.mounted:
-                    if(velocityY > terminalVelocity)
+                    if (velocityY > terminalVelocity)
                         velocityY += gravity * Time.deltaTime;
                     break;
 
@@ -204,15 +222,11 @@ public class PlayerControls : MonoBehaviour
         else if (controller.isGrounded && slopeAngle > controller.slopeLimit)
             velocityY = Mathf.Lerp(velocityY, terminalVelocity, 0.25f);
 
-        //checking WaterLevel
+        // Check WaterLevel
         if (inWater)
-        {        
-            //setting ground ray
+        {
             groundRay.origin = transform.position + collisionPoint + Vector3.up * 0.05f;
             groundRay.direction = Vector3.down;
-
-            //if (Physics.Raycast(groundRay, out groundHit, 0.15f))
-            //    currentSpeed = Mathf.Lerp(currentSpeed, baseSpeed, d_fromWaterSurface / swimLevel);
 
             if (d_fromWaterSurface >= swimLevel)
             {
@@ -223,20 +237,22 @@ public class PlayerControls : MonoBehaviour
             }
         }
 
-        //Applying inputs
+        // Applying inputs
         if (!jumping)
         {
-            velocity = groundDirection.forward * inputNormalized.y * forwardMult + groundDirection.right * inputNormalized.x * strafeMult; //Applying movement direction inputs
-            velocity *= currentSpeed; //Applying current move speed
-            velocity += fallDirection.up * (velocityY * fallMult); //Gravity
+            velocity = groundDirection.forward * inputNormalized.y * forwardMult + groundDirection.right * inputNormalized.x * strafeMult; // Applying movement direction inputs
+            velocity *= currentSpeed; // Applying current move speed
+            velocity += fallDirection.up * (velocityY * fallMult); // Gravity
         }
         else
+        {
             velocity = jumpDirection * jumpSpeed + Vector3.up * velocityY;
+        }
 
-        //moving controller
+        // Moving controller
         controller.Move(velocity * Time.deltaTime);
 
-        if(mountedState == MountedState.mountedFlying && jumping)
+        if (mountedState == MountedState.mountedFlying && jumping)
         {
             float currentJumpHeight = transform.position.y - jumpStartPosY;
 
@@ -244,19 +260,49 @@ public class PlayerControls : MonoBehaviour
                 moveState = MoveState.flying;
         }
 
-        if(controller.isGrounded)
+        // Detect landing
+        if (controller.isGrounded && !wasGrounded)  // Player just landed
         {
-            //stop jumping if grounded
-            if(jumping)
+            // Stop jumping if grounded
+            if (jumping)
+            {
                 jumping = false;
+                canJump = true;  // Allow the player to jump again
 
-            if (!jump && !canJump)
-                canJump = true;
+                // Reset the jumping state
+                animator.ResetTrigger("Jump");
 
-            // stop gravity if grounded
+                // Start landing animation logic
+                if (inputNormalized.magnitude > 0)
+                {
+                    animator.SetTrigger("LandAndMoving");  // Trigger landing and moving animation
+                }
+                else
+                {
+                    animator.SetTrigger("LandNotMoving");  // Trigger landing not moving animation
+                }
+
+                isLanding = true;  // Set landing state
+            }
+
+            // Stop gravity if grounded
             velocityY = 0;
         }
+
+        // Update wasGrounded state
+        wasGrounded = controller.isGrounded;
+
+        // Set animator parameters based on movement state
+        if (!isLanding)  // Only update these if not landing
+        {
+            animator.SetBool("IsRunning", inputNormalized.y > 0 && !jumping);  // Forward movement
+            animator.SetBool("IsRunningBack", inputNormalized.y < 0 && !jumping);  // Backward movement
+            animator.SetBool("IsStanding", inputNormalized.magnitude == 0 && !jumping);  // Idle
+            animator.SetBool("IsFalling", !controller.isGrounded && velocityY < 0);  // Falling
+        }
     }
+
+
 
     void GroundDirection()
     {

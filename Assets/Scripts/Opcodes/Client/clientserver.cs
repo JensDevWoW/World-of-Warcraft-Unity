@@ -168,7 +168,7 @@ public class ClientNetworkManager : MonoBehaviour
             // We are the target, apply the aura to our list
             this.num++;
             print(num);
-            UIHandler.Instance.AddBuff(auraId, IconManager.GetSpellIcon(auraId), duration);
+            UIHandler.Instance.AddBuff(auraId, IconManager.GetSpellIcon(target.GetClass(), auraId), duration); // TODO: Make ClassHandler
         }
     }
 

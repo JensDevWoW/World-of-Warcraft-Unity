@@ -12,10 +12,11 @@ public class PlayerInput : NetworkBehaviour
         KeyBindManager.LoadKeyBinds();
         spellbook.Add(new SpellList("Fireball", 4, KeyBindManager.keyBinds.three));
         spellbook.Add(new SpellList("Pyroblast", 13, KeyBindManager.keyBinds.two));
-        spellbook.Add(new SpellList("Flamestrike", 6, KeyBindManager.keyBinds.one, true)); // Example AoE spell
+        spellbook.Add(new SpellList("Flamestrike", 6, KeyBindManager.keyBinds.one, true)); // AoE click-placement spell
         spellbook.Add(new SpellList("Combustion", 14, KeyBindManager.keyBinds.four));
         spellbook.Add(new SpellList("Frostbolt", 2, KeyBindManager.keyBinds.five));
         spellbook.Add(new SpellList("Ice Lance", 15, KeyBindManager.keyBinds.six));
+        spellbook.Add(new SpellList("Frost Nova", 17, KeyBindManager.keyBinds.seven));
     }
 
     void Update()

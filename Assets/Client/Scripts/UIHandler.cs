@@ -19,10 +19,15 @@ public class UIHandler : MonoBehaviour
     public List<ActionButton> actionButtons; // List of all ActionButton instances
     public Text combatText;
     public Transform buffCanvas; // Reference to the Buff Canvas
+    public Transform targetDebuffCanvas;
+    public GameObject targetDebuffTemplate;
     public GameObject buffTemplate; // Reference to the Buff Template object
     public float buffSpacing = 10f; // Spacing between buffs
     private List<GameObject> activeBuffs = new List<GameObject>();
+    private List<GameObject> activeTargetDebuffs = new List<GameObject>();
     public Unit target;
+    private BuffPosition debuffPos;
+    private BuffPosition buffPos;
     private void Awake()
     {
         if (Instance == null)
@@ -47,6 +52,9 @@ public class UIHandler : MonoBehaviour
 
         // Assign the Buff Canvas
         buffCanvas = GameObject.FindWithTag("Buffs").transform;
+        buffPos = buffCanvas.GetComponent<BuffPosition>();
+        targetDebuffCanvas = canvas.transform.Find("TargetDebuffs");
+        debuffPos = targetDebuffCanvas.GetComponent<BuffPosition>();
     }
 
     public void StartCast(float castTime, string name)
@@ -161,6 +169,7 @@ public class UIHandler : MonoBehaviour
         thbObject.SetActive(true);
         targetFrame.SetActive(true);
         tmbObject.SetActive(true);
+        targetDebuffCanvas.gameObject.SetActive(true);
         Transform healthBarTransform = unit.transform.Find("HealthBarVisual");
 
         if (healthBarTransform != null)
@@ -194,16 +203,24 @@ public class UIHandler : MonoBehaviour
         // Get the BuffDebuff component and initialize it
         BuffDebuff buffDebuff = newBuff.GetComponent<BuffDebuff>();
         buffDebuff.InitializeBuff(spellId, icon, duration);
-
-        // Position the new buff correctly in the UI
-        int row = activeBuffs.Count / 10; // 10 buffs per row, adjust as needed
-        int column = activeBuffs.Count % 10;
-
-        RectTransform buffRectTransform = newBuff.GetComponent<RectTransform>();
-        buffRectTransform.anchoredPosition = new Vector2(column * (buffRectTransform.sizeDelta.x + buffSpacing), -row * (buffRectTransform.sizeDelta.y + buffSpacing));
+        buffPos.AddBuff(newBuff);
         buffDebuff.gameObject.SetActive(true);
         // Add to the list of active buffs
         activeBuffs.Add(newBuff);
+    }
+
+    public void AddTargetDebuff(int spellId, Sprite icon, float duration)
+    {
+        // Clone the BuffTemplate and add it to the buffCanvas
+        GameObject newBuff = Instantiate(targetDebuffTemplate, targetDebuffCanvas);
+
+        // Get the BuffDebuff component and initialize it
+        BuffDebuff buffDebuff = newBuff.GetComponent<BuffDebuff>();
+        buffDebuff.InitializeBuff(spellId, icon, duration);
+        debuffPos.AddBuff(newBuff);
+        buffDebuff.gameObject.SetActive(true);
+        // Add to the list of active buffs
+        activeTargetDebuffs.Add(newBuff);
     }
 
     public void UpdateAura(int spellId, float duration, int stacks)

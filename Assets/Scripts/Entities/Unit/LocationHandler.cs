@@ -82,9 +82,9 @@ public class LocationHandler : MonoBehaviour
     {
         List<Unit> list = new List<Unit>();
         List<Unit> mapUnits = mapHandler.GetAllUnitsInMap(unit.GetMap());
-        foreach (var v in mapUnits)
+        foreach (Unit v in mapUnits)
         {
-            if (IsWithinRange(position, range, v) && unit.IsHostileTo(v) && v.IsAlive())
+            if (IsWithinRange(position, range, v) && unit.IsHostileTo(v) && v.IsAlive() && v != unit)
             {
                 list.Add(v);
             }
@@ -99,7 +99,7 @@ public class LocationHandler : MonoBehaviour
         Vector3 unitForward = unit.transform.forward;
         Vector3 unitPosition = unit.transform.position;
 
-        foreach (var v in GetNearestEnemyUnitList(unit, coneRange))
+        foreach (Unit v in GetNearestEnemyUnitList(unit, coneRange))
         {
             Vector3 targetPosition = v.transform.position;
             Vector3 targetDirection = (targetPosition - unitPosition).normalized;
@@ -107,7 +107,7 @@ public class LocationHandler : MonoBehaviour
             float dotProduct = Vector3.Dot(unitForward, targetDirection);
             float angle = Mathf.Acos(dotProduct) * Mathf.Rad2Deg;
 
-            if (angle <= (coneAngle / 2))
+            if (angle <= (coneAngle / 2) && v != unit)
             {
                 list.Add(v);
             }
@@ -140,7 +140,7 @@ public class LocationHandler : MonoBehaviour
         List<Unit> mapUnits = mapHandler.GetAllUnitsInMap(unit.GetMap());
         foreach (var v in mapUnits)
         {
-            if (IsWithinDist(unit, dist, v) && unit.IsHostileTo(v) && v.IsAlive())
+            if (IsWithinDist(unit, dist, v) && unit.IsHostileTo(v) && v.IsAlive() && v != unit)
             {
                 list.Add(v);
             }
@@ -155,7 +155,7 @@ public class LocationHandler : MonoBehaviour
 
         foreach (var v in GetNearestUnitList(unit, dist))
         {
-            if (v.IsHostileTo(unit))
+            if (v.IsHostileTo(unit) && v != unit)
             {
                 list.Add(v);
             }
@@ -171,7 +171,7 @@ public class LocationHandler : MonoBehaviour
         List<Unit> mapUnits = mapHandler.GetAllUnitsInMap(unit.GetMap());
         foreach (var v in mapUnits)
         {
-            if (IsWithinDist(unit, dist, v))
+            if (IsWithinDist(unit, dist, v) && v != unit)
             {
                 list.Add(v);
             }

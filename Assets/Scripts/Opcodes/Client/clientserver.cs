@@ -161,8 +161,12 @@ public class ClientNetworkManager : MonoBehaviour
 
         if (casterIdentity.netId == NetworkClient.localPlayer.netId)
         {
-
-        }
+            // We need to check if we're targetting the person receiving the debuff still
+            if (caster.GetTarget() == target)
+            {
+                UIHandler.Instance.AddTargetDebuff(auraId, IconManager.GetSpellIcon(target.GetClass(), auraId), duration);
+            }
+        } // No else here because we might be targetting ourselves and receive a buff/debuff
         if (targetIdentity.netId == NetworkClient.localPlayer.netId)
         {
             // We are the target, apply the aura to our list

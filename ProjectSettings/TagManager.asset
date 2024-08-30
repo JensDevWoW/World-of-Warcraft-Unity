@@ -12,6 +12,8 @@ TagManager:
   - ActionBar
   - Buffs
   - UnitHealthBar
+  - DebuffCanvas
+  - TDebuffCanvas
   layers:
   - Default
   - TransparentFX

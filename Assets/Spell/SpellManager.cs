@@ -46,4 +46,27 @@ public class VFXManager : MonoBehaviour
             Debug.LogError($"Spell with ID {spellId} not found.");
         }
     }
+
+    public void CastSpell(int spellId, float speed, Transform caster) // No target
+    {
+        SpellScriptableObject spell = spells.Find(s => s.spellId == spellId);
+
+        if (spell != null)
+        {
+            GameObject selectedPrefab = spell.spellPrefabs[Random.Range(0, spell.spellPrefabs.Count)];
+
+            GameObject spellInstance = Instantiate(selectedPrefab, caster.position, Quaternion.identity);
+            SpellBase spellScript = spellInstance.GetComponent<SpellBase>();
+
+            if (spellScript != null)
+            {
+                spellScript.Initialize(caster, null, speed);
+                spellScript.enabled = true; // Enable the script to start the logic
+            }
+        }
+        else
+        {
+            Debug.LogError($"Spell with ID {spellId} not found.");
+        }
+    }
 }

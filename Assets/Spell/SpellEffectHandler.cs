@@ -70,6 +70,9 @@ public class SpellEffectHandler
 
     private void HandleApplyAura(Spell spell, Unit target)
     {
+        if (target == null)
+            return;
+
         Debug.Log($"Applying aura effect from spell {spell.spellId} to target {target.m_name}");
         List<Unit> targets = spell.GetTargets();
         foreach (Unit tar in targets)

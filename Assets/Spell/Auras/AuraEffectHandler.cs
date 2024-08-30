@@ -16,6 +16,7 @@ public class AuraEffectHandler
         RegisterHandler(AuraEffect.AURA_EFFECT_DAMAGE, HandleSchoolDamage);
         RegisterHandler(AuraEffect.AURA_EFFECT_APPLY_ABSORB, HandleApplyAbsorb);
         RegisterHandler(AuraEffect.AURA_EFFECT_ROOT, HandleRoot);
+        RegisterHandler(AuraEffect.AURA_EFFECT_DISORIENT, HandleDisorient);
     }
 
     private void RegisterHandler(AuraEffect effect, Action<Aura, Unit> handler)
@@ -67,5 +68,15 @@ public class AuraEffectHandler
         // Now it's as simple as adding the unit state
         if (!target.HasUnitState(UnitState.UNIT_STATE_ROOTED))
             target.AddUnitState(UnitState.UNIT_STATE_ROOTED);
+    }
+
+    private void HandleDisorient(Aura aura, Unit target)
+    {
+        if (!target)
+            return;
+
+        // Now it's as simple as adding the unit state
+        if (!target.HasUnitState(UnitState.UNIT_STATE_DISORIENTED))
+            target.AddUnitState(UnitState.UNIT_STATE_DISORIENTED);
     }
 }

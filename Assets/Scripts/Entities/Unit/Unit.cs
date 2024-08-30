@@ -19,6 +19,8 @@ public enum Stats
 public class UnitState
 {
     public const int UNIT_STATE_ROOTED = 1;
+    public const int UNIT_STATE_DISORIENTED = 2;
+    public const int UNIT_STATE_STUNNED = 3;
 }
 public class Unit : MonoBehaviour
 {
@@ -86,10 +88,32 @@ public class Unit : MonoBehaviour
 
     }
 
+    public void SendStateUpdate(int state, bool apply)
+    {
+        NetworkWriter writer = new NetworkWriter();
+
+        writer.WriteNetworkIdentity(Identity);
+        writer.WriteInt(state);
+        writer.WriteBool(apply); // Is it being added or removed;
+
+        OpcodeMessage packet = new OpcodeMessage
+        {
+            opcode = Opcodes.SMSG_UPDATE_UNIT_STATE,
+            payload = writer.ToArray()
+        };
+
+        NetworkServer.SendToAll(packet);
+    }
+
     public void AddUnitState(int state)
     {
         if (!unitStates.Contains(state))
+        {
             unitStates.Add(state);
+
+            // Send opcode
+            SendStateUpdate(state, true);
+        }
     }
 
     public float GetGCDTime()
@@ -103,7 +127,10 @@ public class Unit : MonoBehaviour
     public void RemoveUnitState(int state)
     {
         if (unitStates.Contains(state))
-            unitStates.Remove(state); // I love the autocomplete sometimes
+        {
+            unitStates.Remove(state);
+            SendStateUpdate(state, false);
+        }
     }
 
     public bool HasUnitState(int state)
@@ -495,7 +522,7 @@ public class Unit : MonoBehaviour
     // Check if this unit is hostile to the given target
     public bool IsHostileTo(Unit target)
     {
-        return true; // TODO: Replace with actual hostility logic
+        return target != this; // TODO: Replace with actual hostility logic
     }
 
     // Convert this Unit to a Player if applicable

@@ -155,7 +155,7 @@ public class LocationHandler : MonoBehaviour
 
         foreach (var v in GetNearestUnitList(unit, dist))
         {
-            if (v.IsHostileTo(unit) && v != unit)
+            if (v.IsHostileTo(unit))
             {
                 list.Add(v);
             }
@@ -171,7 +171,7 @@ public class LocationHandler : MonoBehaviour
         List<Unit> mapUnits = mapHandler.GetAllUnitsInMap(unit.GetMap());
         foreach (var v in mapUnits)
         {
-            if (IsWithinDist(unit, dist, v) && v != unit)
+            if (IsWithinDist(unit, dist, v))
             {
                 list.Add(v);
             }

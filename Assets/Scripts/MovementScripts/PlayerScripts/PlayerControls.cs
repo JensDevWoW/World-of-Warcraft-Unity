@@ -26,7 +26,7 @@ public class PlayerControls : MonoBehaviour
     float gravity = -18, velocityY, terminalVelocity = -25;
     float fallMult;
 
-
+    private List<int> unitStates = new List<int>();
 
     [BoxGroup("Speed Configurations", centerLabel: true)]
     [InfoBox("All variables controlling the speed for the player controller is located in this group.")]
@@ -152,6 +152,23 @@ public class PlayerControls : MonoBehaviour
                 Flying();
                 break;
         }
+    }
+
+    public void AddState(int state)
+    {
+        if (!unitStates.Contains(state))
+            unitStates.Add(state);
+    }
+
+    public void RemoveState(int state)
+    {
+        if (unitStates.Contains(state))
+            unitStates.Remove(state);
+    }
+
+    public bool HasState(int state)
+    {
+        return unitStates.Contains(state);
     }
 
     public void OnLandingComplete()
@@ -404,44 +421,72 @@ public class PlayerControls : MonoBehaviour
         if (controls.autoRun.GetControlBindingDown())
             autoRun = !autoRun;
 
-        //FORWARDS BACKWARDS CONTROLS  
-        inputs.y = Axis(controls.forwards.GetControlBinding(), controls.backwards.GetControlBinding());
-
-        if (inputs.y != 0 && !mainCam.autoRunReset)
-            autoRun = false;
-
-        if(autoRun)
+        // Forward and backward controls
+        if (!HasState(UnitState.UNIT_STATE_ROOTED))
         {
-            inputs.y += Axis(true, false);
+            inputs.y = Axis(controls.forwards.GetControlBinding(), controls.backwards.GetControlBinding());
 
-            inputs.y = Mathf.Clamp(inputs.y, -1, 1);
+            if (inputs.y != 0 && !mainCam.autoRunReset)
+                autoRun = false;
+
+            if (autoRun)
+            {
+                inputs.y += Axis(true, false);
+                inputs.y = Mathf.Clamp(inputs.y, -1, 1);
+            }
         }
-
-        //STRAFE LEFT RIGHT
-        inputs.x = Axis(controls.strafeRight.GetControlBinding(), controls.strafeLeft.GetControlBinding());
-
-        if(steer)
-        {
-            inputs.x += Axis(controls.rotateRight.GetControlBinding(), controls.rotateLeft.GetControlBinding());
-
-            inputs.x = Mathf.Clamp(inputs.x, -1, 1);
-        }
-
-        //ROTATE LEFT RIGHT
-        if (steer)
-            rotation = Input.GetAxis("Mouse X") * mainCam.CameraSpeed;
         else
-            rotation = Axis(controls.rotateRight.GetControlBinding(), controls.rotateLeft.GetControlBinding());
+        {
+            inputs.y = 0; // Disable forward and backward movement when rooted
+        }
 
-        //ToggleRun
+        // Strafe left and right controls
+        if (!HasState(UnitState.UNIT_STATE_ROOTED))
+        {
+            inputs.x = Axis(controls.strafeRight.GetControlBinding(), controls.strafeLeft.GetControlBinding());
+        }
+        else
+        {
+            inputs.x = 0; // Disable strafing when rooted
+        }
+
+        // Handling rotation and steering mode
+        if (steer && HasState(UnitState.UNIT_STATE_ROOTED))
+        {
+            // When steering, allow only mouse-based rotation
+            rotation = Input.GetAxis("Mouse X") * mainCam.CameraSpeed;
+            inputs.x = 0; // Prevent lateral movement
+        }
+        else if (steer)
+        {
+            // Normal steering without rooted state
+            inputs.x += Axis(controls.rotateRight.GetControlBinding(), controls.rotateLeft.GetControlBinding());
+            inputs.x = Mathf.Clamp(inputs.x, -1, 1);
+            rotation = Input.GetAxis("Mouse X") * mainCam.CameraSpeed;
+        }
+        else if (HasState(UnitState.UNIT_STATE_ROOTED))
+        {
+            // Allow rotation using rotateLeft and rotateRight keys only when not steering
+            rotation = Axis(controls.rotateRight.GetControlBinding(), controls.rotateLeft.GetControlBinding());
+        }
+        else
+        {
+            // Normal rotation handling when not rooted
+            rotation = Axis(controls.rotateRight.GetControlBinding(), controls.rotateLeft.GetControlBinding());
+        }
+
+        // Toggle Run
         if (controls.walkRun.GetControlBindingDown())
             run = !run;
 
-        //Jumping
-        jump = controls.jump.GetControlBinding();
+        // Jumping - Allow jumping even when rooted
+        if (!HasState(UnitState.UNIT_STATE_ROOTED))
+            jump = controls.jump.GetControlBinding();
 
         inputNormalized = inputs.normalized;
     }
+
+
 
     void GetSwimDirection()
     {

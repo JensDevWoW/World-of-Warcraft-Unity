@@ -148,7 +148,6 @@ public class ClientNetworkManager : MonoBehaviour
         }
 
     }
-    int num = 0;
     private void HandleApplyAura(NetworkReader reader)
     {
         NetworkIdentity casterIdentity = reader.ReadNetworkIdentity();
@@ -170,8 +169,6 @@ public class ClientNetworkManager : MonoBehaviour
         if (targetIdentity.netId == NetworkClient.localPlayer.netId)
         {
             // We are the target, apply the aura to our list
-            this.num++;
-            print(num);
             UIHandler.Instance.AddBuff(auraId, IconManager.GetSpellIcon(target.GetClass(), auraId), duration); // TODO: Make ClassHandler
         }
     }

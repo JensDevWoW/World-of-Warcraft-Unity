@@ -25,7 +25,7 @@ public class Spell : MonoBehaviour
     public int CastFlags;
     public float CastTime;
     public float GCD;
-    public bool AnimationEnabled = true;
+    public bool AnimationEnabled;
     public bool IsSpellQueueSpell;
     public Vector3 position;
     public bool VOC;
@@ -64,6 +64,7 @@ public class Spell : MonoBehaviour
         this.cooldownTime = spellInfo.Cooldown;
         this.cooldownLeft = spellInfo.Cooldown;
         this.trigger = triggerObject;
+        this.AnimationEnabled = !spellInfo.HasFlag(SpellFlags.SPELL_FLAG_DISABLE_ANIM);
         this.GCD = HasFlag(SpellFlags.SPELL_FLAG_IGNORES_GCD) ? 0f : 1.5f;
         AttachSpellScript(spellId);
 

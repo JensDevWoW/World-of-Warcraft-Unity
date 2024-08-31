@@ -418,6 +418,9 @@ public class PlayerControls : MonoBehaviour
 
     void GetInputs()
     {
+        if (HasState(UnitState.UNIT_STATE_STUNNED) || HasState(UnitState.UNIT_STATE_DISORIENTED))
+            return; // We cannot do anything while stunned or disoriented
+
         if (controls.autoRun.GetControlBindingDown())
             autoRun = !autoRun;
 

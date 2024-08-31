@@ -56,7 +56,7 @@ public class Unit : MonoBehaviour
     public Unit m_target { get; protected set; }
 
     public List<int> knownSpells; // List of spell IDs the Unit knows
-
+    public AnimationHandler animHandler {  get; protected set; }
     public Creature creature {  get; protected set; }
     
     void Start()
@@ -64,7 +64,7 @@ public class Unit : MonoBehaviour
         // Get the NetworkIdentity component attached to the same GameObject
         Identity = GetComponent<NetworkIdentity>();
         locationHandler = LocationHandler.Instance;
-
+        animHandler = GetComponent<AnimationHandler>();
         creature = GetComponent<Creature>();
 
         lastPosition = transform.position;

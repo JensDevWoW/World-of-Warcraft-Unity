@@ -206,7 +206,7 @@
             "spellscript": "null",
             "cooldown": 6,
             "attributes": "SPELL_ATTR_ALLOW_CAST_WHILE_CASTING,SPELL_ATTR_PASSIVE",
-            "flags": "SPELL_FLAG_CAST_WHILE_CASTING,SPELL_FLAG_CAST_WHILE_MOVING,SPELL_FLAG_NEEDS_TARGET,SPELL_FLAG_IGNORES_GCD",
+            "flags": "SPELL_FLAG_CAST_WHILE_CASTING,SPELL_FLAG_CAST_WHILE_MOVING,SPELL_FLAG_NEEDS_TARGET,SPELL_FLAG_IGNORES_GCD,SPELL_FLAG_DISABLE_ANIM",
             "range": 1000,
             "aura": {
                 "auraId": 11,
@@ -237,7 +237,7 @@
             "spellscript": "null",
             "cooldown": 6,
             "attributes": "SPELL_ATTR_ALLOW_CAST_WHILE_CASTING,SPELL_ATTR_PASSIVE",
-            "flags": "SPELL_FLAG_CAST_WHILE_CASTING,SPELL_FLAG_CAST_WHILE_MOVING,SPELL_FLAG_NEEDS_TARGET,SPELL_FLAG_IGNORES_GCD",
+            "flags": "SPELL_FLAG_CAST_WHILE_CASTING,SPELL_FLAG_CAST_WHILE_MOVING,SPELL_FLAG_NEEDS_TARGET,SPELL_FLAG_IGNORES_GCD,SPELL_FLAG_DISABLE_ANIM",
             "range": 1000,
             "aura": {
                 "auraId": 12,
@@ -287,7 +287,7 @@
             "spellscript": "null",
             "cooldown": 60,
             "attributes": "",
-            "flags": "SPELL_FLAG_IGNORES_GCD,SPELL_FLAG_CAST_WHILE_CASTING,SPELL_FLAG_CAST_WHILE_MOVING",
+            "flags": "SPELL_FLAG_IGNORES_GCD,SPELL_FLAG_CAST_WHILE_CASTING,SPELL_FLAG_CAST_WHILE_MOVING,SPELL_FLAG_DISABLE_ANIM",
             "range": 0,
             "aura": {
                 "auraId": 14,
@@ -337,7 +337,7 @@
             "spellscript": "null",
             "cooldown": 0,
             "attributes": "",
-            "flags": "SPELL_FLAG_NEEDS_TARGET,SPELL_FLAG_IGNORES_GCD",
+            "flags": "SPELL_FLAG_NEEDS_TARGET,SPELL_FLAG_IGNORES_GCD,SPELL_FLAG_DISABLE_ANIM",
             "range": 0,
             "aura": {
                 "auraId": 16,

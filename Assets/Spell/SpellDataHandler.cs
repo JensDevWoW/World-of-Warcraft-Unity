@@ -44,6 +44,7 @@ public enum SpellFlags
     SPELL_FLAG_MOUSE_TARGET = 1 << 5,
     SPELL_FLAG_ALWAYS_CRIT = 1 << 6,
     SPELL_FLAG_IGNORES_GCD = 1 << 7,
+    SPELL_FLAG_DISABLE_ANIM = 1 << 8,
 
 }
 

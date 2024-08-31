@@ -34,7 +34,6 @@ public class ClientNetworkManager : MonoBehaviour
 
     private void HandleSpellStart(NetworkReader reader)
     {
-        // Deserialize each field in the same order as they were serialized
         int castFlags = reader.ReadInt();
         NetworkIdentity casterIdentity = reader.ReadNetworkIdentity();
         NetworkIdentity targetIdentity = reader.ReadNetworkIdentity();
@@ -46,10 +45,6 @@ public class ClientNetworkManager : MonoBehaviour
         Vector3 aoePosition = reader.ReadVector3();
         bool voc = reader.ReadBool();
 
-        // Now you have all the deserialized data
-        Debug.Log($"Received spell start for spell ID {spellId}");
-
-        // Retrieve the Unit component associated with the caster
         Unit caster = casterIdentity.GetComponent<Unit>();
 
         if (casterIdentity.netId == NetworkClient.localPlayer.netId)
@@ -61,11 +56,13 @@ public class ClientNetworkManager : MonoBehaviour
                 UIHandler.Instance.StartGlobalCooldown(gcd);
         }
 
+        if (animationEnabled)
+            caster.animHandler.animator.SetBool("IsCastingDirected", true);
+
     }
 
     private string GetSpellNameById(int spellId)
     {
-        // Replace with your actual logic to retrieve the spell name
         SpellInfo spellInfo = SpellDataHandler.Instance.Spells.FirstOrDefault(spell => spell.Id == spellId);
         return spellInfo != null ? spellInfo.Name : "Unknown Spell";
     }
@@ -83,18 +80,25 @@ public class ClientNetworkManager : MonoBehaviour
         float spellTime = reader.ReadFloat();
         bool animationEnabled = reader.ReadBool();
         Vector3 aoePosition = reader.ReadVector3();
-        int manaCost = reader.ReadInt(); // Assuming mana cost is an int, adjust if needed
+        int manaCost = reader.ReadInt();
         bool voc = reader.ReadBool();
         bool isToggled = reader.ReadBool();
 
-        // Now you have all the deserialized data
-        Debug.Log($"Received spell go for spell ID {spellId}");
-
-        // Retrieve the Unit component associated with the caster
         Unit caster = casterIdentity.GetComponent<Unit>();
         Unit target = null;
+
         if (targetIdentity != null)
             target = targetIdentity.GetComponent<Unit>();
+
+
+
+        if (caster != null && animationEnabled == true)
+        {
+                
+            caster.animHandler.SetupSpellParameters(spellId, speed, caster.transform, target.transform);
+            caster.animHandler.animator.SetBool("IsCastingDirected", false);
+            caster.animHandler.animator.SetTrigger("CastFinished");
+        }
 
         if (casterIdentity.netId == NetworkClient.localPlayer.netId)
         {
@@ -109,7 +113,7 @@ public class ClientNetworkManager : MonoBehaviour
 
             if (target == null)
             {
-                VFXManager.Instance.CastSpell(spellId, speed, casterTransform);
+                //VFXManager.Instance.CastSpell(spellId, speed, casterTransform);
                 return;
             }
 
@@ -120,10 +124,8 @@ public class ClientNetworkManager : MonoBehaviour
             if (!targetTransform)
                 Debug.LogError("No transform found for Target!");
 
-            VFXManager.Instance.CastSpell(spellId, speed, casterTransform, targetTransform);
+            
         }
-
-        // Implement additional logic here, such as starting animations, reducing mana, etc.
     }
 
     private void HandleUpdateStat(NetworkReader reader)
@@ -203,10 +205,6 @@ public class ClientNetworkManager : MonoBehaviour
         {
             UIHandler.Instance.UpdateAura(auraId, duration, stacks);
         }
-        
-
-        // This stuff needs to be run regardless
-        
     }
 
     private void HandleCombatText(NetworkReader reader)

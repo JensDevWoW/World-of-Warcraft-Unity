@@ -114,8 +114,19 @@ public class SpellEffectHandler
 
     private void HandleTeleport(Spell spell, Unit target)
     {
-        Debug.Log($"Teleporting target {target.m_name} using spell {spell.spellId}");
-        // Implement the logic for teleporting here
+        // Just going to hard-code this for now
+        if (spell.m_spellInfo.Id == 18) // Blink
+        {
+            target = spell.caster;
+            if (target != null)
+            {
+                Transform tarTran = target.transform;
+                if (tarTran != null)
+                {
+                    target.locationHandler.BlinkEffect(target, tarTran);
+                }
+            }
+        }
     }
 
     private void HandleInterruptCast(Spell spell, Unit target)

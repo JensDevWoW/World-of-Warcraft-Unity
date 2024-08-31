@@ -6,7 +6,6 @@ public class LocationHandler : MonoBehaviour
     public Unit unit {  get; private set; }
     public static LocationHandler Instance;
     private MapHandler mapHandler;
-
     private void Awake()
     {
         
@@ -49,6 +48,69 @@ public class LocationHandler : MonoBehaviour
     public void MoveTowards(Unit unit, Vector3 targetPosition, float speed)
     {
         unit.transform.position = Vector3.MoveTowards(unit.transform.position, targetPosition, speed * Time.deltaTime);
+    }
+
+    public void BlinkEffect(Unit unit, Transform casterTransform)
+    {
+        Vector3 startPosition = casterTransform.position;
+        Vector3 forwardDirection = casterTransform.forward;
+
+        int maxBlinkDistance = 20;
+        float maxSlopeAngle = unit.charController.slopeLimit;
+
+        // Raycast to check for obstacles and slopes
+        if (Physics.Raycast(startPosition, forwardDirection, out RaycastHit hit, maxBlinkDistance))
+        {
+            // Check if the hit object is within slope limits
+            if (Vector3.Angle(Vector3.up, hit.normal) <= unit.charController.slopeLimit)
+            {
+                // Move the caster to the hit point
+                Vector3 targetPosition = hit.point;
+
+                // Adjust slightly up to prevent sinking into the ground
+                targetPosition.y += 0.5f;
+                casterTransform.position = targetPosition;
+                Debug.Log("Blink successful to: " + targetPosition);
+            }
+            else
+            {
+                // If the slope is too steep, stop at the current position
+                Vector3 stopPosition = hit.point - forwardDirection * 0.5f; // Slight offset back from hit point
+                casterTransform.position = stopPosition;
+                Debug.Log("Blink stopped due to steep slope at: " + stopPosition);
+            }
+        }
+        else
+        {
+            // No obstacles, blink to the max distance
+            Vector3 blinkPosition = startPosition + forwardDirection * maxBlinkDistance;
+
+            // Check if the final position is above a slope that’s too steep
+            if (Physics.Raycast(blinkPosition + Vector3.up, Vector3.down, out RaycastHit groundHit, Mathf.Infinity))
+            {
+                if (Vector3.Angle(Vector3.up, groundHit.normal) <= maxSlopeAngle)
+                {
+                    // Valid position on the slope
+                    blinkPosition = groundHit.point + Vector3.up * 0.5f;
+                    casterTransform.position = blinkPosition;
+                    Debug.Log("Blink successful to max distance: " + blinkPosition);
+                }
+                else
+                {
+                    // Too steep; adjust position
+                    Vector3 adjustedPosition = blinkPosition - forwardDirection * 0.5f;
+                    casterTransform.position = adjustedPosition;
+                    Debug.Log("Blink stopped due to steep slope at: " + adjustedPosition);
+                }
+            }
+            else
+            {
+                // Flat ground at max blink distance
+                blinkPosition.y = startPosition.y;
+                casterTransform.position = blinkPosition;
+                Debug.Log("Blink successful to flat ground: " + blinkPosition);
+            }
+        }
     }
 
     public Unit GetNearestEnemy(Unit unit)

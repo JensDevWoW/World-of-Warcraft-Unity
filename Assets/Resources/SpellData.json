@@ -382,6 +382,25 @@
                 "type": "Debuff",
                 "aurascript": "null"
             }
+        },
+        {
+            "id": 18,
+            "name": "Blink",
+            "schoolMask": "Arcane",
+            "type": "Buff",
+            "manaCost": 10,
+            "castTime": 0,
+            "spellTime": false,
+            "speed": 1.0,
+            "positive": true,
+            "basepoints": 5,
+            "damageclass": "Intellect",
+            "effects": "SPELL_EFFECT_TELEPORT",
+            "spellscript": "null",
+            "cooldown": 16,
+            "attributes": "",
+            "flags": "SPELL_FLAG_CAST_WHILE_CASTING,SPELL_FLAG_CAST_WHILE_MOVING,SPELL_FLAG_SELF_TARGET,SPELL_FLAG_DISABLE_ANIM",
+            "range": 20
         }
     ]
 }

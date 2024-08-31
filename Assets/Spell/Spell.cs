@@ -462,6 +462,13 @@ public class Spell : MonoBehaviour
         bool needsTarget = NeedsTarget();
         bool posNeg = isPositive;
 
+        if (HasFlag(SpellFlags.SPELL_FLAG_SELF_TARGET)) // Self-applied requirement
+        {
+            targetList.Clear();
+            targetList.Add(target);
+            return targetList;
+        }
+
         // Add the primary target if needed
         if (needsTarget && target != null && target.IsAlive() && target != caster)
         {

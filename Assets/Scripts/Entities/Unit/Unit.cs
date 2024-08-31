@@ -51,6 +51,7 @@ public class Unit : MonoBehaviour
     private bool isMoving;
     private float movementThreshold = 0.1f; // The threshold for detecting movement
     public CooldownHandler cdHandler { get; private set; }
+    public CharacterController charController { get; private set; }
     public Player player { get; private set; }
     public LocationHandler locationHandler { get; protected set; }
     public Unit m_target { get; protected set; }
@@ -66,7 +67,7 @@ public class Unit : MonoBehaviour
         locationHandler = LocationHandler.Instance;
         animHandler = GetComponent<AnimationHandler>();
         creature = GetComponent<Creature>();
-
+        charController = gameObject.GetComponent<CharacterController>();
         lastPosition = transform.position;
 
         if (creature != null)

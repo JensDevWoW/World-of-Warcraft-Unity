@@ -465,7 +465,7 @@ public class Spell : MonoBehaviour
         if (HasFlag(SpellFlags.SPELL_FLAG_SELF_TARGET)) // Self-applied requirement
         {
             targetList.Clear();
-            targetList.Add(target);
+            targetList.Add(caster);
             return targetList;
         }
 

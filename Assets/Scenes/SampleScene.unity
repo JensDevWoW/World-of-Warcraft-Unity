@@ -449,7 +449,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   keybind: 56
-  spellId: 0
+  spellId: 18
   buttonImage: {fileID: 1307020487}
   cooldownImage: {fileID: 1610697017}
 --- !u!114 &145429942
@@ -8637,7 +8637,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   keybind: 55
-  spellId: 0
+  spellId: 17
   buttonImage: {fileID: 122564602}
   cooldownImage: {fileID: 1155924210}
 --- !u!114 &1992166003

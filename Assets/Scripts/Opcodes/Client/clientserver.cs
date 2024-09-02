@@ -95,7 +95,7 @@ public class ClientNetworkManager : MonoBehaviour
         if (caster != null && animationEnabled == true)
         {
                 
-            caster.animHandler.SetupSpellParameters(spellId, speed, caster.transform, target.transform);
+            caster.animHandler.SetupSpellParameters(spellId, speed, caster.transform, target?.transform);
             caster.animHandler.animator.SetBool("IsCastingDirected", false);
             caster.animHandler.animator.SetTrigger("CastFinished");
         }

@@ -92,6 +92,25 @@ public class SpellEffectHandler
         List<Unit> targets = spell.GetTargets();
         foreach (Unit tar in targets)
         {
+            // First check if we already have that aura
+            // When you cast the same spell on a target with a particular aura, it should refresh that aura rather than double it
+            bool auraReapply = false;
+            foreach (Aura aura in tar.GetAuras())
+            {
+                if (aura.auraInfo.Id == spell.m_spellInfo.Id)
+                {
+                    aura.Refresh();
+                    auraReapply = true;
+                    break;
+                }
+            }
+
+            // This is so we don't do this for every target
+            // Some targets might not have the aura already
+            if (auraReapply)
+                break;
+
+
             // Create and initialize the Aura object
             GameObject auraObject = new GameObject("AuraObject");
 

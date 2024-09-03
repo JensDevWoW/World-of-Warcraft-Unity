@@ -614,6 +614,11 @@ public class Unit : MonoBehaviour
             auraList.Remove(aura);
     }
 
+    public List<Aura> GetAuras()
+    {
+        return auraList;
+    }
+
     public Spell CastSpell(int spellId, Unit target)
     {
         GameNetworkManager GNM = FindObjectOfType<GameNetworkManager>();

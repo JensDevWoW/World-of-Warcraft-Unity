@@ -14,7 +14,7 @@ public class BuffDebuff : MonoBehaviour
 
     private void Start()
     {
-        currentTime = timer; // Initialize the timer
+        currentTime = timer;
     }
 
     private void Update()
@@ -23,12 +23,19 @@ public class BuffDebuff : MonoBehaviour
         {
             currentTime -= Time.deltaTime;
             if (currentTime <= 0)
-            {
-                // Timer has finished, remove the buff/debuff
                 Destroy(gameObject);
-            }
-            textBox.text = Mathf.Ceil(currentTime).ToString();
+            UpdateTextBox();
         }
+    }
+
+    private void UpdateTextBox()
+    {
+        if (currentTime < 60)
+            textBox.text = Mathf.Ceil(currentTime).ToString() + "s";
+        else if (currentTime < 3600)
+            textBox.text = Mathf.Floor(currentTime / 60).ToString() + "m";
+        else
+            textBox.text = Mathf.Floor(currentTime / 3600).ToString() + "h";
     }
 
     public void UpdateData(float duration, int stacks)
@@ -37,19 +44,18 @@ public class BuffDebuff : MonoBehaviour
         {
             this.timer = duration;
             currentTime = duration;
-            textBox.text = Mathf.Ceil(duration).ToString();
+            UpdateTextBox();
         }
         else
             Destroy(gameObject);
     }
 
-    // This function allows setting up the buff/debuff with the icon and duration
     public void InitializeBuff(int spellId, Sprite icon, float duration)
     {
         this.spellId = spellId;
         this.buffIcon.sprite = icon;
         this.timer = duration;
         currentTime = duration;
-        textBox.text = Mathf.Ceil(duration).ToString();
+        UpdateTextBox();
     }
 }

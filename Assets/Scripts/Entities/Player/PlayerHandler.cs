@@ -18,6 +18,7 @@ public class PlayerInput : NetworkBehaviour
         spellbook.Add(new SpellList("Ice Lance", 15, KeyBindManager.keyBinds.six));
         spellbook.Add(new SpellList("Frost Nova", 17, KeyBindManager.keyBinds.seven));
         spellbook.Add(new SpellList("Blink", 18, KeyBindManager.keyBinds.eight));
+        spellbook.Add(new SpellList("Arcane Brilliance", 19, KeyBindManager.keyBinds.nine));
     }
 
     void Update()

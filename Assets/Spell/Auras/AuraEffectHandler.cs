@@ -17,6 +17,7 @@ public class AuraEffectHandler
         RegisterHandler(AuraEffect.AURA_EFFECT_APPLY_ABSORB, HandleApplyAbsorb);
         RegisterHandler(AuraEffect.AURA_EFFECT_ROOT, HandleRoot);
         RegisterHandler(AuraEffect.AURA_EFFECT_DISORIENT, HandleDisorient);
+        RegisterHandler(AuraEffect.AURA_EFFECT_INCREASE_STAT, HandleStatIncrease);
     }
 
     private void RegisterHandler(AuraEffect effect, Action<Aura, Unit> handler)
@@ -78,5 +79,18 @@ public class AuraEffectHandler
         // Now it's as simple as adding the unit state
         if (!target.HasUnitState(UnitState.UNIT_STATE_DISORIENTED))
             target.AddUnitState(UnitState.UNIT_STATE_DISORIENTED);
+    }
+
+    private void HandleStatIncrease(Aura aura, Unit target)
+    {
+        if (!target)
+            return;
+
+        switch (aura.auraInfo.Id)
+        {
+            case 19: // Arcane Brilliance
+                //TODO: Increase a stat
+                break;
+        }
     }
 }

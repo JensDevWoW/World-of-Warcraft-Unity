@@ -307,6 +307,9 @@ public class SpellDataHandler : MonoBehaviour
                 case "AURA_EFFECT_ROOT":
                     effects.Add(AuraEffect.AURA_EFFECT_ROOT);
                     break;
+                case "AURA_EFFECT_INCREASE_STAT":
+                    effects.Add(AuraEffect.AURA_EFFECT_INCREASE_STAT);
+                    break;
                 case "AURA_EFFECT_DUMMY":
                     effects.Add(AuraEffect.AURA_EFFECT_DUMMY);
                     break;

@@ -17,6 +17,7 @@ public class AuraEffect
     public static readonly AuraEffect AURA_EFFECT_APPLY_ABSORB = new AuraEffect("AURA_EFFECT_APPLY_ABSORB", 2);
     public static readonly AuraEffect AURA_EFFECT_ROOT = new AuraEffect("AURA_EFFECT_ROOT", 4);
     public static readonly AuraEffect AURA_EFFECT_DISORIENT = new AuraEffect("AURA_EFFECT_DISORIENT", 5);
+    public static readonly AuraEffect AURA_EFFECT_INCREASE_STAT = new AuraEffect("AURA_EFFECT_INCREASE_STAT", 6);
     public static readonly AuraEffect AURA_EFFECT_DUMMY = new AuraEffect("AURA_EFFECT_DUMMY", 100);
 
 

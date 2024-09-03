@@ -401,6 +401,37 @@
             "attributes": "",
             "flags": "SPELL_FLAG_CAST_WHILE_CASTING,SPELL_FLAG_CAST_WHILE_MOVING,SPELL_FLAG_SELF_TARGET,SPELL_FLAG_DISABLE_ANIM",
             "range": 20
+        },
+        {
+            "id": 19,
+            "name": "Arcane Brilliance",
+            "schoolMask": "Arcane",
+            "type": "Buff",
+            "manaCost": 5,
+            "castTime": 0,
+            "spellTime": false,
+            "speed": 1.0,
+            "positive": true,
+            "basepoints": 5,
+            "damageclass": "Intellect",
+            "effects": "SPELL_EFFECT_APPLY_AURA",
+            "spellscript": "null",
+            "cooldown": 0,
+            "attributes": "",
+            "flags": "SPELL_FLAG_NEEDS_TARGET",
+            "range": 40,
+            "aura": {
+                "auraId": 19,
+                "name": "Arcane Brilliance",
+                "duration": 3600,
+                "stacks": 1,
+                "periodic": false,
+                "ticktime": 0,
+                "effects": "AURA_EFFECT_INCREASE_STAT",
+                "positive": true,
+                "type": "Buff",
+                "aurascript": "null"
+            }
         }
     ]
 }

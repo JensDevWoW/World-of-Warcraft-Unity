@@ -166,6 +166,9 @@ public class Aura : MonoBehaviour
 
         NetworkWriter writer = new NetworkWriter();
 
+        if (auraInfo.Id == 12 && duration == 0)
+            print("Potato");
+
         writer.WriteNetworkIdentity(caster.Identity); // Caster
         writer.WriteNetworkIdentity(target.Identity); // Target
         writer.WriteInt(auraInfo.Id);

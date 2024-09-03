@@ -55,14 +55,14 @@ public class BuffDebuff : MonoBehaviour
 
     public void UpdateData(float duration, int stacks)
     {
-        if (duration > 0)
+        if (duration == 0)
+            Destroy(gameObject);
+        else
         {
             this.timer = duration;
             currentTime = duration;
             UpdateTextBox();
         }
-        else
-            Destroy(gameObject);
     }
 
     public void InitializeBuff(int spellId, Sprite icon, float duration)

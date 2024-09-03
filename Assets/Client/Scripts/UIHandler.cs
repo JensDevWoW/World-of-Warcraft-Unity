@@ -72,6 +72,19 @@ public class UIHandler : MonoBehaviour
         debuffPos = targetDebuffCanvas.GetComponent<BuffPosition>();
     }
 
+    public void Update()
+    {
+        // We need to keep track of if our buffs contain a null value, TODO: Figure out where it comes from
+        GameObject bufftoremove = null;
+        foreach (GameObject buff in activeBuffs)
+        {
+            if (buff == null)
+            {
+                bufftoremove = buff;
+                break;
+            }
+        }
+    }
     public void StartCast(float castTime, string name)
     {
         if (castBar != null)
@@ -214,7 +227,7 @@ public class UIHandler : MonoBehaviour
     {
         // Clone the BuffTemplate and add it to the buffCanvas
         GameObject newBuff = Instantiate(buffTemplate, buffCanvas);
-
+        newBuff.name = $"{spellId}";
         // Get the BuffDebuff component and initialize it
         BuffDebuff buffDebuff = newBuff.GetComponent<BuffDebuff>();
         buffDebuff.InitializeBuff(spellId, icon, duration);
@@ -240,7 +253,6 @@ public class UIHandler : MonoBehaviour
 
     public void UpdateAura(int spellId, float duration, int stacks)
     {
-        GameObject buffToRemove = null;
         foreach (var buff in activeBuffs)
         {
             if (buff != null)
@@ -250,23 +262,11 @@ public class UIHandler : MonoBehaviour
                 {
                     if (buffdebuff.spellId == spellId)
                     {
-                        if (duration == 0) // UI needs to delete the buff from the list if we're updating it's duration to 0 (meaning we remove it)
-                            buffToRemove = buff;
-                        else
-                        {
-                            buffdebuff.UpdateData(duration, stacks);
-                            return;
-                        }
+                        buffdebuff.UpdateData(duration, stacks);
+                        return;
                     }
                 }
             }
-            else
-                buffToRemove = buff; break;
-        }
-        if (buffToRemove != null)
-        {
-            Destroy(buffToRemove);
-            activeBuffs.Remove(buffToRemove);
         }
     }
 }

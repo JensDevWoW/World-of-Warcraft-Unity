@@ -405,7 +405,7 @@ public class Spell : MonoBehaviour
             if (caster.ToPlayer().IsOnGCD())
                 return "global cooldown";
 
-        if (caster.IsCasting())
+        if (caster.IsCasting() && !HasFlag(SpellFlags.SPELL_FLAG_CAST_WHILE_CASTING))
             return "casting";
 
         if (NeedsTarget() && target == null)

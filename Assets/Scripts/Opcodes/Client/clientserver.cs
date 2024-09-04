@@ -36,7 +36,8 @@ public class ClientNetworkManager : MonoBehaviour
         opcodeHandler.RegisterHandler(Opcodes.SMSG_APPLY_AURA,          HandleApplyAura);
         opcodeHandler.RegisterHandler(Opcodes.SMSG_UPDATE_TARGET,       HandleUpdateTarget);
         opcodeHandler.RegisterHandler(Opcodes.SMSG_SPELL_FAILED,        HandleSpellFailed);
-        opcodeHandler.RegisterHandler(Opcodes.SMSG_UPDATE_UNIT_STATE,   HandleUpdateUnitState);
+        opcodeHandler.RegisterHandler(Opcodes.SMSG_UPDATE_UNIT_STATE,   HandleUpdateUnitState); 
+        opcodeHandler.RegisterHandler(Opcodes.SMSG_INIT_BARS,           HandleInitBars);
         // Register the OpcodeMessage handler on the client
         NetworkClient.RegisterHandler<OpcodeMessage>(OnOpcodeMessageReceived);
     }
@@ -45,6 +46,16 @@ public class ClientNetworkManager : MonoBehaviour
     {
         // Handle the opcode using the registered handler
         opcodeHandler.HandleOpcode(msg.opcode, new NetworkReader(msg.payload));
+    }
+
+    private void HandleInitBars(NetworkReader reader)
+    {
+        NetworkIdentity identity = reader.ReadNetworkIdentity();
+
+        if (identity.netId == NetworkClient.localPlayer.netId)
+        {
+            UIHandler.Instance.InitBars();
+        }
     }
 
     private void HandleSpellStart(NetworkReader reader)

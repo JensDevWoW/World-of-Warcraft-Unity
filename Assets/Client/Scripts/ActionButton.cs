@@ -14,13 +14,14 @@
  */
 
 
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class ActionButton : MonoBehaviour
 {
     public KeyCode keybind = KeyCode.Space; // Set your default keybind here
-    public int spellId; // Add a spellId to link to the correct spell
+    public int spellId = 0; // Add a spellId to link to the correct spell
 
     public Image buttonImage;
     public Image cooldownImage; // The background image to show the cooldown effect
@@ -31,10 +32,20 @@ public class ActionButton : MonoBehaviour
     private float cooldownTimer;
     private float gcdTime;
     private float gcdTimer;
-
-    void Start()
+    private bool m_offGCD = false;
+    public void Init()
     {
-        
+        if (spellId != 0)
+        {
+            this.buttonImage.sprite = IconManager.GetSpellIcon(spellId);
+            this.cooldownImage.sprite = IconManager.GetSpellIcon(spellId);
+            this.buttonImage.color = originalColor;
+            SpellInfo currentSpell = SpellContainer.Instance.GetSpellById(spellId);
+            if (currentSpell != null)
+            {
+                this.m_offGCD = currentSpell.HasFlag(SpellFlags.SPELL_FLAG_IGNORES_GCD);
+            }
+        }
     }
 
     void Update()
@@ -98,6 +109,19 @@ public class ActionButton : MonoBehaviour
         return cooldownTimer > 0;
     }
 
+    public bool OffGCD()
+    {
+        return m_offGCD;
+    }    
     public bool IsOnGlobalCooldown()
     { return gcdTimer > 0; }
+
+    public void UpdateButton(int spellId, Sprite icon)
+    {
+        this.spellId = spellId;
+        this.buttonImage.sprite = icon;
+        this.cooldownImage.sprite = icon;
+        this.buttonImage.color = originalColor;
+        this.m_offGCD = SpellContainer.Instance.GetSpellById(spellId).HasFlag(SpellFlags.SPELL_FLAG_CAST_WHILE_CASTING) ? true : false;
+    }
 }

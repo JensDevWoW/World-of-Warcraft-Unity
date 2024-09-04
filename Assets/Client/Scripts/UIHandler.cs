@@ -85,6 +85,17 @@ public class UIHandler : MonoBehaviour
             }
         }
     }
+    
+    public void InitBars()
+    {
+        foreach (ActionButton button in actionButtons)
+        {
+            if (button != null)
+            {
+                button.Init();
+            }
+        }
+    }
     public void StartCast(float castTime, string name)
     {
         if (castBar != null)
@@ -136,7 +147,7 @@ public class UIHandler : MonoBehaviour
         foreach (var button in actionButtons)
         {
             // Only start the GCD if the button isn't already on cooldown
-            if (!button.IsOnCooldown())
+            if (!button.IsOnCooldown() && button.OffGCD() == false)
             {
                 button.StartGlobalCooldown(gcdDuration);
             }

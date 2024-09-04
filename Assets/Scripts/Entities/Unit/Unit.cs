@@ -586,6 +586,21 @@ public class Unit : MonoBehaviour
         CastSpell(spellId, this);
     }
 
+    public void InitBars(NetworkIdentity identity)
+    {
+        NetworkWriter writer = new NetworkWriter();
+
+        writer.WriteNetworkIdentity(identity);
+
+        OpcodeMessage packet = new OpcodeMessage
+        {
+            opcode = Opcodes.SMSG_INIT_BARS,
+            payload = writer.ToArray()
+        };
+
+        NetworkServer.SendToAll(packet);
+    }
+
     public void AddAura(Aura aura)
     {
         CastSpell(aura.auraInfo.Id, this);

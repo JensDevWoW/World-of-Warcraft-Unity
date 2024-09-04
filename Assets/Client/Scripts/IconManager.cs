@@ -33,4 +33,33 @@ public class IconManager : MonoBehaviour
 
         return spellIcon;
     }
+
+    public static Sprite GetSpellIcon(int spellId)
+    {
+        // Define the base path where all spell icons are located
+        string basePath = "SpellIcons/";
+
+        // Load all subdirectories within the base path
+        string[] folders = new string[] { "Mage" }; // Replace with actual folder names if known, or add logic to discover folders dynamically.
+
+        // Iterate through each folder to try and find the sprite
+        foreach (string folder in folders)
+        {
+            // Construct the full path to the sprite
+            string fullPath = $"{basePath}{folder}/{spellId}";
+
+            // Attempt to load the sprite
+            Sprite spellIcon = Resources.Load<Sprite>(fullPath);
+
+            // If the sprite is found, return it
+            if (spellIcon != null)
+            {
+                return spellIcon;
+            }
+        }
+
+        // If no sprite is found, log a warning
+        Debug.LogWarning($"Spell icon not found for spellId: {spellId}");
+        return null;
+    }
 }

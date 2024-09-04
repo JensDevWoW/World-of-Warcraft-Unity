@@ -31,5 +31,8 @@ public class Opcodes
     public const int SMSG_UPDATE_TARGET = 9;
     public const int SMSG_SPELL_FAILED = 10;
     public const int SMSG_UPDATE_UNIT_STATE = 11;
+    public const int SMSG_INIT_BARS = 12; // TODO: Change to InitCharacter
+    public const int CMSG_JOIN_WORLD = 13;
+
 }
 

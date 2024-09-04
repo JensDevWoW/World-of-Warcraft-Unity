@@ -24,6 +24,7 @@ public class GameNetworkManager : NetworkManager
     private OpcodeHandler opcodeHandler;
     public GameObject spellPrefab;
     public GameObject triggerPrefab;
+    public Transform spawnPoint;
     public override void OnStartServer()
     {
         opcodeHandler = new OpcodeHandler();
@@ -33,11 +34,26 @@ public class GameNetworkManager : NetworkManager
         // Register opcode handlers
         opcodeHandler.RegisterHandler(Opcodes.CMSG_CAST_SPELL,          HandleCastSpell);
         opcodeHandler.RegisterHandler(Opcodes.CMSG_SELECT_TARGET,       HandleSelectTarget);
+        opcodeHandler.RegisterHandler(Opcodes.CMSG_JOIN_WORLD,          HandleJoinWorld);
         //opcodeHandler.RegisterHandler((int)Opcodes.MoveCharacter, HandleMoveCharacter);
 
         NetworkServer.RegisterHandler<OpcodeMessage>(OnOpcodeMessageReceived, true);
     }
 
+    private void HandleJoinWorld(NetworkConnection conn, NetworkReader reader)
+    {
+        if (conn is NetworkConnectionToClient clientConn)
+        {
+            GameObject player = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
+            NetworkServer.AddPlayerForConnection(clientConn, player);
+
+            Unit playerUnit = player.GetComponent<Unit>();
+            if (playerUnit != null)
+            {
+                playerUnit.InitBars(conn.identity);
+            }
+        }
+    }
     private void OnOpcodeMessageReceived(NetworkConnection conn, OpcodeMessage msg)
     {
         opcodeHandler.HandleOpcode(conn, msg.opcode, new NetworkReader(msg.payload));

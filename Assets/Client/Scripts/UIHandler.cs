@@ -29,8 +29,8 @@ public class UIHandler : MonoBehaviour
     public HealthBar healthBar;
     public TargetHealthBar targetHealthBar;
     public GameObject targetFrame;
-    public GameObject thbObject;
-    public GameObject tmbObject;
+    public GameObject targetHealthBarObject;
+    public GameObject targetManaBarObject;
     public List<ActionButton> actionButtons; // List of all ActionButton instances
     public Text combatText;
     public Transform buffCanvas; // Reference to the Buff Canvas
@@ -205,9 +205,9 @@ public class UIHandler : MonoBehaviour
         if (unit == null)
             return;
 
-        thbObject.SetActive(true);
+        targetHealthBarObject.SetActive(true);
         targetFrame.SetActive(true);
-        tmbObject.SetActive(true);
+        targetManaBarObject.SetActive(true);
         targetDebuffCanvas.gameObject.SetActive(true);
         Transform healthBarTransform = unit.transform.Find("HealthBarVisual");
 

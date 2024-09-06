@@ -15,6 +15,7 @@
 
 using Mirror;
 using System.Linq;
+using Unity.Services.Authentication;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -36,7 +37,7 @@ public class ClientNetworkManager : MonoBehaviour
         opcodeHandler.RegisterHandler(Opcodes.SMSG_APPLY_AURA,          HandleApplyAura);
         opcodeHandler.RegisterHandler(Opcodes.SMSG_UPDATE_TARGET,       HandleUpdateTarget);
         opcodeHandler.RegisterHandler(Opcodes.SMSG_SPELL_FAILED,        HandleSpellFailed);
-        opcodeHandler.RegisterHandler(Opcodes.SMSG_UPDATE_UNIT_STATE,   HandleUpdateUnitState); 
+        opcodeHandler.RegisterHandler(Opcodes.SMSG_UPDATE_UNIT_STATE,   HandleUpdateUnitState);
         opcodeHandler.RegisterHandler(Opcodes.SMSG_INIT_BARS,           HandleInitBars);
         // Register the OpcodeMessage handler on the client
         NetworkClient.RegisterHandler<OpcodeMessage>(OnOpcodeMessageReceived);
@@ -235,15 +236,21 @@ public class ClientNetworkManager : MonoBehaviour
 
     private void HandleCombatText(NetworkReader reader)
     {
-        float newHealth = reader.ReadFloat();
-        bool positive = reader.ReadBool();
-        NetworkIdentity identity = reader.ReadNetworkIdentity();
+        NetworkIdentity casterIdentity = reader.ReadNetworkIdentity();
+        NetworkIdentity targetIdentity = reader.ReadNetworkIdentity();
+        float damage = reader.ReadFloat();
+        bool isPositive = reader.ReadBool();
+        bool absorb = reader.ReadBool();
 
-        Unit target = identity.GetComponent<Unit>();
+        Unit target = targetIdentity.GetComponent<Unit>();
 
-        if (identity.netId == NetworkClient.localPlayer.netId)
+        if (casterIdentity.netId == NetworkClient.localPlayer.netId)
         {
-            // This is working
+            Transform transform = targetIdentity.transform;
+            if (transform != null)
+            {
+                DynamicTextManager.CreateText(transform.position, damage.ToString(), DynamicTextManager.defaultData);
+            }
         }
     }
 

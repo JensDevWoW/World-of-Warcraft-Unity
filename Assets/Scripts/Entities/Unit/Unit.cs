@@ -739,7 +739,29 @@ public class Unit : MonoBehaviour
 
         // Send health opcode
         SendHealthUpdate(target, newHealth, spell.isPositive);
-        // TODO: Send SMSG_SEND_COMBAT_TEXT
+        SendCombatText(target, damage, spell.isPositive, absorb);
+    }
+
+    private void SendCombatText(Unit target, float damage, bool isPositive, bool absorb)
+    {
+        if (target == null)
+            return;
+
+        NetworkWriter writer = new NetworkWriter();
+
+        writer.WriteNetworkIdentity(Identity);
+        writer.WriteNetworkIdentity(target.Identity);
+        writer.WriteFloat(damage);
+        writer.WriteBool(isPositive);
+        writer.WriteBool(absorb);
+
+        OpcodeMessage msg = new OpcodeMessage
+        {
+            opcode = Opcodes.SMSG_SEND_COMBAT_TEXT,
+            payload = writer.ToArray()
+        };
+
+        NetworkServer.SendToAll(msg);
     }
 
     public void SendHealthUpdate(Unit target, float health, bool Positive)

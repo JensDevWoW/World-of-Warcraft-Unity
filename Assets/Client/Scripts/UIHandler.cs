@@ -86,6 +86,27 @@ public class UIHandler : MonoBehaviour
         }
     }
     
+    public void UpdateCharges(int spellId, int charges)
+    {
+        ActionButton button = GetButtonById(spellId);
+
+        if (button != null)
+        {
+            button.UpdateCharges(charges);
+        }
+    }
+
+    public ActionButton GetButtonById(int spellId)
+    {
+        foreach (ActionButton button in actionButtons)
+        {
+            if (button.spellId == spellId)
+                return button;
+        }
+
+        return null;
+    }
+
     public void InitBars()
     {
         foreach (ActionButton button in actionButtons)
@@ -129,6 +150,19 @@ public class UIHandler : MonoBehaviour
                 castBar.CastFailed();
             }
         }
+    }
+
+    public bool IsOnCooldown(int spellId)
+    {
+        foreach (var button in actionButtons)
+        {
+            if (button.spellId == spellId)
+            {
+                return button.IsOnCooldown();
+            }
+        }
+
+        return false;
     }
 
     public void StartCooldown(int spellId, float cooldownTime)

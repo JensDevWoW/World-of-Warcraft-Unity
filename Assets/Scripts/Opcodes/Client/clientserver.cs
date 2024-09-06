@@ -39,6 +39,8 @@ public class ClientNetworkManager : MonoBehaviour
         opcodeHandler.RegisterHandler(Opcodes.SMSG_SPELL_FAILED,        HandleSpellFailed);
         opcodeHandler.RegisterHandler(Opcodes.SMSG_UPDATE_UNIT_STATE,   HandleUpdateUnitState);
         opcodeHandler.RegisterHandler(Opcodes.SMSG_INIT_BARS,           HandleInitBars);
+        opcodeHandler.RegisterHandler(Opcodes.SMSG_UPDATE_CHARGES,      HandleUpdateCharges);
+        opcodeHandler.RegisterHandler(Opcodes.SMSG_SPELL_COOLDOWN,      HandleSpellCooldown);
         // Register the OpcodeMessage handler on the client
         NetworkClient.RegisterHandler<OpcodeMessage>(OnOpcodeMessageReceived);
     }
@@ -47,6 +49,30 @@ public class ClientNetworkManager : MonoBehaviour
     {
         // Handle the opcode using the registered handler
         opcodeHandler.HandleOpcode(msg.opcode, new NetworkReader(msg.payload));
+    }
+
+    private void HandleSpellCooldown(NetworkReader reader)
+    {
+        NetworkIdentity identity = reader.ReadNetworkIdentity();
+        int spellId = reader.ReadInt();
+        float duration = reader.ReadFloat();
+
+        if (identity.netId == NetworkClient.localPlayer.netId)
+        {
+            UIHandler.Instance.StartCooldown(spellId, duration);
+        }
+    }
+
+    private void HandleUpdateCharges(NetworkReader reader)
+    {
+        NetworkIdentity identity = reader.ReadNetworkIdentity();
+        int spellId = reader.ReadInt();
+        int charges = reader.ReadInt();
+
+        if (identity.netId == NetworkClient.localPlayer.netId)
+        {
+            UIHandler.Instance.UpdateCharges(spellId, charges);
+        }
     }
 
     private void HandleInitBars(NetworkReader reader)
@@ -131,7 +157,7 @@ public class ClientNetworkManager : MonoBehaviour
         if (casterIdentity.netId == NetworkClient.localPlayer.netId)
         {
             // We need to tell the client that the cooldown is now set
-            if (cooldownTime > 0)
+            if (cooldownTime > 0 && UIHandler.Instance.IsOnCooldown(spellId) == false)
                 UIHandler.Instance.StartCooldown(spellId, cooldownTime);
         }
 

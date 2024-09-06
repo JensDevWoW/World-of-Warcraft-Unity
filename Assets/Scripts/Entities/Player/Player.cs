@@ -21,7 +21,6 @@ public class Player : MonoBehaviour
     public int level;
 
     private float gcdTimer = 0;
-    private float gcdTime = 1.5f;
 
     public Unit unit { get; set; }
 
@@ -47,9 +46,9 @@ public class Player : MonoBehaviour
         return gcdTimer > 0;
     }
 
-    public void SetOnGCD()
+    public void SetOnGCD(float timer)
     {
-        gcdTimer = gcdTime;
+        gcdTimer = timer;
     }
 
     public float GetGCDTime()

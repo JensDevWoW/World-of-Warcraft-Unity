@@ -22,6 +22,7 @@ using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Android;
+using static UnityEngine.UI.CanvasScaler;
 
 public enum Stats
 {
@@ -65,13 +66,12 @@ public class Unit : MonoBehaviour
     private Vector3 lastPosition;
     private bool isMoving;
     private float movementThreshold = 0.1f; // The threshold for detecting movement
-    public CooldownHandler cdHandler { get; private set; }
     public CharacterController charController { get; private set; }
     public Player player { get; private set; }
     public LocationHandler locationHandler { get; protected set; }
     public Unit m_target { get; protected set; }
 
-    public List<int> knownSpells; // List of spell IDs the Unit knows
+    public List<UnitSpell> spellBook; // List of spell IDs the Unit knows
     public AnimationHandler animHandler {  get; protected set; }
     public Creature creature {  get; protected set; }
     
@@ -92,16 +92,51 @@ public class Unit : MonoBehaviour
         {
             print("NetworkIdentity component is missing on the Unit's GameObject.");
         }
-        cdHandler = new CooldownHandler();
 
-        if (knownSpells == null)
-            knownSpells = new List<int>();
+        if (spellBook == null)
+            spellBook = new List<UnitSpell>();
 
         player = GetComponent<Player>();
 
         unitStates = new List<int>(); // Need to add the class, gotta wait for it to load, slow pc
 
+        FillKnownSpells();
+    }
 
+    public void SendUpdateCharges(int spellId, int stacks)
+    {
+        NetworkWriter writer = new NetworkWriter();
+
+        writer.WriteNetworkIdentity(Identity);
+        writer.WriteInt(spellId);
+        writer.WriteInt(stacks);
+
+        OpcodeMessage packet = new OpcodeMessage
+        {
+            opcode = Opcodes.SMSG_UPDATE_CHARGES,
+            payload = writer.ToArray()
+        };
+
+        NetworkServer.SendToAll(packet);
+    }
+
+    // This is trash, just a test case, eventually need to add in a SpellBook class
+    public void FillKnownSpells()
+    {
+        List<int> spells = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 };
+
+        foreach (int spell in spells)
+        {
+            SpellInfo info = SpellContainer.Instance.GetSpellById(spell);
+            if (info != null)
+            {
+                UnitSpell unitSpell = SpellContainer.Instance.Convert(info);
+                if (unitSpell != null)
+                {
+                    spellBook.Add(unitSpell);
+                }
+            }
+        }
     }
 
     public void SendStateUpdate(int state, bool apply)
@@ -255,7 +290,148 @@ public class Unit : MonoBehaviour
 
     }
 
-    public void Update()
+    public void SendCooldownOpcode(int spellId, float duration)
+    {
+        NetworkWriter writer = new NetworkWriter();
+
+        writer.WriteNetworkIdentity(Identity);
+        writer.WriteInt(spellId);
+        writer.WriteFloat(duration);
+
+        OpcodeMessage packet = new OpcodeMessage
+        {
+            opcode = Opcodes.SMSG_SPELL_COOLDOWN,
+            payload = writer.ToArray()
+        };
+
+        NetworkServer.SendToAll(packet);
+    }
+
+    public bool IsOnCooldown(int spellId)
+    {
+        foreach (var spell in spellBook)
+        {
+            if (spell.SpellInfo.Id == spellId)
+                return spell.currentCooldownTime > 0;
+        }
+
+        return false;
+    }
+
+    public void StartCooldown(int spellId)
+    {
+        foreach (var spell in spellBook)
+        {
+            if (spell.SpellInfo.Id == spellId)
+                spell.StartCooldown();
+        }
+    }
+
+    public bool IsCooldownActive(int spellId)
+    {
+        foreach (var spell in spellBook)
+        {
+            if (spell.SpellInfo.Id == spellId)
+                return spell.IsCooldownActive();    
+        }
+
+        return false;
+    }
+
+    public float GetRemainingCooldown(int spellId)
+    {
+        foreach (var spell in spellBook)
+        {
+            if (spell.SpellInfo.Id == spellId)
+                return spell.GetRemainingCooldown();
+        }
+
+        return 0f;
+    }
+
+    public void DropCharge(int spellId)
+    {
+        foreach (var spell in spellBook)
+        {
+            if (spell.SpellInfo.Id == spellId)
+            {
+                spell.UpdateStacks(spell.Stacks - 1);
+                SendUpdateCharges(spellId, spell.Stacks);
+            }
+        }
+    }
+
+    public void AddCharge(int spellId)
+    {
+        foreach (var spell in spellBook)
+        {
+            if (spell.SpellInfo.Id == spellId)
+                if (spell.Stacks < spell.SpellInfo.Stacks)
+                {
+                    spell.UpdateStacks(spell.Stacks + 1);
+                    SendUpdateCharges(spellId, spell.Stacks);
+                    
+                    if (spell.Stacks + 1 < spell.SpellInfo.Stacks)
+                    {
+                        spell.StartCooldown();
+                    }
+                }
+                else
+                {
+                    spell.ResetCooldown();
+                }
+        }
+    }
+
+    public int GetCharges(int spellId)
+    {
+        foreach (var spell in spellBook)
+        {
+            if (spell.SpellInfo.Id == spellId)
+                return spell.Stacks;
+        }
+
+        return 1000;
+    }
+
+
+    private void UpdateCooldown(UnitSpell spell)
+    {
+        spell.currentCooldownTime -= Time.deltaTime;
+
+        // Check if the cooldown has completed
+        if (spell.currentCooldownTime <= 0)
+        {
+            spell.currentCooldownTime = 0;
+            OnCooldownComplete(spell);
+        }
+    }
+
+    private void OnCooldownComplete(UnitSpell spell)
+    {
+        // Check if the spell has stacks to update
+        if (spell.HasStacks())
+        {
+            spell.UpdateStacks(spell.Stacks + 1);
+            SendUpdateCharges(spell.SpellInfo.Id, spell.Stacks);
+
+            // Restart cooldown if the spell hasn't reached max stacks
+            if (spell.Stacks < spell.SpellInfo.Stacks)
+            {
+                RestartCooldown(spell);
+            }
+        }
+    }
+
+    // Method to restart the cooldown and send cooldown information
+    private void RestartCooldown(UnitSpell spell)
+    {
+        spell.StartCooldown();
+        SendCooldownOpcode(spell.SpellInfo.Id, spell.SpellInfo.Cooldown);
+    }
+
+
+public void Update()
     {
         if (GetHealth() <= 0)
         {
@@ -269,8 +445,16 @@ public class Unit : MonoBehaviour
 
 
 
-        //DRHandler().Update();
-        cdHandler.Update();
+        // We update on Unit function so we can access certain data without needing to backtrack
+        foreach (var spell in spellBook)
+        {
+            // Check if the spell's cooldown is active
+            if (spell.currentCooldownTime > 0)
+            {
+                UpdateCooldown(spell);
+            }
+        }
+
         CheckMovement();
         //target stealth update
         /*if (HasTarget())

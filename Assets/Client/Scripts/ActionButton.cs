@@ -16,6 +16,7 @@
 
 using UnityEditor;
 using UnityEngine;
+using TMPro;
 using UnityEngine.UI;
 
 public class ActionButton : MonoBehaviour
@@ -25,6 +26,8 @@ public class ActionButton : MonoBehaviour
 
     public Image buttonImage;
     public Image cooldownImage; // The background image to show the cooldown effect
+    public GameObject Charges;
+    private TextMeshProUGUI ChargeText;
     private Color originalColor = new Color32(255, 255, 255, 255);
     private Color darkColor = new Color32(119, 104, 104, 255); // The dark color to change to
 
@@ -32,7 +35,9 @@ public class ActionButton : MonoBehaviour
     private float cooldownTimer;
     private float gcdTime;
     private float gcdTimer;
+    private int m_charges;
     private bool m_offGCD = false;
+    SpellInfo currentSpell;
     public void Init()
     {
         if (spellId != 0)
@@ -40,10 +45,21 @@ public class ActionButton : MonoBehaviour
             this.buttonImage.sprite = IconManager.GetSpellIcon(spellId);
             this.cooldownImage.sprite = IconManager.GetSpellIcon(spellId);
             this.buttonImage.color = originalColor;
-            SpellInfo currentSpell = SpellContainer.Instance.GetSpellById(spellId);
+            this.currentSpell = SpellContainer.Instance.GetSpellById(spellId);
+           
+            ChargeText = Charges.GetComponent<TextMeshProUGUI>();
+
             if (currentSpell != null)
             {
                 this.m_offGCD = currentSpell.HasFlag(SpellFlags.SPELL_FLAG_IGNORES_GCD);
+                if (currentSpell.Stacks > 1)
+                {
+                    if (ChargeText != null)
+                    {
+                        ChargeText.text = currentSpell.Stacks.ToString();
+                        ChargeText.gameObject.SetActive(true);
+                    }
+                }
             }
         }
     }
@@ -72,6 +88,12 @@ public class ActionButton : MonoBehaviour
         }
     }
 
+    // TODO: Add in functionality to get local client spell cooldowns rather than from SpellData
+    public void UpdateCharges(int charges)
+    {
+        ChargeText.text = charges.ToString();
+    }
+
     // Darken the button visually
     private void DarkenButton()
     {
@@ -90,10 +112,19 @@ public class ActionButton : MonoBehaviour
         }
     }
 
+    public void StartLightCooldown(float duration)
+    {
+        cooldownTime = duration;
+        cooldownTimer = duration;
+        cooldownImage.color = originalColor;
+        cooldownImage.fillAmount = 1f;
+    }
+
     public void StartCooldown(float duration)
     {
         cooldownTime = duration;
         cooldownTimer = duration;
+        cooldownImage.color = darkColor;
         cooldownImage.fillAmount = 1f;
     }
 

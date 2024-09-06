@@ -50,6 +50,8 @@ public class Spell : MonoBehaviour
     public float m_elapsedTime = 0f;
     public int m_minDistanceToTarget = 1;
     public int m_manaCost;
+    public int m_charges;
+    public int m_maxCharges;
     public int cooldownTime;
     public float cooldownLeft;
     public float modBasePoints = 0;
@@ -79,6 +81,19 @@ public class Spell : MonoBehaviour
         this.cooldownTime = spellInfo.Cooldown;
         this.cooldownLeft = spellInfo.Cooldown;
         this.trigger = triggerObject;
+
+        // Stacks
+        if (m_spellInfo.Stacks > 1)
+        {
+            this.m_charges = m_spellInfo.Stacks;
+            this.m_maxCharges = m_spellInfo.Stacks;
+        }
+        else
+        {
+            this.m_charges = 1;
+            this.m_maxCharges = 1;
+        }
+
         this.AnimationEnabled = !spellInfo.HasFlag(SpellFlags.SPELL_FLAG_DISABLE_ANIM);
         this.GCD = HasFlag(SpellFlags.SPELL_FLAG_IGNORES_GCD) ? 0f : 1.5f;
         AttachSpellScript(spellId);
@@ -326,7 +341,7 @@ public class Spell : MonoBehaviour
             SendSpellStartPacket();
 
             if (caster.ToPlayer() != null && (!HasFlag(SpellFlags.SPELL_FLAG_IGNORES_GCD)))
-                caster.ToPlayer().SetOnGCD();
+                caster.ToPlayer().SetOnGCD(GetGCD());
 
             if (IsInstant())
                 Cast();
@@ -393,12 +408,33 @@ public class Spell : MonoBehaviour
         }
     }
 
+    public float GetGCD()
+    {
+        // We need to eventually add in a better way to get this data, but this will work for now
+        float gcdTime = 1.5f;
+
+        if (m_spellInfo != null)
+        {
+            switch (m_spellInfo.Id)
+            {
+                case 20: // Fire Blast
+                    gcdTime = 0.75f;
+                    break;
+            }
+
+            if (HasFlag(SpellFlags.SPELL_FLAG_IGNORES_GCD))
+                return 0f;
+        }
+
+        return gcdTime;
+    }
+
     public string CheckCast()
     {
         if (!caster)
             return "";
 
-        if (caster.cdHandler.IsCooldownActive(spellId))
+        if (!HasCharges() && caster.IsCooldownActive(spellId) || (HasCharges() && GetCharges() < 1))
             return "cooldown";
 
         if (caster.ToPlayer() != null)
@@ -452,6 +488,43 @@ public class Spell : MonoBehaviour
         {
             caster.ToPlayer().GetGlobalCooldownMgr().CancelGlobalCooldown(m_spellInfo);
         }*/
+    }
+
+    public bool HasCharges()
+    {
+        return m_spellInfo.Stacks > 1;
+    }
+
+    public int GetCharges()
+    {
+        return caster.GetCharges(m_spellInfo.Id);
+    }
+
+    public void DropCharge()
+    {
+        caster.DropCharge(m_spellInfo.Id);
+    }
+
+    public void AddCharge()
+    {
+        caster.AddCharge(m_spellInfo.Id);
+    }
+
+    public void SendUpdateCharges()
+    {
+        NetworkWriter writer = new NetworkWriter();
+
+        writer.WriteNetworkIdentity(caster.Identity);
+        writer.WriteInt(m_spellInfo.Id);
+        writer.WriteInt(m_charges);
+
+        OpcodeMessage packet = new OpcodeMessage
+        {
+            opcode = Opcodes.SMSG_UPDATE_CHARGES,
+            payload = writer.ToArray()
+        };
+
+        NetworkServer.SendToAll(packet);
     }
 
     public int GetSpellState()
@@ -546,7 +619,7 @@ public class Spell : MonoBehaviour
         // TODO: Somehow put an array in this bith
         writer.WriteNetworkIdentity(target != null ? target.Identity : null); // Use Target's NetworkIdentity, if available
         writer.WriteFloat(CastTime);
-        writer.WriteFloat(GCD);
+        writer.WriteFloat(GetGCD());
         writer.WriteInt(spellId);
         writer.WriteBool(AnimationEnabled);
         writer.WriteBool(IsSpellQueueSpell);
@@ -610,8 +683,22 @@ public class Spell : MonoBehaviour
         if (!caster)
             return;
 
+        if (caster.IsOnCooldown(m_spellInfo.Id))
+            return;
+
         if (HasCooldown())
-            caster.cdHandler.StartCooldown(spellId, cooldownTime);
+            caster.StartCooldown(spellId);
+    }
+
+    private bool IsOnCooldown()
+    {
+        if (!caster)
+            return false;
+
+        if (HasCooldown())
+            return caster.IsCooldownActive(spellId);
+
+        return false;
     }
 
     private bool HasCooldown()
@@ -686,38 +773,20 @@ public class Spell : MonoBehaviour
 
         SetOnCooldown();
 
-        /*if (HasCharge())
+        if (GetCharges() > 0)
             DropCharge();
-        else if (HasCooldown())
-        {
+       // else if (HasCooldown())
+        //{
             // Toggled spells shouldn't apply cooldown on first cast
-            if (Toggled())
-                return;
+            //if (Toggled())
+                //return;
 
-            if (!HasFlag("SPELL_FLAG_OVERRIDE"))
-            {
-                SetOnCooldown();
-            }
-        }*/
-        /*--Consume a charge if you have charges and set on cooldown that way so we can handle it already being on cooldown
-
-            if self:HasCharges() then
-                self:DropCharge(); --Drop 1 charge;
-
-            else
-                if self:HasCooldown() then
-                    -- Toggled spells shouldn't apply cooldown on first cast
-
-                    if self.spell:findFirstChild("Toggle") then
-
-                        return;
-        end
-        -- Overridden spells need to go on cooldown manually
-
-                    if not self: HasFlag("SPELL_FLAG_OVERRIDE") then
-                        self:SetOnCooldown();
-        end*/
-        // Check what 'this' is referring to
+            //if (!HasFlag("SPELL_FLAG_OVERRIDE"))
+           // {
+            //    SetOnCooldown();
+           // }
+       // }
+        
     }
     private bool IsInstant()
     {

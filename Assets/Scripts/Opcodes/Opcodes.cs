@@ -33,6 +33,7 @@ public class Opcodes
     public const int SMSG_UPDATE_UNIT_STATE = 11;
     public const int SMSG_INIT_BARS = 12; // TODO: Change to InitCharacter
     public const int CMSG_JOIN_WORLD = 13;
-
+    public const int SMSG_UPDATE_CHARGES = 14;
+    public const int SMSG_SPELL_COOLDOWN = 15;
 }
 

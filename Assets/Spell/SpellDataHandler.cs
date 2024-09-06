@@ -85,6 +85,7 @@ public class SpellData
     public string attributes;
     public string flags;
     public int range;
+    public int stacks;
     public AuraData aura;
 }
 
@@ -169,8 +170,27 @@ public class SpellDataHandler : MonoBehaviour
             SpellAttributes attributes = ParseSpellAttributes(spellData.attributes);
             SpellFlags flags = ParseSpellFlags(spellData.flags);
 
-            SpellInfo spell = new SpellInfo(spellData.id, spellData.name, mask, type, spellData.manaCost, spellData.castTime,
-                spellData.spellTime, spellData.speed, spellData.positive, spellData.basepoints, spellData.damageclass, effects, spellData.spellscript, spellData.cooldown, attributes, flags, spellData.range);
+            SpellInfo spell = new SpellInfo(
+                spellData.id,
+                spellData.name,
+                mask,
+                type,
+                spellData.manaCost,
+                spellData.castTime,
+                spellData.spellTime,
+                spellData.speed,
+                spellData.positive,
+                spellData.basepoints,
+                spellData.damageclass,
+                effects,
+                spellData.spellscript,
+                spellData.cooldown,
+                attributes,
+                flags,
+                spellData.range,
+                spellData.stacks
+            );
+
 
             if (spellData.aura != null && !string.IsNullOrEmpty(spellData.aura.name))
             {

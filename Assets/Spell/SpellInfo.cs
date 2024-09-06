@@ -46,10 +46,12 @@ public class SpellInfo
     public SpellAttributes Attributes { get; private set; }
     public SpellFlags Flags { get; private set; }
     public int Range { get; private set; }
+
+    public int Stacks {  get; private set; }
     public SpellInfo(int id, string name, SpellSchoolMask schoolMask, SpellType type, 
         int manaCost, float castTime, bool spellTime, float speed, bool positive, 
         int basePoints, string damageclass, List<SpellEffect> effects, string spellScript, 
-        int cooldown, SpellAttributes attributes, SpellFlags flags, int range)
+        int cooldown, SpellAttributes attributes, SpellFlags flags, int range, int stacks)
     {
         Id = id;
         Name = name;
@@ -68,6 +70,7 @@ public class SpellInfo
         Attributes = attributes;
         Flags = flags;
         Range = range;
+        Stacks = stacks;
     }
 
     public bool HasFlag(SpellFlags flag)

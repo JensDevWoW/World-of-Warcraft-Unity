@@ -10645,7 +10645,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5ea1b38e2e50e84a8709558f99b6a10, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  creatureId: 0
+  creatureId: 1
 --- !u!114 &9141735004106529127
 MonoBehaviour:
   m_ObjectHideFlags: 0

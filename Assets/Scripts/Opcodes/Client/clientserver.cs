@@ -83,8 +83,9 @@ public class ClientNetworkManager : MonoBehaviour
                 UIHandler.Instance.StartGlobalCooldown(gcd);
         }
 
-        if (animationEnabled)
-            caster.animHandler.animator.SetBool("IsCastingDirected", true);
+        if (caster.ToPlayer() != null)
+            if (animationEnabled)
+                caster.animHandler.animator.SetBool("IsCastingDirected", true);
 
     }
 
@@ -119,7 +120,7 @@ public class ClientNetworkManager : MonoBehaviour
 
 
 
-        if (caster != null && animationEnabled == true)
+        if (caster != null && animationEnabled == true && caster.ToPlayer() != null)
         {
                 
             caster.animHandler.SetupSpellParameters(spellId, speed, caster.transform, target?.transform);
@@ -249,7 +250,10 @@ public class ClientNetworkManager : MonoBehaviour
             Transform transform = targetIdentity.transform;
             if (transform != null)
             {
-                DynamicTextManager.CreateText(transform.position, damage.ToString(), DynamicTextManager.defaultData);
+                if (absorb)
+                    DynamicTextManager.CreateText(transform.position, "absorb", DynamicTextManager.defaultData);
+                else
+                    DynamicTextManager.CreateText(transform.position, damage.ToString(), DynamicTextManager.defaultData);
             }
         }
     }

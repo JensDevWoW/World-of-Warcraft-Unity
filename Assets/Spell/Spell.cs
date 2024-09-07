@@ -57,6 +57,7 @@ public class Spell : MonoBehaviour
     public float m_channeledDuration;
     public float m_timer;
     public bool effectsHandled = false;
+    private float custom_pct = 0;
     public GameObject trigger;
     public SpellEffectHandler effectHandler {  get; protected set; }
 
@@ -116,7 +117,15 @@ public class Spell : MonoBehaviour
         effectHandler = new SpellEffectHandler();
     }
 
+    public float GetModPct()
+    {
+        return modBasePoints;
+    }
 
+    public void SetModPct(float customPct)
+    {
+        modBasePoints = customPct;
+    }
     public int CheckMovement()
     {
         if (IsInstant())

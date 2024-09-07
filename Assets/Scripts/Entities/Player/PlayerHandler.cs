@@ -26,14 +26,7 @@ public class PlayerInput : NetworkBehaviour
     {
         KeyBindManager.LoadKeyBinds();
         spellbook.Add(new SpellList("Drain Soul", 21, KeyBindManager.keyBinds.three));
-        spellbook.Add(new SpellList("Pyroblast", 13, KeyBindManager.keyBinds.two));
-        spellbook.Add(new SpellList("Fire Blast", 20, KeyBindManager.keyBinds.one)); // AoE click-placement spell
-        spellbook.Add(new SpellList("Combustion", 14, KeyBindManager.keyBinds.four));
-        spellbook.Add(new SpellList("Frostbolt", 2, KeyBindManager.keyBinds.five));
-        spellbook.Add(new SpellList("Ice Lance", 15, KeyBindManager.keyBinds.six));
-        spellbook.Add(new SpellList("Frost Nova", 17, KeyBindManager.keyBinds.seven));
-        spellbook.Add(new SpellList("Blink", 18, KeyBindManager.keyBinds.eight));
-        spellbook.Add(new SpellList("Arcane Brilliance", 19, KeyBindManager.keyBinds.nine));
+        spellbook.Add(new SpellList("Agony", 23, KeyBindManager.keyBinds.one));
     }
 
     void Update()

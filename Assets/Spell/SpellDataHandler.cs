@@ -43,7 +43,8 @@ public enum SpellAttributes
     SPELL_ATTR_NOT_USABLE_IN_ARENA = 1 << 16,
     SPELL_ATTR_REACTIVE_DAMAGE_PROC = 1 << 17,
     SPELL_ATTR_IGNORE_GCD = 1 << 18,
-    SPELL_ATTR_BREAKABLE_BY_DAMAGE = 1 << 19
+    SPELL_ATTR_BREAKABLE_BY_DAMAGE = 1 << 19,
+    SPELL_ATTR_EFFECT_ON_HIT = 1 << 20,
     // Add more attributes as needed
 }
 

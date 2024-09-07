@@ -17,6 +17,7 @@ using Mirror;
 using System.Collections.Generic;
 using UnityEditor.UI;
 using UnityEngine;
+using System;
 
 public class Aura : MonoBehaviour
 {
@@ -33,12 +34,14 @@ public class Aura : MonoBehaviour
 
     public float m_tickTime { get; private set; }
 
-    public int m_stacks { get; private set; }
+    public int m_stacks = 1;
     public int m_maxStacks { get; private set; }
     public bool m_stackable = false;
     private float m_timeBetweenTicks;
     private bool finished = false;
     public bool m_effectHit = false;
+    private float custom_pct = 0;
+    public AuraScript auraScript;
     public void Initialize(AuraInfo auraInfo, Unit caster, Unit target, Spell spell)
     {
 
@@ -49,7 +52,6 @@ public class Aura : MonoBehaviour
         this.duration = auraInfo.Duration;
         this.caster = caster;
         this.spell = spell;
-        this.m_stacks = auraInfo.Stacks;
         this.m_maxStacks = auraInfo.Stacks;
         if (auraInfo.Stacks > 1)
             this.m_stackable = true;
@@ -57,6 +59,7 @@ public class Aura : MonoBehaviour
         this.m_hasTimer = duration < 9999;
         this.m_tickTime = auraInfo.TickTime;
         this.m_timeBetweenTicks = this.m_tickTime;
+        AttachAuraScript(auraInfo.Id);
 
         // Add this aura to the target's aura list
         target.InitAura(this);
@@ -66,8 +69,71 @@ public class Aura : MonoBehaviour
 
         // Apply initial effects if necessary
         HandleEffects();
+        OnApply();
         if (!m_isPeriodic)
             m_effectHit = true;
+    }
+
+    private void AttachAuraScript(int spellId)
+    {
+        // Get the script type from the registry using the spellId
+        Type scriptType = AuraScriptRegistry.GetAuraScriptType(spellId);
+
+        if (scriptType != null)
+        {
+            // Attach the script as a component
+            auraScript = gameObject.AddComponent(scriptType) as AuraScript;
+            if (auraScript != null)
+            {
+                Debug.Log($"Attached script {scriptType.Name} to {gameObject.name}");
+            }
+            else
+            {
+                Debug.LogError($"Failed to attach script for spell ID {spellId}.");
+            }
+        }
+    }
+
+    public float GetCustomPct()
+    {
+        return custom_pct;
+    }    
+
+    public void SetCustomPct(float customPct )
+    {
+        custom_pct = customPct;
+    }
+
+    private void OnApply()
+    {
+        if (auraScript != null)
+        {
+            auraScript.OnApply(this, caster, target);
+        }
+    }
+
+    private void OnTick()
+    {
+        if (auraScript != null)
+        {
+            auraScript.OnTick(this, caster, target);
+        }
+    }
+
+    private void OnRemove()
+    {
+        if (auraScript != null)
+        {
+            auraScript.OnRemove(this, caster, target);
+        }
+    }
+
+    private void Modify()
+    {
+        if (auraScript != null)
+        {
+            auraScript.Modify(this, caster, target);
+        }
     }
 
     private void HandleEffects()
@@ -79,6 +145,7 @@ public class Aura : MonoBehaviour
     public void Finish()
     {
         CancelEffects();
+        OnRemove();
         this.duration = 0;
         UpdateClient();
         // TODO: Handle OnRemove aurascript
@@ -126,12 +193,28 @@ public class Aura : MonoBehaviour
         UpdateClient();
     }
 
+    public int GetStacks()
+    {
+        return m_stacks;
+    }
+
     public void AddStack()
     {
         if (m_stacks < m_maxStacks)
             m_stacks++;
 
-        Refresh();
+        Spell spell = ToSpell();
+        float basePoints = spell.m_spellInfo.BasePoints;
+        // handle tick damage adjustment
+        switch (auraInfo.Id)
+        {
+            case 23: // Agony
+                spell.SetModPct(basePoints + ((GetStacks() / 10) * basePoints)); // Add 10% per stack
+                break;
+        }
+
+        if (auraInfo.Id != 23) // Don't refresh Agony on new stack added
+            Refresh();
     }
 
     public void DropStack()
@@ -205,10 +288,7 @@ public class Aura : MonoBehaviour
             {
                 HandleEffects();
                 m_timeBetweenTicks = m_tickTime; // Reset tick timer;
-
-                // Custom handle for Agony, stacks will continue up to 10
-                if (m_stacks < 10 && auraInfo.Id == 100 /* agony ID placeholder */)
-                    AddStack();
+                OnTick();
             }
         }
         if (duration > 0)

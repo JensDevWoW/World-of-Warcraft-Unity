@@ -1233,7 +1233,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   keybind: 49
-  spellId: 0
+  spellId: 23
   buttonImage: {fileID: 1721193079}
   cooldownImage: {fileID: 685330669}
   Charges: {fileID: 611835321}

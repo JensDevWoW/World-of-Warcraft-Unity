@@ -248,17 +248,6 @@ public class Unit : MonoBehaviour
         }
     }
 
-    public void CancelLCast(int spellId)
-    {
-        foreach (Spell sp in spellList)
-        {
-            if (sp.spellId == spellId)
-                spellList.Remove(sp);
-            StopCasting();
-            SendCancelCastOpcode(sp);
-        }
-    }
-
     public void SendCancelCastOpcode(Spell spell)
     {
         NetworkWriter writer = new NetworkWriter();

@@ -40,7 +40,7 @@ public class IconManager : MonoBehaviour
         string basePath = "SpellIcons/";
 
         // Load all subdirectories within the base path
-        string[] folders = new string[] { "Mage" }; // Replace with actual folder names if known, or add logic to discover folders dynamically.
+        string[] folders = new string[] { "Warlock" }; // Replace with actual folder names if known, or add logic to discover folders dynamically.
 
         // Iterate through each folder to try and find the sprite
         foreach (string folder in folders)

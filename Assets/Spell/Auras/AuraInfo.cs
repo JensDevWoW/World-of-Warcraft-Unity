@@ -61,6 +61,11 @@ public class AuraInfo
         spellinfo = spellInfo;
     }
 
+    public void SetSpellReference(SpellInfo spell)
+    {
+        spellinfo = spell;
+    }
+
     public SpellInfo ToSpell()
     {
         return spellinfo;

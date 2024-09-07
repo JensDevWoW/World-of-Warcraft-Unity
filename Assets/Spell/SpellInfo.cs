@@ -47,11 +47,12 @@ public class SpellInfo
     public SpellFlags Flags { get; private set; }
     public int Range { get; private set; }
 
+    public AuraInfo AuraInfo { get; private set; }
     public int Stacks {  get; private set; }
     public SpellInfo(int id, string name, SpellSchoolMask schoolMask, SpellType type, 
         int manaCost, float castTime, bool spellTime, float speed, bool positive, 
         int basePoints, string damageclass, List<SpellEffect> effects, string spellScript, 
-        int cooldown, SpellAttributes attributes, SpellFlags flags, int range, int stacks)
+        int cooldown, SpellAttributes attributes, SpellFlags flags, int range, int stacks, AuraInfo aura)
     {
         Id = id;
         Name = name;
@@ -71,6 +72,9 @@ public class SpellInfo
         Flags = flags;
         Range = range;
         Stacks = stacks;
+        AuraInfo = aura;
+
+        AuraInfo?.SetSpellReference(this);
     }
 
     public bool HasFlag(SpellFlags flag)
@@ -79,6 +83,23 @@ public class SpellInfo
             return true;
 
         return false;
+    }
+
+    public bool HasAttribute(SpellAttributes attribute)
+    {
+        return (Attributes & attribute) != 0;
+    }
+
+    public bool IsChanneled()
+    {
+        return (Attributes & SpellAttributes.SPELL_ATTR_IS_CHANNELED) != 0;
+    }
+
+    public float GetDuration()
+    {
+        if (AuraInfo != null)
+            return AuraInfo.Duration;
+        return 999f;
     }
 
 }

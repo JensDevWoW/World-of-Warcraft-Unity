@@ -59,7 +59,6 @@ public class SpellEffectHandler
             if (effectHandlers.TryGetValue(effect.Id, out var handler))
             {
                 handler(spell, target);
-                spell.m_spellState = Spell.SPELL_STATE_NULL;
             }
             else
             {

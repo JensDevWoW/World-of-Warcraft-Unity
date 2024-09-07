@@ -148,7 +148,6 @@ public class SpellDataHandler : MonoBehaviour
             return;
         }
 
-        // Deserialize the JSON data into a SpellDataWrapper object
         SpellDataWrapper spellDataWrapper = JsonUtility.FromJson<SpellDataWrapper>(jsonData.text);
 
         if (spellDataWrapper == null || spellDataWrapper.spells == null || spellDataWrapper.spells.Length == 0)
@@ -164,11 +163,32 @@ public class SpellDataHandler : MonoBehaviour
         {
             SpellSchoolMask mask = GetSchoolMaskFromString(spellData.schoolMask);
             SpellType type = GetSpellTypeFromString(spellData.type);
-
             List<SpellEffect> effects = ParseSpellEffects(spellData.effects);
-
             SpellAttributes attributes = ParseSpellAttributes(spellData.attributes);
             SpellFlags flags = ParseSpellFlags(spellData.flags);
+
+            AuraInfo aura = null;
+            if (spellData.aura != null && !string.IsNullOrEmpty(spellData.aura.name))
+            {
+                AuraType auratype = GetAuraTypeFromString(spellData.aura.type);
+                List<AuraEffect> auraEffects = ParseAuraEffects(spellData.aura.effects);
+                aura = new AuraInfo(
+                    spellData.aura.auraId,
+                    spellData.aura.name,
+                    auratype,
+                    spellData.positive,
+                    spellData.aura.duration,
+                    spellData.aura.periodic,
+                    spellData.aura.ticktime,
+                    spellData.aura.stacks,
+                    spellData.basepoints,
+                    spellData.damageclass,
+                    auraEffects,
+                    spellData.aura.aurascript,
+                    null // Temporarily set associated spell to null
+                );
+                Auras.Add(aura);
+            }
 
             SpellInfo spell = new SpellInfo(
                 spellData.id,
@@ -188,17 +208,14 @@ public class SpellDataHandler : MonoBehaviour
                 attributes,
                 flags,
                 spellData.range,
-                spellData.stacks
+                spellData.stacks,
+                aura // Pass the created aura to the spell
             );
 
-
-            if (spellData.aura != null && !string.IsNullOrEmpty(spellData.aura.name))
+            // Set the spell reference in the aura after both objects are created
+            if (aura != null)
             {
-                AuraType auratype = GetAuraTypeFromString(spellData.aura.type);
-
-                List<AuraEffect> auraEffects = ParseAuraEffects(spellData.aura.effects);
-                AuraInfo aura = new AuraInfo(spellData.aura.auraId, spellData.aura.name, auratype, spellData.positive, spellData.aura.duration, spellData.aura.periodic, spellData.aura.ticktime, spellData.aura.stacks, spellData.basepoints, spellData.damageclass, auraEffects, spellData.aura.aurascript, spell);
-                Auras.Add(aura);
+                aura.SetSpellReference(spell);
             }
 
             Spells.Add(spell);
@@ -206,6 +223,7 @@ public class SpellDataHandler : MonoBehaviour
 
         Debug.Log("Successfully loaded and parsed spells.");
     }
+
 
 
     SpellAttributes ParseSpellAttributes(string attributesString)
@@ -362,6 +380,7 @@ public class SpellDataHandler : MonoBehaviour
         {
             case "Fire": return SpellSchoolMask.Fire;
             case "Frost": return SpellSchoolMask.Frost;
+            case "Shadow": return SpellSchoolMask.Shadow;
             // Add other cases as necessary
             default: return SpellSchoolMask.Physical;
         }

@@ -86,6 +86,14 @@ public class UIHandler : MonoBehaviour
         }
     }
     
+    public void StartChannel(int spellId, float duration)
+    {
+        if (castBar != null)
+        {
+            castBar.StartChannel(spellId, duration);
+        }
+    }
+
     public void UpdateCharges(int spellId, int charges)
     {
         ActionButton button = GetButtonById(spellId);
@@ -294,6 +302,25 @@ public class UIHandler : MonoBehaviour
         buffDebuff.gameObject.SetActive(true);
         // Add to the list of active buffs
         activeTargetDebuffs.Add(newBuff);
+    }
+
+    public void UpdateTargetAura(int spellId, float duration, int stacks)
+    {
+        foreach (var buff in activeTargetDebuffs)
+        {
+            if (buff != null)
+            {
+                BuffDebuff buffdebuff = buff.GetComponent<BuffDebuff>();
+                if (buffdebuff != null)
+                {
+                    if (buffdebuff.spellId == spellId)
+                    {
+                        buffdebuff.UpdateData(duration, stacks);
+                        return;
+                    }
+                }
+            }
+        }
     }
 
     public void UpdateAura(int spellId, float duration, int stacks)

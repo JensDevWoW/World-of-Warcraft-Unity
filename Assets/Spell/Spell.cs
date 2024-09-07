@@ -30,7 +30,7 @@ using UnityEngine.UIElements;
 public class Spell : MonoBehaviour
 {
     public const int SPELL_STATE_PREPARING = 1, SPELL_STATE_DELAYED = 2, SPELL_STATE_FINISHED = 3, SPELL_STATE_CASTING = 4, SPELL_STATE_NULL = 5, SPELL_STATE_QUEUED = 6;
-
+    public const int SPELL_FAILED_MOVING = 1, SPELL_CAST_OK = 2;
     public int spellId;
     public Unit caster, target;
     public bool isPreparing = false;
@@ -38,7 +38,6 @@ public class Spell : MonoBehaviour
     public int m_spellState;
     public SpellInfo m_spellInfo { get; protected set; }
     public int CastFlags;
-    public float CastTime;
     public float GCD;
     public bool AnimationEnabled;
     public bool IsSpellQueueSpell;
@@ -55,6 +54,9 @@ public class Spell : MonoBehaviour
     public int cooldownTime;
     public float cooldownLeft;
     public float modBasePoints = 0;
+    public float m_channeledDuration;
+    public float m_timer;
+    public bool effectsHandled = false;
     public GameObject trigger;
     public SpellEffectHandler effectHandler {  get; protected set; }
 
@@ -74,7 +76,7 @@ public class Spell : MonoBehaviour
         this.targetList = new List<Unit>();
         this.m_spellInfo = spellInfo;
         this.target = caster.GetTarget();
-        this.CastTime = spellInfo.CastTime;
+        this.m_timer = spellInfo.CastTime;
         this.isPositive = spellInfo.Positive;
         this.m_speed = spellInfo.Speed;
         this.m_manaCost = spellInfo.ManaCost;
@@ -115,8 +117,30 @@ public class Spell : MonoBehaviour
     }
 
 
+    public int CheckMovement()
+    {
+        if (IsInstant())
+            return SPELL_CAST_OK;
+
+        if (m_spellState == SPELL_STATE_PREPARING)
+        {
+            if (m_spellInfo.CastTime > 0)
+                if (!HasFlag(SpellFlags.SPELL_FLAG_CAST_WHILE_MOVING)) // TODO: Add InterruptFlags
+                    return SPELL_FAILED_MOVING;
+        }
+        else if (m_spellState == SPELL_STATE_CASTING)
+            if (HasFlag(SpellFlags.SPELL_FLAG_CAST_WHILE_MOVING))
+                return SPELL_FAILED_MOVING;
+
+        return SPELL_FAILED_MOVING;
+    }
+
     public void Update()
     {
+
+        if (m_timer > 0 && caster.IsMoving())
+            Cancel();
+
         switch (m_spellState)
         {
             case SPELL_STATE_QUEUED:
@@ -137,16 +161,33 @@ public class Spell : MonoBehaviour
                     break;
                 }
 
-                if (CastTime > 0f)
+                if (m_timer > 0f)
                 {
-                    CastTime -= Time.deltaTime;
+                    m_timer -= Time.deltaTime;
                 }
                 else
                 {
                     Cast();
                 }
                 break;
+            case SPELL_STATE_CASTING:
+                if (m_timer > 0)
+                {
+                    if (!UpdateChanneledTargetList())
+                    {
+                        Debug.Log($"Channeled spell: {m_spellInfo.Id} has been removed due to: No targets");
+                        m_timer = 0;
 
+                    }
+
+                    m_timer -= Time.deltaTime;
+                }
+                else 
+                {
+                    SendChannelUpdate(0);
+                    finish(true);
+                }
+                break;
             case SPELL_STATE_DELAYED:
                 Unit target = this.target;
 
@@ -168,7 +209,7 @@ public class Spell : MonoBehaviour
                         m_spellTime = 0f;
                         OnHit();
                         HandleEffects();
-                        //SetState(SPELL_STATE_NULL);
+                        m_spellState = SPELL_STATE_NULL;
                         //m_isPreparing = false;
                         return;
                     }
@@ -183,7 +224,7 @@ public class Spell : MonoBehaviour
                 m_spellTime = 0f;
                 OnHit();
                 HandleEffects();
-                //SetState(SPELL_STATE_NULL);
+                m_spellState = SPELL_STATE_NULL;
                 //m_isPreparing = false;
                 //return true;
                 caster.RemoveSpellFromList(this);
@@ -193,9 +234,19 @@ public class Spell : MonoBehaviour
                 break; // Cast complete, nothing left to do
 
             default:
-                // Handle other possible states or add a default case
                 break;
         }
+    }
+
+    public bool UpdateChanneledTargetList()
+    {
+        foreach (Unit target in targetList)
+        {
+            if (target.IsAlive())
+                return true; // We know we have at least one target so we can skip the rest
+        }
+
+        return false;
     }
 
     public void HandleMana()
@@ -224,6 +275,150 @@ public class Spell : MonoBehaviour
         this.modBasePoints = m_spellInfo.BasePoints * amount;
     }
 
+    public void SendChanneledStart(float duration)
+    {
+        Unit unitCaster = caster.ToUnit();
+        if (unitCaster == null)
+            return;
+
+        NetworkWriter writer = new NetworkWriter();
+
+        writer.WriteNetworkIdentity(caster.Identity);
+        writer.WriteInt(m_spellInfo.Id);
+        writer.WriteFloat(duration);
+
+        OpcodeMessage packet = new OpcodeMessage
+        {
+            opcode = Opcodes.SMSG_CHANNELED_START,
+            payload = writer.ToArray()
+        };
+
+        NetworkServer.SendToAll(packet);
+
+        m_timer = duration;
+
+        unitCaster.SetChanneledSpellId(m_spellInfo.Id);
+    }
+
+    public void SendChannelUpdate(float time)
+    {
+        if (time == 0)
+            caster.SetChanneledSpellId(0);
+
+        NetworkWriter writer = new NetworkWriter();
+
+        writer.WriteNetworkIdentity(caster.Identity);
+        writer.WriteFloat(time);
+
+        OpcodeMessage packet = new OpcodeMessage
+        {
+            opcode = Opcodes.SMSG_CHANNELED_UPDATE,
+            payload = writer.ToArray()
+        };
+
+        NetworkServer.SendToAll(packet);
+    }
+
+    public void HandleDelayedChannel()
+    {
+        // Ensure the caster is a player, and the spell is currently channeling
+     //   Player playerCaster = caster as Player;
+     //   if (playerCaster == null || m_spellState != SPELL_STATE_CASTING)
+      //      return;
+
+        // Check if the spell can be delayed
+     //   if (!m_spellInfo.ChannelInterruptFlags.HasFlag(ChannelInterruptFlags.DELAY))
+     //       return;
+
+        // Check if the spell has already been delayed the maximum allowed number of times
+       // if (IsDelayableNoMore())
+       //     return;
+
+        // Calculate the initial delay time (25% of the remaining duration)
+        float delayTime = m_channeledDuration * 0.25f;
+
+        // Apply player-specific modifiers to the delay time
+      //  float delayReduce = playerCaster.GetTotalAuraModifier(AuraType.REDUCE_PUSHBACK); // Example modifier
+       // delayTime *= (1f - delayReduce / 100f);
+
+        // Ensure the delay doesn't reduce the channel time below zero
+        if (m_timer <= delayTime)
+        {
+            delayTime = m_timer;
+            m_timer = 0;
+        }
+        else
+        {
+            m_timer -= delayTime;
+        }
+
+        // Update effects for all valid targets affected by the channel
+        foreach (Unit target in targetList)
+        {
+            if (target != null && target.IsAlive())
+            {
+                // Delay target-specific effects here, if applicable
+               // target.DelayAura(m_spellInfo.Id, delayTime); 
+            }
+        }
+
+        // If there is any area effect associated, adjust its duration as well
+       /* if (areaEffect != null)
+        {
+            areaEffect.Delay(delayTime);
+        }*/
+
+        // Send an update to reflect the new channel duration on the client
+        SendChannelUpdate(m_timer);
+    }
+
+
+
+    public void HandleImmediate()
+    {
+        if (m_spellInfo.IsChanneled())
+        {
+            float duration = m_spellInfo.GetDuration();
+            if (duration > 0)
+            {
+                m_channeledDuration = duration;
+                SendChanneledStart(duration);
+            }
+            else if (duration == -1) // Infinite cast
+                SendChanneledStart(duration);
+
+            if (duration != 0)
+                this.m_spellState = SPELL_STATE_CASTING;
+        }
+
+        HandleEffects();
+
+        if (this.m_spellState != SPELL_STATE_CASTING)
+            finish(true);
+    }
+
+    private void finish(bool ok)
+    {
+        if (m_spellState == SPELL_STATE_FINISHED)
+            return;
+
+        m_spellState = SPELL_STATE_FINISHED;
+
+        if (caster == null)
+            return;
+
+        if (m_spellInfo.IsChanneled())
+            caster.InterruptChanneled();
+
+        if (caster.IsCasting())
+            caster.StopCasting();
+
+        if (!ok)
+            return;
+
+
+    }
+
     public void OnHit()
     {
         if (spellScript != null)
@@ -250,12 +445,15 @@ public class Spell : MonoBehaviour
 
     public void SetCastTime(float time)
     {
-        this.CastTime = time;
+        this.m_timer = time;
     }
 
     private void HandleEffects()
     {
-        effectHandler.HandleEffects(this);
+        if (!effectsHandled)
+            effectHandler.HandleEffects(this);
+
+        effectsHandled = true;
     }
     public void prepare()
     {
@@ -350,7 +548,7 @@ public class Spell : MonoBehaviour
 
     public float GetCastTimeLeft()
     {
-        return CastTime;
+        return m_timer;
     }
 
     public void SetSpellState(int state)
@@ -453,6 +651,21 @@ public class Spell : MonoBehaviour
         return "";
     }
 
+    public void CancelEffects()
+    {
+        if (m_timer > 0)
+        {
+            // remove the aura from the target
+            foreach (Unit target in targetList)
+            {
+                if (target.HasAuraFrom(this))
+                    target.RemoveAura(m_spellInfo.Id);
+            }
+
+            m_timer = 0;
+        }
+    }
+
     public void Cancel()
     {
         if (m_spellState == SPELL_STATE_FINISHED)
@@ -469,6 +682,7 @@ public class Spell : MonoBehaviour
 
                 break;
             case SPELL_STATE_CASTING:
+                CancelEffects();
                 break;
         }
 
@@ -618,7 +832,7 @@ public class Spell : MonoBehaviour
         writer.WriteNetworkIdentity(caster.Identity); // Use Caster's NetworkIdentity
         // TODO: Somehow put an array in this bith
         writer.WriteNetworkIdentity(target != null ? target.Identity : null); // Use Target's NetworkIdentity, if available
-        writer.WriteFloat(CastTime);
+        writer.WriteFloat(m_timer);
         writer.WriteFloat(GetGCD());
         writer.WriteInt(spellId);
         writer.WriteBool(AnimationEnabled);
@@ -649,7 +863,7 @@ public class Spell : MonoBehaviour
         writer.WriteInt(0); // Cast Flags
         writer.WriteNetworkIdentity(caster.Identity); 
         writer.WriteNetworkIdentity(target != null ? target.Identity : null); 
-        writer.WriteFloat(CastTime);
+        writer.WriteFloat(m_timer);
         writer.WriteFloat(cooldownTime);
         writer.WriteInt(spellId);
         writer.WriteFloat(m_speed);
@@ -712,11 +926,6 @@ public class Spell : MonoBehaviour
             { return; }
         SelectSpellTargets();
 
-        if (HasHitDelay())
-            m_spellState = SPELL_STATE_DELAYED;
-        else
-            m_spellState = SPELL_STATE_FINISHED;
-
         Execute();
         OnCast();
     }
@@ -759,6 +968,17 @@ public class Spell : MonoBehaviour
 
         SendSpellGo();
         HandleMana();
+
+        if (HasHitDelay() && !m_spellInfo.IsChanneled())
+        {
+            m_spellState = SPELL_STATE_DELAYED;
+
+            if (caster.HasUnitState(UnitState.UNIT_STATE_CASTING))
+                caster.RemoveUnitState(UnitState.UNIT_STATE_CASTING);
+        }
+        else
+            HandleImmediate();
+
         if (IsNegative())
         {
             foreach (Unit target in targetList)

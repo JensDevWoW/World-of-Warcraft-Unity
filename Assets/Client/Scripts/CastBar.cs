@@ -1,103 +1,93 @@
-/*
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
- */
-
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+
 public class CastBar : MonoBehaviour
 {
-    public Image bar;              // Reference to the Image component
-    public Text spellNameText;     // Reference to the Text component for the spell name
+    public Image bar;
+    public Text spellNameText;
     public GameObject castbar;
 
-    private float duration;        // Duration of the spell cast
-    private float timeRemaining;   // Time remaining for the cast to complete
-    private bool isCasting;        // Whether a spell is currently being cast
-    private Color originalColor;   // Original color of the cast bar
+    private float duration;
+    private float timeRemaining;
+    private bool isCasting;
+    private bool isChanneling;
+    private Color originalColor;
 
     void Start()
     {
-        // Hide the cast bar at the start
-        castbar.gameObject.SetActive(false);
-        originalColor = bar.color; // Store the original color of the bar
+        castbar.SetActive(false);
+        originalColor = bar.color;
     }
 
     void Update()
     {
-        if (isCasting)
+        if (isCasting || isChanneling)
         {
             if (timeRemaining > 0)
             {
                 timeRemaining -= Time.deltaTime;
-                bar.fillAmount = Mathf.Clamp01(1 - (timeRemaining / duration));
+                bar.fillAmount = isChanneling
+                    ? Mathf.Clamp01(timeRemaining / duration) // Decrease for channeling
+                    : Mathf.Clamp01(1 - (timeRemaining / duration)); // Increase for normal casting
             }
             else
             {
-                // Casting complete
                 FinishCast();
             }
         }
     }
 
-    // Method to start the cast bar with the provided duration and spell name
     public void StartCast(float castDuration, string spellName)
     {
         duration = castDuration;
         timeRemaining = castDuration;
         isCasting = true;
-
-        // Update the UI elements
         bar.fillAmount = 0;
         spellNameText.text = spellName;
-
-        // Show the cast bar
-        castbar.gameObject.SetActive(true);
+        castbar.SetActive(true);
     }
 
-    // Method to finish the cast and hide the bar
+    public void StartChannel(int spellId, float channelDuration)
+    {
+        SpellInfo spell = SpellContainer.Instance.GetSpellById(spellId);
+        if (spell == null) return;
+
+        duration = channelDuration;
+        timeRemaining = channelDuration;
+        isChanneling = true;
+        bar.fillAmount = 1; // Start full for channeling
+        spellNameText.text = spell.Name;
+        castbar.SetActive(true);
+    }
+
     public void FinishCast()
     {
         isCasting = false;
-        castbar.gameObject.SetActive(false);
+        isChanneling = false;
+        castbar.SetActive(false);
     }
 
-    // Method to cancel a cast
     public void CancelCast()
     {
         isCasting = false;
+        isChanneling = false;
         FinishCast();
     }
 
-    // Method to indicate a failed cast
     public void CastFailed()
     {
         isCasting = false;
+        isChanneling = false;
         StartCoroutine(FadeOutCastBar());
     }
 
-    // Coroutine to fade the cast bar out after a failed cast
     private IEnumerator FadeOutCastBar()
     {
-        // Set the cast bar color to red
         bar.color = Color.red;
-
-        // Set the duration of the fade out
         float fadeDuration = 0.5f;
         float elapsedTime = 0f;
 
-        // While loop to fade out the bar
         while (elapsedTime < fadeDuration)
         {
             elapsedTime += Time.deltaTime;
@@ -106,8 +96,7 @@ public class CastBar : MonoBehaviour
             yield return null;
         }
 
-        // After fading out, reset the bar and hide it
-        bar.color = originalColor; // Reset to original color
-        castbar.gameObject.SetActive(false);
+        bar.color = originalColor;
+        castbar.SetActive(false);
     }
 }

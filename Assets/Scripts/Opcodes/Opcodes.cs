@@ -35,5 +35,7 @@ public class Opcodes
     public const int CMSG_JOIN_WORLD = 13;
     public const int SMSG_UPDATE_CHARGES = 14;
     public const int SMSG_SPELL_COOLDOWN = 15;
+    public const int SMSG_CHANNELED_START = 16;
+    public const int SMSG_CHANNELED_UPDATE = 17;
 }
 

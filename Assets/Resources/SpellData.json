@@ -469,6 +469,38 @@
             "flags": "SPELL_FLAG_NEEDS_TARGET,SPELL_FLAG_ALWAYS_CRIT,SPELL_FLAG_CAST_WHILE_CASTING,SPELL_FLAG_CAST_WHILE_MOVING,SPELL_FLAG_CUSTOM_GCD",
             "range": 40,
             "stacks": 3
+        },
+        {
+            "id": 21,
+            "name": "Drain Soul",
+            "schoolMask": "Fire",
+            "type": "Damage",
+            "manaCost": 3,
+            "castTime": 0,
+            "spellTime": false,
+            "speed": 1.0,
+            "positive": false,
+            "basepoints": 3,
+            "damageclass": "Intellect",
+            "effects": "SPELL_EFFECT_APPLY_AURA",
+            "spellscript": "null",
+            "cooldown": 0,
+            "attributes": "SPELL_ATTR_IS_CHANNELED",
+            "flags": "SPELL_FLAG_NEEDS_TARGET",
+            "range": 40,
+            "stacks": 1,
+            "aura": {
+                "auraId": 21,
+                "name": "Drain Soul",
+                "duration": 6,
+                "stacks": 1,
+                "periodic": true,
+                "ticktime": 2,
+                "effects": "AURA_EFFECT_DAMAGE",
+                "positive": false,
+                "type": "Debuff",
+                "aurascript": "null"
+            }
         }
     ]
 }

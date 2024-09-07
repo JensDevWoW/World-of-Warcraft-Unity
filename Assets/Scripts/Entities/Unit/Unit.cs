@@ -37,6 +37,7 @@ public class UnitState
     public const int UNIT_STATE_ROOTED = 1;
     public const int UNIT_STATE_DISORIENTED = 2;
     public const int UNIT_STATE_STUNNED = 3;
+    public const int UNIT_STATE_CASTING = 4;
 }
 public class Unit : MonoBehaviour
 {
@@ -64,8 +65,10 @@ public class Unit : MonoBehaviour
     private bool m_isCasting;
     private List<int> unitStates;
     private Vector3 lastPosition;
+    private Spell m_channeledSpell = null;
     private bool isMoving;
-    private float movementThreshold = 0.1f; // The threshold for detecting movement
+    private float movementThreshold = 0.01f; // The threshold for detecting movement
+    private int m_channeledSpellId = 0;
     public CharacterController charController { get; private set; }
     public Player player { get; private set; }
     public LocationHandler locationHandler { get; protected set; }
@@ -139,6 +142,11 @@ public class Unit : MonoBehaviour
         }
     }
 
+    public void SetChanneledSpell(Spell spell)
+    {
+        m_channeledSpell = spell;
+    }
+
     public void SendStateUpdate(int state, bool apply)
     {
         NetworkWriter writer = new NetworkWriter();
@@ -156,6 +164,21 @@ public class Unit : MonoBehaviour
         NetworkServer.SendToAll(packet);
     }
 
+    public Spell GetChanneledSpell()
+    {
+        return m_channeledSpell;
+    }
+
+    public void InterruptChanneled()
+    {
+        Spell currentSpell = GetChanneledSpell();
+        if (currentSpell != null)
+        {
+            currentSpell.Cancel();
+            SetChanneledSpellId(0);
+        }
+    }
+
     public void AddUnitState(int state)
     {
         if (!unitStates.Contains(state))
@@ -165,6 +188,11 @@ public class Unit : MonoBehaviour
             // Send opcode
             SendStateUpdate(state, true);
         }
+    }
+
+    public void SetChanneledSpellId(int spellId)
+    {
+        m_channeledSpellId = spellId;
     }
 
     public float GetGCDTime()
@@ -217,6 +245,17 @@ public class Unit : MonoBehaviour
                 spellList.Remove(sp);
             StopCasting();
             SendCancelCastOpcode(spell);
+        }
+    }
+
+    public void CancelLCast(int spellId)
+    {
+        foreach (Spell sp in spellList)
+        {
+            if (sp.spellId == spellId)
+                spellList.Remove(sp);
+            StopCasting();
+            SendCancelCastOpcode(sp);
         }
     }
 
@@ -807,6 +846,17 @@ public void Update()
         }
     }
 
+    public bool HasAuraFrom(Spell spell)
+    {
+        foreach (Aura aura in auraList)
+        {
+            if (aura.auraInfo.Id == spell.spellId)
+                return true;
+        }
+
+        return false;
+    }
+
     public void RemoveAura(Aura aura)
     {
         if (auraList.Contains(aura))
@@ -971,7 +1021,6 @@ public void Update()
     {
         // Calculate the distance moved since the last frame
         float distanceMoved = Vector3.Distance(transform.position, lastPosition);
-
         // If the distance moved is greater than the threshold, consider the unit to be moving
         isMoving = distanceMoved > movementThreshold;
 
@@ -987,12 +1036,12 @@ public void Update()
 
     public string GetClass()
     {
-        return "Mage"; // TODO: Create class system
+        return "Warlock"; // TODO: Create class system
     }
 
     public string GetSpecialization()
     {
-        return "Fire"; // TODO: Create Spec system
+        return "Affliction"; // TODO: Create Spec system
     }
 
     public float SpellDamageBonusDone(Unit victim, Spell spell, SpellInfo m_spellInfo, out bool crit)

@@ -41,6 +41,8 @@ public class ClientNetworkManager : MonoBehaviour
         opcodeHandler.RegisterHandler(Opcodes.SMSG_INIT_BARS,           HandleInitBars);
         opcodeHandler.RegisterHandler(Opcodes.SMSG_UPDATE_CHARGES,      HandleUpdateCharges);
         opcodeHandler.RegisterHandler(Opcodes.SMSG_SPELL_COOLDOWN,      HandleSpellCooldown);
+        opcodeHandler.RegisterHandler(Opcodes.SMSG_CHANNELED_START,     HandleStartChannel);
+        //opcodeHandler.RegisterHandler(Opcodes.SMSG_CHANNELED_UPDATE,    HandleUpdateChannel);
         // Register the OpcodeMessage handler on the client
         NetworkClient.RegisterHandler<OpcodeMessage>(OnOpcodeMessageReceived);
     }
@@ -215,6 +217,30 @@ public class ClientNetworkManager : MonoBehaviour
         }
 
     }
+
+    private void HandleStartChannel(NetworkReader reader)
+    {
+        NetworkIdentity networkIdentity = reader.ReadNetworkIdentity();
+        int spellId = reader.ReadInt();
+        float duration = reader.ReadFloat();
+
+
+        Unit unit = networkIdentity.GetComponent<Unit>();
+
+        if (unit != null)
+        {
+            // TODO: Handle animation
+        }
+
+        if (networkIdentity.netId == NetworkClient.localPlayer.netId)
+        {
+            UIHandler.Instance.StartChannel(spellId, duration);
+        }
+
+        
+
+    }
+
     private void HandleApplyAura(NetworkReader reader)
     {
         NetworkIdentity casterIdentity = reader.ReadNetworkIdentity();
@@ -258,6 +284,12 @@ public class ClientNetworkManager : MonoBehaviour
         if (targetIdentity.netId == NetworkClient.localPlayer.netId)
         {
             UIHandler.Instance.UpdateAura(auraId, duration, stacks);
+        }
+
+        // Need to check if we're targetting the unit
+        if (UIHandler.Instance.GetTarget() == target)
+        {
+            UIHandler.Instance.UpdateTargetAura(auraId, duration, stacks);
         }
     }
 

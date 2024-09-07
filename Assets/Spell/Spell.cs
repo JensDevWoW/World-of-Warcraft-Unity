@@ -57,7 +57,6 @@ public class Spell : MonoBehaviour
     public float m_channeledDuration;
     public float m_timer;
     public bool effectsHandled = false;
-    private float custom_pct = 0;
     public GameObject trigger;
     public SpellEffectHandler effectHandler {  get; protected set; }
 

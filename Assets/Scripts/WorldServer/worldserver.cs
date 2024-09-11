@@ -48,6 +48,11 @@ public class WorldServer : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        // We need to load all objects
+
+    }
     public void AddUnit(Unit unit)
     {
         allUnits.Add(unit);

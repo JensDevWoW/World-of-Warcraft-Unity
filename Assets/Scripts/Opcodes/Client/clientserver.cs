@@ -18,11 +18,16 @@ using System.Linq;
 using Unity.Services.Authentication;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ClientNetworkManager : MonoBehaviour
 {
     private ClientOpcodeHandler opcodeHandler;
 
+    private void Awake()
+    {
+        DontDestroyOnLoad(this);
+    }
     void Start()
     {
         opcodeHandler = new ClientOpcodeHandler();
@@ -42,6 +47,8 @@ public class ClientNetworkManager : MonoBehaviour
         opcodeHandler.RegisterHandler(Opcodes.SMSG_UPDATE_CHARGES,      HandleUpdateCharges);
         opcodeHandler.RegisterHandler(Opcodes.SMSG_SPELL_COOLDOWN,      HandleSpellCooldown);
         opcodeHandler.RegisterHandler(Opcodes.SMSG_CHANNELED_START,     HandleStartChannel);
+        opcodeHandler.RegisterHandler(Opcodes.SMSG_ACCOUNT_INFO,        HandleAccountInfo);
+
         //opcodeHandler.RegisterHandler(Opcodes.SMSG_CHANNELED_UPDATE,    HandleUpdateChannel);
         // Register the OpcodeMessage handler on the client
         NetworkClient.RegisterHandler<OpcodeMessage>(OnOpcodeMessageReceived);
@@ -52,6 +59,17 @@ public class ClientNetworkManager : MonoBehaviour
         // Handle the opcode using the registered handler
         opcodeHandler.HandleOpcode(msg.opcode, new NetworkReader(msg.payload));
     }
+
+    private void HandleAccountInfo(NetworkReader reader)
+    {
+        Debug.Log("Account data received!");
+        int accountId = reader.ReadInt();
+        string accountName = reader.ReadString();
+        Account currentAccount = new Account { accountName = accountName, Id = accountId };
+        // Store account info in a client-side manager
+        ClientAccountManager.Instance.SetCurrentAccount(currentAccount);
+    }
+
 
     private void HandleSpellCooldown(NetworkReader reader)
     {

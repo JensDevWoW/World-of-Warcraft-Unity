@@ -15,9 +15,8 @@
 
 // Filename: GameNetworkManager.cs
 using Mirror;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.Assertions;
+using UnityEngine.SceneManagement;
 
 public class GameNetworkManager : NetworkManager
 {
@@ -25,6 +24,7 @@ public class GameNetworkManager : NetworkManager
     public GameObject spellPrefab;
     public GameObject triggerPrefab;
     public Transform spawnPoint;
+
     public override void OnStartServer()
     {
         opcodeHandler = new OpcodeHandler();
@@ -32,10 +32,10 @@ public class GameNetworkManager : NetworkManager
         base.OnStartServer();
 
         // Register opcode handlers
-        opcodeHandler.RegisterHandler(Opcodes.CMSG_CAST_SPELL,          HandleCastSpell);
-        opcodeHandler.RegisterHandler(Opcodes.CMSG_SELECT_TARGET,       HandleSelectTarget);
-        opcodeHandler.RegisterHandler(Opcodes.CMSG_JOIN_WORLD,          HandleJoinWorld);
-        //opcodeHandler.RegisterHandler((int)Opcodes.MoveCharacter, HandleMoveCharacter);
+        opcodeHandler.RegisterHandler(Opcodes.CMSG_LOGIN_REQUEST, HandleLoginRequest);
+        opcodeHandler.RegisterHandler(Opcodes.CMSG_CAST_SPELL, HandleCastSpell);
+        opcodeHandler.RegisterHandler(Opcodes.CMSG_SELECT_TARGET, HandleSelectTarget);
+        opcodeHandler.RegisterHandler(Opcodes.CMSG_JOIN_WORLD, HandleJoinWorld);
 
         NetworkServer.RegisterHandler<OpcodeMessage>(OnOpcodeMessageReceived, true);
     }
@@ -44,16 +44,22 @@ public class GameNetworkManager : NetworkManager
     {
         if (conn is NetworkConnectionToClient clientConn)
         {
-            GameObject player = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
-            NetworkServer.AddPlayerForConnection(clientConn, player);
+            SceneManager.LoadScene("SampleScene", LoadSceneMode.Single);
 
-            Unit playerUnit = player.GetComponent<Unit>();
-            if (playerUnit != null)
-            {
-                playerUnit.InitBars(conn.identity);
-            }
+            // Start the timer to spawn the character after 3 seconds
+            Invoke(nameof(SpawnCharacter), 1.5f);
         }
     }
+
+    private void SpawnCharacter()
+    {
+        foreach (NetworkConnectionToClient conn in NetworkServer.connections.Values)
+        {
+            GameObject player = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
+            NetworkServer.AddPlayerForConnection(conn, player);
+        }
+    }
+
     private void OnOpcodeMessageReceived(NetworkConnection conn, OpcodeMessage msg)
     {
         opcodeHandler.HandleOpcode(conn, msg.opcode, new NetworkReader(msg.payload));
@@ -72,6 +78,41 @@ public class GameNetworkManager : NetworkManager
 
         Spell spell = caster.CreateSpellAndPrepare(spellId, spellPrefab, triggerPrefab);
     }
+
+    private void HandleLoginRequest(NetworkConnection conn, NetworkReader reader)
+    {
+        string username = reader.ReadString();
+        string password = reader.ReadString();
+
+        // Check the credentials against the database
+        Account account = DatabaseManager.Instance.GetAccountByUsername(username);
+
+        if (account != null && account.accountPass == password)
+        {
+            Debug.Log("Account found!");
+
+            // Send account info to client
+            NetworkWriter writer = new NetworkWriter();
+            writer.WriteInt(account.Id);
+            writer.WriteString(account.accountName);
+
+            OpcodeMessage msg = new OpcodeMessage
+            {
+                opcode = Opcodes.SMSG_ACCOUNT_INFO,
+                payload = writer.ToArray()
+            };
+
+            conn.Send(msg);
+
+            SceneManager.LoadScene("CharacterSelectionScene");
+        }
+        else
+        {
+            Debug.Log("Account not found or password incorrect.");
+        }
+    }
+
+
 
 
     private void HandleSelectTarget(NetworkConnection conn, NetworkReader reader)

@@ -5,7 +5,6 @@ using Mirror;
 public class SpawnerScript : NetworkBehaviour
 {
     public Button spawnButton;
-
     private void Start()
     {
         if (spawnButton != null)

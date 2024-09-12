@@ -16,8 +16,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
 
-public class CameraController : MonoBehaviour
+public class CameraController : NetworkBehaviour
 {
     //Input Variables
     KeyCode leftMouse = KeyCode.Mouse0, rightMouse = KeyCode.Mouse1, middleMouse = KeyCode.Mouse2;
@@ -69,6 +70,13 @@ public class CameraController : MonoBehaviour
 
     void Start()
     {
+        if (!isLocalPlayer)
+        {
+            // Disable the camera if this is not the local player
+            Camera.main.gameObject.SetActive(false);
+        }
+
+
         player = FindObjectOfType<PlayerControls>();
         player.mainCam = this;
         mainCam = Camera.main;
@@ -102,6 +110,7 @@ public class CameraController : MonoBehaviour
 
     void LateUpdate()
     {
+
         panAngle = Vector3.SignedAngle(transform.forward, player.transform.forward, Vector3.up);
 
         switch(camMoveState)

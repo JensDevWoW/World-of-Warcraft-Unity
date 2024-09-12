@@ -21,19 +21,6 @@ public class Character_Load : MonoBehaviour
                 _loaded = true;
                 Destroy(this);
             }
-            else if (SceneManager.GetSceneByName("SampleScene").isLoaded == true)
-            {
-                if (_loadingStarted == false)
-                    _loadingStarted = true;
-
-                if (_loadTime > 0 && _loadingStarted)
-                    _loadTime -= Time.deltaTime;
-                else if (_loadingStarted == true && _loadTime <= 0)
-                {
-                    _loadTime = 0;
-                    
-                }
-            }
         }
     }
 }

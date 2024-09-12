@@ -16,7 +16,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
-using UnityEditor.Build.Content;
 using System.Runtime.Versioning;
 
 public class UIHandler : MonoBehaviour

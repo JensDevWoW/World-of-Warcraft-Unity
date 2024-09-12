@@ -82,6 +82,7 @@ public class CharacterSelectionManager : MonoBehaviour
             };
             NetworkClient.Send(joinWorldPacket);
 
+            SceneManager.LoadScene("SampleScene", LoadSceneMode.Single);
 
         }
         else

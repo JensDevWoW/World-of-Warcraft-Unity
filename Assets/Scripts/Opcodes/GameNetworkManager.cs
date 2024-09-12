@@ -17,6 +17,7 @@
 using Mirror;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameNetworkManager : NetworkManager
 {
@@ -24,12 +25,15 @@ public class GameNetworkManager : NetworkManager
     public GameObject spellPrefab;
     public GameObject triggerPrefab;
     public Transform spawnPoint;
+    public GameObject buttonPrefab;
 
     public override void OnStartServer()
     {
         opcodeHandler = new OpcodeHandler();
 
         base.OnStartServer();
+
+        SceneManager.LoadScene("SampleScene");
 
         // Register opcode handlers
         opcodeHandler.RegisterHandler(Opcodes.CMSG_LOGIN_REQUEST, HandleLoginRequest);
@@ -39,12 +43,11 @@ public class GameNetworkManager : NetworkManager
 
         NetworkServer.RegisterHandler<OpcodeMessage>(OnOpcodeMessageReceived, true);
     }
-
     private void HandleJoinWorld(NetworkConnection conn, NetworkReader reader)
     {
         if (conn is NetworkConnectionToClient clientConn)
         {
-            SceneManager.LoadScene("SampleScene", LoadSceneMode.Single);
+          //  SceneManager.LoadScene("SampleScene", LoadSceneMode.Single);
 
             // Start the timer to spawn the character after 3 seconds
             Invoke(nameof(SpawnCharacter), 1.5f);
@@ -104,7 +107,7 @@ public class GameNetworkManager : NetworkManager
 
             conn.Send(msg);
 
-            SceneManager.LoadScene("CharacterSelectionScene");
+           // SceneManager.LoadScene("CharacterSelectionScene");
         }
         else
         {

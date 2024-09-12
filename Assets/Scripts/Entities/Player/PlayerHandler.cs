@@ -96,16 +96,8 @@ public class PlayerInput : NetworkBehaviour
             payload = writer.ToArray()
         };
 
-        CmdSendOpcode(msg);
-    }
-
-
-    [Command]
-    private void CmdSendOpcode(OpcodeMessage msg)
-    {
         NetworkClient.Send(msg);
     }
-
     private bool IsLoggedIn() { return true; }
     private bool CanCast() { return true; }
     private bool IsOnGlobalCooldown() { return false; }

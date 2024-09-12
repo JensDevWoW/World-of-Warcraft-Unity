@@ -68,6 +68,8 @@ public class ClientNetworkManager : MonoBehaviour
         Account currentAccount = new Account { accountName = accountName, Id = accountId };
         // Store account info in a client-side manager
         ClientAccountManager.Instance.SetCurrentAccount(currentAccount);
+
+        SceneManager.LoadScene("CharacterSelectionScene");
     }
 
 

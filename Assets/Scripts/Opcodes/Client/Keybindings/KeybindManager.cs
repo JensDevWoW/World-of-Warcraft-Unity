@@ -23,6 +23,8 @@ public class KeyBindManager : MonoBehaviour
 
     private void Awake()
     {
+        DontDestroyOnLoad(gameObject);
+
         keyBindsFilePath = Path.Combine(Application.persistentDataPath, "keybinds.json");
         LoadKeyBinds();
     }

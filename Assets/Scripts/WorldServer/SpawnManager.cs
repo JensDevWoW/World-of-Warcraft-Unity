@@ -6,6 +6,12 @@ public class SpawnManager : MonoBehaviour
 {
     public List<GameObject> prefabList; // List of prefabs to instantiate
 
+    void Awake()
+    {
+        DontDestroyOnLoad(gameObject); 
+    }
+
+
     void Start()
     {
         SpawnObjects();

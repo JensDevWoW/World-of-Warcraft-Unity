@@ -17,6 +17,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using Mirror.Examples.Common;
 
 public class CameraController : NetworkBehaviour
 {
@@ -62,7 +63,7 @@ public class CameraController : NetworkBehaviour
     PlayerControls player;
     public Transform tilt;
     Camera mainCam;
-
+    public Camera playerCamera;
     private void Awake()
     {
         transform.SetParent(null);
@@ -70,16 +71,21 @@ public class CameraController : NetworkBehaviour
 
     void Start()
     {
+
         if (!isLocalPlayer)
         {
-            // Disable the camera if this is not the local player
-            Camera.main.gameObject.SetActive(false);
+            // Disable the camera for other players
+            playerCamera.gameObject.SetActive(false);
         }
-
+        else
+        {
+            // Enable camera for local player
+            playerCamera.gameObject.SetActive(true);
+        }
 
         player = FindObjectOfType<PlayerControls>();
         player.mainCam = this;
-        mainCam = Camera.main;
+        mainCam = playerCamera;
 
         transform.position = player.transform.position + Vector3.up * CameraHeight;
         transform.rotation = player.transform.rotation;

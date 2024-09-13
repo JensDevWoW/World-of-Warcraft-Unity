@@ -48,6 +48,7 @@ public class ClientNetworkManager : MonoBehaviour
         opcodeHandler.RegisterHandler(Opcodes.SMSG_SPELL_COOLDOWN,      HandleSpellCooldown);
         opcodeHandler.RegisterHandler(Opcodes.SMSG_CHANNELED_START,     HandleStartChannel);
         opcodeHandler.RegisterHandler(Opcodes.SMSG_ACCOUNT_INFO,        HandleAccountInfo);
+        opcodeHandler.RegisterHandler(Opcodes.SMSG_UPDATE_POS,          HandleUpdatePosition);
 
         //opcodeHandler.RegisterHandler(Opcodes.SMSG_CHANNELED_UPDATE,    HandleUpdateChannel);
         // Register the OpcodeMessage handler on the client
@@ -59,6 +60,25 @@ public class ClientNetworkManager : MonoBehaviour
         // Handle the opcode using the registered handler
         opcodeHandler.HandleOpcode(msg.opcode, new NetworkReader(msg.payload));
     }
+
+    private void HandleUpdatePosition(NetworkReader reader)
+    {
+        // Read the NetworkIdentity of the object being updated
+        NetworkIdentity identity = reader.ReadNetworkIdentity();
+
+        // Read the updated position and rotation
+        Vector3 newPosition = reader.ReadVector3();
+        Quaternion newRotation = reader.ReadQuaternion();
+
+        // Ensure the object exists and update its position and rotation only if it is not the local player
+        if (identity != null && identity.netId != NetworkClient.localPlayer.netId)
+        {
+            GameObject targetObject = identity.gameObject;
+            targetObject.transform.position = newPosition;
+            targetObject.transform.rotation = newRotation;
+        }
+    }
+
 
     private void HandleAccountInfo(NetworkReader reader)
     {

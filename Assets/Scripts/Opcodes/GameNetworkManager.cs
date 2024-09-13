@@ -36,10 +36,11 @@ public class GameNetworkManager : NetworkManager
         SceneManager.LoadScene("SampleScene");
 
         // Register opcode handlers
-        opcodeHandler.RegisterHandler(Opcodes.CMSG_LOGIN_REQUEST, HandleLoginRequest);
-        opcodeHandler.RegisterHandler(Opcodes.CMSG_CAST_SPELL, HandleCastSpell);
-        opcodeHandler.RegisterHandler(Opcodes.CMSG_SELECT_TARGET, HandleSelectTarget);
-        opcodeHandler.RegisterHandler(Opcodes.CMSG_JOIN_WORLD, HandleJoinWorld);
+        opcodeHandler.RegisterHandler(Opcodes.CMSG_LOGIN_REQUEST,       HandleLoginRequest);
+        opcodeHandler.RegisterHandler(Opcodes.CMSG_CAST_SPELL,          HandleCastSpell);
+        opcodeHandler.RegisterHandler(Opcodes.CMSG_SELECT_TARGET,       HandleSelectTarget);
+        opcodeHandler.RegisterHandler(Opcodes.CMSG_JOIN_WORLD,          HandleJoinWorld);
+        opcodeHandler.RegisterHandler(Opcodes.CMSG_UPDATE_POS,          HandleMoveCharacter);
 
         NetworkServer.RegisterHandler<OpcodeMessage>(OnOpcodeMessageReceived, true);
     }
@@ -129,8 +130,29 @@ public class GameNetworkManager : NetworkManager
     }
     private void HandleMoveCharacter(NetworkConnection conn, NetworkReader reader)
     {
+        // Read the new position and rotation from the message
         Vector3 position = reader.ReadVector3();
-        Debug.Log($"Server: Move character to {position}");
-        // Implement movement logic here
+        Quaternion rotation = reader.ReadQuaternion();
+
+        // Get the game object associated with this connection
+        NetworkIdentity playerIdentity = conn.identity;
+
+        // Prepare the message to send to all clients
+        NetworkWriter writer = new NetworkWriter();
+        writer.WriteNetworkIdentity(playerIdentity);
+        writer.WriteVector3(position);
+        writer.WriteQuaternion(rotation);
+
+        // Create the opcode message with the updated position and rotation
+        OpcodeMessage moveMessage = new OpcodeMessage
+        {
+            opcode = Opcodes.SMSG_UPDATE_POS,
+            payload = writer.ToArray()
+        };
+
+        // Send the message to all clients including the sender
+        NetworkServer.SendToAll(moveMessage);
     }
+
+
 }

@@ -17,9 +17,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
+using Mirror;
 
 
-public class PlayerControls : MonoBehaviour
+public class PlayerControls : NetworkBehaviour
 {
     //inputs
     public Controls controls;
@@ -102,6 +103,9 @@ public class PlayerControls : MonoBehaviour
     [BoxGroup("Swimming Configurations", centerLabel: true)]
     public bool inWater;
 
+    private float positionUpdateInterval = 0.5f;
+    private float timeSinceLastUpdate = 0f;
+
     //Debug
     [BoxGroup("Debugging", centerLabel: true)]
     public bool showGroundRay, showMoveDirection, showForwardDirection, showStrafeDirection, showFallNormal, showSwimNormal;
@@ -121,6 +125,13 @@ public class PlayerControls : MonoBehaviour
 
     void Update()
     {
+        timeSinceLastUpdate += Time.deltaTime;
+        if (timeSinceLastUpdate >= positionUpdateInterval)
+        {
+            SendMovementUpdate(transform.position, transform.rotation);
+            timeSinceLastUpdate = 0f;
+        }
+
         GetInputs();
         GetSwimDirection();
 
@@ -186,12 +197,32 @@ public class PlayerControls : MonoBehaviour
         return unitStates.Contains(state);
     }
 
+    private void SendMovementUpdate(Vector3 position, Quaternion rotation)
+    {
+        NetworkWriter writer = new NetworkWriter();
+
+        writer.WriteVector3(position);
+        writer.WriteQuaternion(rotation); // Send rotation data
+
+        if (NetworkClient.isConnected)
+        {
+            NetworkClient.Send(new OpcodeMessage
+            {
+                opcode = Opcodes.CMSG_UPDATE_POS,
+                payload = writer.ToArray()
+            });
+        }
+    }
+
     public void OnLandingComplete()
     {
         isLanding = false;
     }
     void Locomotion()
     {
+        if (!isLocalPlayer)
+            return;
+
         GroundDirection();
 
         // Running and walking logic
@@ -323,6 +354,8 @@ public class PlayerControls : MonoBehaviour
 
         // Update wasGrounded state
         wasGrounded = controller.isGrounded;
+
+        SendMovementUpdate(transform.position, transform.rotation);
 
         // Set animator parameters based on movement state
         if (!isLanding)  // Only update these if not landing

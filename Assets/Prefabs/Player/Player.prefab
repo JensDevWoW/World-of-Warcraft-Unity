@@ -1780,7 +1780,6 @@ MonoBehaviour:
   m_maxHealth: 1000
   m_mana: 100
   m_maxMana: 100
-  knownSpells: 
 --- !u!114 &4388284789796336436
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1820,6 +1819,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a70aec3deccbcca4bbeb0f7db2c85793, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
   controls:
     forwards:
       primary: 77000000
@@ -2312,6 +2314,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffb80638f2cd9f74989e43e55c642a9b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
   CameraHeight: 1.75
   CameraMaxDistance: 25
   CameraSpeed: 2
@@ -2328,6 +2333,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   tilt: {fileID: 5276845769696377202}
+  playerCamera: {fileID: 4328717194130096328}
 --- !u!1 &4439459484656795786
 GameObject:
   m_ObjectHideFlags: 0

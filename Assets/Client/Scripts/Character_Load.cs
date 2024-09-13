@@ -9,8 +9,6 @@ public class Character_Load : MonoBehaviour
 {
     // Start is called before the first frame update
     private bool _loaded = false;
-    private float _loadTime = 2;
-    private bool _loadingStarted = false;
     private void Update()
     {
         if (ClientAccountManager.Instance.GetCurrentAccount() != null && _loaded == false)

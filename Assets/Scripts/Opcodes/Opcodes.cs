@@ -39,5 +39,7 @@ public class Opcodes
     public const int SMSG_CHANNELED_UPDATE = 17;
     public const int CMSG_LOGIN_REQUEST = 18;
     public const int SMSG_ACCOUNT_INFO = 19;
+    public const int CMSG_UPDATE_POS = 20;
+    public const int SMSG_UPDATE_POS = 21;
 }
 

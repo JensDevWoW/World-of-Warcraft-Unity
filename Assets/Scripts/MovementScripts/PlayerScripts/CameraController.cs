@@ -98,6 +98,9 @@ public class CameraController : NetworkBehaviour
 
     void Update()
     {
+        if (player == null)
+            return;
+
         if (!Input.GetKey(leftMouse) && !Input.GetKey(rightMouse) && !Input.GetKey(middleMouse)) //if no mouse button is pressed
             cameraState = CameraState.CameraNone;
         else if (Input.GetKey(leftMouse) && !Input.GetKey(rightMouse) && !Input.GetKey(middleMouse)) //if left mouse button is pressed
@@ -116,6 +119,8 @@ public class CameraController : NetworkBehaviour
 
     void LateUpdate()
     {
+        if (player == null)
+            return;
 
         panAngle = Vector3.SignedAngle(transform.forward, player.transform.forward, Vector3.up);
 

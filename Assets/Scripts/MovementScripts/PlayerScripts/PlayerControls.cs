@@ -125,12 +125,9 @@ public class PlayerControls : NetworkBehaviour
 
     void Update()
     {
-        timeSinceLastUpdate += Time.deltaTime;
-        if (timeSinceLastUpdate >= positionUpdateInterval)
-        {
-            SendMovementUpdate(transform.position, transform.rotation);
-            timeSinceLastUpdate = 0f;
-        }
+        // Ensure we only move the LocalPlayer's character (byproduct of Mirror)
+        if (!isLocalPlayer)
+            return;
 
         GetInputs();
         GetSwimDirection();
@@ -220,6 +217,7 @@ public class PlayerControls : NetworkBehaviour
     }
     void Locomotion()
     {
+        // Ensure we only move the LocalPlayer's character (byproduct of Mirror)
         if (!isLocalPlayer)
             return;
 

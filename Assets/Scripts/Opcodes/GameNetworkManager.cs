@@ -26,6 +26,19 @@ public class GameNetworkManager : NetworkManager
     public GameObject triggerPrefab;
     public Transform spawnPoint;
     public GameObject buttonPrefab;
+    private NetworkManagerHUD hud;
+    private bool autoStartServer = true;
+    public override void Start()
+    {
+        base.Start();
+
+        // Automatically start the server when in the Editor or Standalone build
+        if (autoStartServer && Application.isEditor)
+        {
+            StartServer();
+            Debug.Log("Server started automatically.");
+        }
+    }
 
     public override void OnStartServer()
     {
@@ -154,5 +167,23 @@ public class GameNetworkManager : NetworkManager
         NetworkServer.SendToAll(moveMessage);
     }
 
+
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        if (hud != null)
+        {
+            hud.gameObject.SetActive(false); // Hide the HUD for the client
+        }
+    }
+
+    public override void OnStopClient()
+    {
+        base.OnStopClient();
+        if (hud != null)
+        {
+            hud.gameObject.SetActive(true); // Optionally re-enable the HUD if needed
+        }
+    }
 
 }

@@ -19,7 +19,7 @@ using Unity.Services.Authentication;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-
+using System.Collections.Generic;
 public class ClientNetworkManager : MonoBehaviour
 {
     private ClientOpcodeHandler opcodeHandler;
@@ -53,6 +53,8 @@ public class ClientNetworkManager : MonoBehaviour
         //opcodeHandler.RegisterHandler(Opcodes.SMSG_CHANNELED_UPDATE,    HandleUpdateChannel);
         // Register the OpcodeMessage handler on the client
         NetworkClient.RegisterHandler<OpcodeMessage>(OnOpcodeMessageReceived);
+        NetworkClient.RegisterHandler<CharacterListMessage>(OnCharacterListReceived);
+
     }
 
     private void OnOpcodeMessageReceived(OpcodeMessage msg)
@@ -78,6 +80,26 @@ public class ClientNetworkManager : MonoBehaviour
             targetObject.transform.rotation = newRotation;
         }
     }
+
+    private void OnCharacterListReceived(CharacterListMessage msg)
+    {
+        List<Character> characters = new List<Character>();
+
+        foreach (var data in msg.Characters)
+        {
+            characters.Add(new Character
+            {
+                Id = data.Id,
+                characterName = data.CharacterName,
+                classId = data.ClassId,
+                specId = data.SpecId,
+                factionId = data.FactionId
+            });
+        }
+
+        CharacterSelectionManager.Instance.ReceiveCharacterList(characters);
+    }
+
 
 
     private void HandleAccountInfo(NetworkReader reader)

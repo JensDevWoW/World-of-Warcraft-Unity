@@ -4,13 +4,16 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Mirror;
 using TMPro;
+using UnityEngine.TextCore.Text;
+
 public class CharacterSelectionManager : MonoBehaviour
 {
     public GameObject charPrefab; // Prefab for character UI panel
     public Transform charListParent; // Parent panel where character UI panels will be added
-    private Account currentAccount;
     private Character selectedCharacter; // Currently selected character
     public static CharacterSelectionManager Instance { get; private set; }
+    public List<Character> characterList = new List<Character>(); // List to store characters from the server
+
     private void Awake()
     {
         if (Instance == null)
@@ -24,20 +27,29 @@ public class CharacterSelectionManager : MonoBehaviour
         }
     }
 
+    // Call this function when the client receives character data from the server
+    public void ReceiveCharacterList(List<Character> characters)
+    {
+        characterList = characters;
+    }
+    public bool HasReceivedCharacterList()
+    {
+        return characterList != null && characterList.Count > 0;
+    }
+    // Load the character UI panels from the received character list
     public void LoadCharacters()
     {
         if (charListParent == null)
             charListParent = GameObject.Find("CharList").transform;
-        // Get the logged-in account (assuming it's stored in a global state or via singleton)
-        currentAccount = ClientAccountManager.Instance.GetCurrentAccount();
 
-        if (currentAccount == null) return;
-
-        // Retrieve all characters for the current account
-        List<Character> characters = DatabaseManager.Instance.GetCharactersByAccountId(currentAccount.Id);
+        // Clear existing UI panels
+        foreach (Transform child in charListParent)
+        {
+            Destroy(child.gameObject);
+        }
 
         // Create a UI panel for each character
-        foreach (var character in characters)
+        foreach (var character in characterList)
         {
             GameObject charPanel = Instantiate(charPrefab, charListParent);
             charPanel.GetComponentInChildren<TextMeshProUGUI>().text = character.characterName; // Assuming the prefab has a Text component
@@ -63,7 +75,6 @@ public class CharacterSelectionManager : MonoBehaviour
     {
         if (selectedCharacter != null)
         {
-            // Set the selected character as the login character (implement your logic to store this)
             Debug.Log($"Joining world as: {selectedCharacter.characterName}");
 
             // Disable all existing main cameras
@@ -73,8 +84,10 @@ public class CharacterSelectionManager : MonoBehaviour
                 cam.gameObject.SetActive(false);
             }
 
-            //Send opcode
+            // Send the opcode to join the world
             NetworkWriter writer = new NetworkWriter();
+            writer.WriteInt(selectedCharacter.Id); // Send the character ID or necessary info
+
             OpcodeMessage joinWorldPacket = new OpcodeMessage
             {
                 opcode = Opcodes.CMSG_JOIN_WORLD,
@@ -83,7 +96,6 @@ public class CharacterSelectionManager : MonoBehaviour
             NetworkClient.Send(joinWorldPacket);
 
             SceneManager.LoadScene("SampleScene", LoadSceneMode.Single);
-
         }
         else
         {

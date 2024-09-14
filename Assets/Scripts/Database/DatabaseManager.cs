@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using SQLite4Unity3d;
+using System.IO;
 using System.Linq;
 
 public class DatabaseManager : MonoBehaviour
@@ -28,9 +29,10 @@ public class DatabaseManager : MonoBehaviour
 
     void Start()
     {
-        string authdbPath = $"{Application.streamingAssetsPath}/auth.db";
-        string charactersdbPath = $"{Application.streamingAssetsPath}/characters.db";
-        string worlddbPath = $"{Application.streamingAssetsPath}/world.db";
+        // Updated paths to point to the 'Database' folder in Assets
+        string authdbPath = Path.Combine(Application.dataPath, "Database", "auth.db");
+        string charactersdbPath = Path.Combine(Application.dataPath, "Database", "characters.db");
+        string worlddbPath = Path.Combine(Application.dataPath, "Database", "world.db");
 
         _authConnection = new SQLiteConnection(authdbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
         _charConnection = new SQLiteConnection(charactersdbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);

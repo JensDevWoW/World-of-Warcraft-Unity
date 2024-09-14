@@ -11,14 +11,20 @@ public class Character_Load : MonoBehaviour
     private bool _loaded = false;
     private void Update()
     {
-        if (ClientAccountManager.Instance.GetCurrentAccount() != null && _loaded == false)
+        if (ClientAccountManager.Instance.GetCurrentAccount() != null && !_loaded)
         {
-            if (SceneManager.GetSceneByName("CharacterSelectionScene").isLoaded == true)
+            // Check if the CharacterSelectionScene is loaded
+            if (SceneManager.GetSceneByName("CharacterSelectionScene").isLoaded)
             {
-                CharacterSelectionManager.Instance.LoadCharacters();
-                _loaded = true;
-                Destroy(this);
+                // Ensure the CharacterSelectionManager has received characters
+                if (CharacterSelectionManager.Instance.HasReceivedCharacterList())
+                {
+                    CharacterSelectionManager.Instance.LoadCharacters();
+                    _loaded = true;
+                    Destroy(this);
+                }
             }
         }
     }
+
 }

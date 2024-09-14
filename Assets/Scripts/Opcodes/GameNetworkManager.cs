@@ -15,6 +15,7 @@
 
 // Filename: GameNetworkManager.cs
 using Mirror;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -113,21 +114,49 @@ public class GameNetworkManager : NetworkManager
             writer.WriteInt(account.Id);
             writer.WriteString(account.accountName);
 
-            OpcodeMessage msg = new OpcodeMessage
+            OpcodeMessage accountInfoMsg = new OpcodeMessage
             {
                 opcode = Opcodes.SMSG_ACCOUNT_INFO,
                 payload = writer.ToArray()
             };
 
-            conn.Send(msg);
+            conn.Send(accountInfoMsg);
 
-           // SceneManager.LoadScene("CharacterSelectionScene");
+            List<Character> characters = DatabaseManager.Instance.GetCharactersByAccountId(account.Id);
+
+            SendCharacterList(conn, characters);
         }
         else
         {
             Debug.Log("Account not found or password incorrect.");
         }
     }
+
+    private void SendCharacterList(NetworkConnection conn, List<Character> characters)
+    {
+        CharacterListMessage msg = new CharacterListMessage { Characters = new List<CharacterListMessage.CharacterData>() };
+
+        // Populate message with character data
+        foreach (var character in characters)
+        {
+            var data = new CharacterListMessage.CharacterData(
+                character.Id,
+                character.characterName,
+                character.classId,
+                character.specId,
+                character.factionId
+            );
+
+            msg.Characters.Add(data);
+        }
+
+        // Send the character list message to the client
+        conn.Send(msg);
+    }
+
+
+
+
 
 
 

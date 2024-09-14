@@ -103,9 +103,6 @@ public class PlayerControls : NetworkBehaviour
     [BoxGroup("Swimming Configurations", centerLabel: true)]
     public bool inWater;
 
-    private float positionUpdateInterval = 0.5f;
-    private float timeSinceLastUpdate = 0f;
-
     //Debug
     [BoxGroup("Debugging", centerLabel: true)]
     public bool showGroundRay, showMoveDirection, showForwardDirection, showStrafeDirection, showFallNormal, showSwimNormal;

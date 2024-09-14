@@ -109,15 +109,6 @@ public class GameNetworkManager : NetworkManager
         }
     }
 
-
-    // Helper method to get character ID, replace with actual implementation
-    private int GetCharacterIdFromConnection(NetworkConnection conn)
-    {
-        // Your logic to get character ID based on connection, e.g., storing it when the player logs in
-        return 1; // Replace with actual retrieval
-    }
-
-
     private void OnOpcodeMessageReceived(NetworkConnection conn, OpcodeMessage msg)
     {
         opcodeHandler.HandleOpcode(conn, msg.opcode, new NetworkReader(msg.payload));

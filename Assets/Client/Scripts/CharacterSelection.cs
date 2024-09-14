@@ -84,9 +84,12 @@ public class CharacterSelectionManager : MonoBehaviour
                 cam.gameObject.SetActive(false);
             }
 
+            int accountId = ClientAccountManager.Instance.GetCurrentAccount().Id;
+
             // Send the opcode to join the world
             NetworkWriter writer = new NetworkWriter();
-            writer.WriteInt(selectedCharacter.Id); // Send the character ID or necessary info
+            writer.WriteInt(accountId); // TODO: Get AccountId
+            writer.WriteInt(selectedCharacter.characterId); // Send the character ID or necessary info
 
             OpcodeMessage joinWorldPacket = new OpcodeMessage
             {

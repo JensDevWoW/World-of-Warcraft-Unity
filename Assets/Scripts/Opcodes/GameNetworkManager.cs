@@ -29,6 +29,7 @@ public class GameNetworkManager : NetworkManager
     public GameObject buttonPrefab;
     private NetworkManagerHUD hud;
     private bool autoStartServer = true;
+    private Dictionary<NetworkConnectionToClient, (GameObject, int)> playerReferences = new Dictionary<NetworkConnectionToClient, (GameObject, int)>();
     public override void Start()
     {
         base.Start();
@@ -60,12 +61,23 @@ public class GameNetworkManager : NetworkManager
     }
     private void HandleJoinWorld(NetworkConnection conn, NetworkReader reader)
     {
-        if (conn is NetworkConnectionToClient clientConn)
-        {
-          //  SceneManager.LoadScene("SampleScene", LoadSceneMode.Single);
+        // Retrieve accountId from the assigned authenticationData
+        int accountId = (int)conn.authenticationData; // Ensure authenticationData was correctly set on login
+        int charId = reader.ReadInt();
 
-            // Start the timer to spawn the character after 3 seconds
+        // Validate if character belongs to the account
+        Character character = DatabaseManager.Instance.GetCharacterById(charId);
+        if (character != null && character.accountId == accountId)
+        {
+            // Store the character ID in the connection for use in spawning
+            conn.authenticationData = charId; // Assign charId to use in SpawnCharacter
+
+            // Start the timer to spawn the character after 1.5 seconds
             Invoke(nameof(SpawnCharacter), 1.5f);
+        }
+        else
+        {
+            Debug.LogError("Character validation failed.");
         }
     }
 
@@ -73,10 +85,38 @@ public class GameNetworkManager : NetworkManager
     {
         foreach (NetworkConnectionToClient conn in NetworkServer.connections.Values)
         {
-            GameObject player = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
+            // Retrieve character ID from the connection's authentication data
+            int characterId = (int)conn.authenticationData;
+
+            // Fetch the character's location data from the database
+            CharacterLocation location = DatabaseManager.Instance.GetCharacterLocation(characterId);
+
+            // Set default spawn position if no location data is found
+            Vector3 spawnPosition = spawnPoint.position;
+            Quaternion spawnRotation = spawnPoint.rotation;
+
+            if (location != null)
+            {
+                // Use the location data if available
+                spawnPosition = new Vector3(location.x, location.y, location.z);
+                spawnRotation = Quaternion.Euler(0, location.orientation, 0);
+            }
+
+            // Instantiate the player at the correct location
+            GameObject player = Instantiate(playerPrefab, spawnPosition, spawnRotation);
+            playerReferences[conn] = (player, characterId);
             NetworkServer.AddPlayerForConnection(conn, player);
         }
     }
+
+
+    // Helper method to get character ID, replace with actual implementation
+    private int GetCharacterIdFromConnection(NetworkConnection conn)
+    {
+        // Your logic to get character ID based on connection, e.g., storing it when the player logs in
+        return 1; // Replace with actual retrieval
+    }
+
 
     private void OnOpcodeMessageReceived(NetworkConnection conn, OpcodeMessage msg)
     {
@@ -109,6 +149,9 @@ public class GameNetworkManager : NetworkManager
         {
             Debug.Log("Account found!");
 
+            // Assign accountId to the connection object
+            conn.authenticationData = account.Id; // Store the account ID in the connection's authenticationData
+
             // Send account info to client
             NetworkWriter writer = new NetworkWriter();
             writer.WriteInt(account.Id);
@@ -122,8 +165,8 @@ public class GameNetworkManager : NetworkManager
 
             conn.Send(accountInfoMsg);
 
+            // Send character list to client
             List<Character> characters = DatabaseManager.Instance.GetCharactersByAccountId(account.Id);
-
             SendCharacterList(conn, characters);
         }
         else
@@ -131,6 +174,7 @@ public class GameNetworkManager : NetworkManager
             Debug.Log("Account not found or password incorrect.");
         }
     }
+
 
     private void SendCharacterList(NetworkConnection conn, List<Character> characters)
     {
@@ -140,7 +184,7 @@ public class GameNetworkManager : NetworkManager
         foreach (var character in characters)
         {
             var data = new CharacterListMessage.CharacterData(
-                character.Id,
+                character.characterId,
                 character.characterName,
                 character.classId,
                 character.specId,
@@ -195,6 +239,38 @@ public class GameNetworkManager : NetworkManager
         // Send the message to all clients including the sender
         NetworkServer.SendToAll(moveMessage);
     }
+
+    public override void OnServerDisconnect(NetworkConnectionToClient conn)
+    {
+        if (playerReferences.TryGetValue(conn, out var playerData))
+        {
+            GameObject player = playerData.Item1;
+            int characterId = playerData.Item2;
+
+            if (player != null)
+            {
+                Vector3 position = player.transform.position;
+                float orientation = player.transform.eulerAngles.y;
+
+                CharacterLocation location = new CharacterLocation
+                {
+                    Id = characterId,
+                    x = position.x,
+                    y = position.y,
+                    z = position.z,
+                    orientation = orientation
+                };
+
+                DatabaseManager.Instance.UpdateCharacterLocation(location);
+                Debug.Log($"Character {characterId} location saved to the database.");
+            }
+
+            playerReferences.Remove(conn);
+        }
+
+        base.OnServerDisconnect(conn);
+    }
+
 
 
     public override void OnStartClient()

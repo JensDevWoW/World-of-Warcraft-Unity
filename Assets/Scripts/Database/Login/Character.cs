@@ -3,10 +3,10 @@ using SQLite4Unity3d;
 public class Character
 {
     [PrimaryKey, AutoIncrement]
-    public int Id { get; set; }
 
     // Foreign key linking to the Account table
     public int accountId { get; set; }
+    public int characterId { get; set; }
 
     // Character-specific attributes
     public int classId { get; set; } // e.g., Mage, Warrior, etc.

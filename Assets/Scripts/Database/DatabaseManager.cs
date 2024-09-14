@@ -64,6 +64,51 @@ public class DatabaseManager : MonoBehaviour
         return _charConnection.Table<Character>().Where(character => character.accountId == accountId).ToList();
     }
 
+    public Character GetCharacterById(int characterId)
+    {
+        // Query the Character table to find the character with the specified ID
+        var character = _charConnection.Table<Character>()
+                         .FirstOrDefault(c => c.characterId == characterId);
+
+        if (character != null)
+        {
+            Debug.Log($"Character ID {characterId} loaded successfully.");
+            return character;
+        }
+        else
+        {
+            Debug.LogWarning($"No character found with ID {characterId}.");
+            return null;
+        }
+    }
+
+
+    public CharacterLocation GetCharacterLocation(int characterId)
+    {
+        // Query the CharacterLocation table to find the location for the specified character
+        var location = _charConnection.Table<CharacterLocation>()
+                        .FirstOrDefault(loc => loc.Id == characterId);
+
+        if (location != null)
+        {
+            Debug.Log($"Location for Character ID {characterId} loaded successfully.");
+            return location;
+        }
+        else
+        {
+            Debug.LogWarning($"No location found for Character ID {characterId}.");
+            return null;
+        }
+    }
+
+    public void UpdateCharacterLocation(CharacterLocation location)
+    {
+        string query = "UPDATE CharacterLocation SET x = ?, y = ?, z = ?, orientation = ? WHERE Id = ?";
+        _charConnection.Execute(query, location.x, location.y, location.z, location.orientation, location.Id);
+    }
+
+
+
     void OnDestroy()
     {
         _authConnection?.Close();
@@ -83,4 +128,15 @@ public class SpawnData
     public string ParentTag { get; set; }
     public int UI { get; set; }
     public bool HasCoordinates => !(X == 0 && Y == 0 && Z == 0);
+}
+
+public class CharacterLocation
+{
+    [PrimaryKey, AutoIncrement]
+    public int Id { get; set; }
+    public int mapId { get; set; }
+    public float x { get; set; }
+    public float y { get; set; }
+    public float z { get; set; }
+    public float orientation { get; set; }
 }

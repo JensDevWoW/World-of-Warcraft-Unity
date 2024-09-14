@@ -89,7 +89,7 @@ public class ClientNetworkManager : MonoBehaviour
         {
             characters.Add(new Character
             {
-                Id = data.Id,
+                characterId = data.Id,
                 characterName = data.CharacterName,
                 classId = data.ClassId,
                 specId = data.SpecId,

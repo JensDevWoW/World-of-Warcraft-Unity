@@ -63,6 +63,7 @@ public enum SpellFlags
     SPELL_FLAG_DISABLE_ANIM = 1 << 8,
     SPELL_FLAG_SELF_TARGET = 1 << 9,
     SPELL_FLAG_CAST_WHILE_CASTING = 1 << 10,
+    SPELL_FLAG_CUSTOM_GCD = 1 << 11,
 
 }
 

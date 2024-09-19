@@ -41,7 +41,7 @@ public class Unit : MonoBehaviour
 {
     // Reference to the NetworkIdentity component
     public NetworkIdentity Identity { get; private set; }
-    public LocationHandler location {  get; private set; }
+    public LocationHandler location { get; private set; }
 
     private List<Spell> spellList = new List<Spell>();
     private List<Aura> auraList = new List<Aura>();
@@ -73,8 +73,10 @@ public class Unit : MonoBehaviour
     public Unit m_target { get; protected set; }
 
     public List<UnitSpell> spellBook; // List of spell IDs the Unit knows
-    public AnimationHandler animHandler {  get; protected set; }
-    public Creature creature {  get; protected set; }
+    public AnimationHandler animHandler { get; protected set; }
+    public Creature creature { get; protected set; }
+    public int factionId;
+    public Character character;
     
     void Start()
     {
@@ -119,6 +121,11 @@ public class Unit : MonoBehaviour
         };
 
         NetworkServer.SendToAll(packet);
+    }
+
+    public Character ToCharacter()
+    {
+        return character;
     }
 
     // This is trash, just a test case, eventually need to add in a SpellBook class
@@ -748,7 +755,8 @@ public void Update()
     // Check if this unit is hostile to the given target
     public bool IsHostileTo(Unit target)
     {
-        return target != this; // TODO: Replace with actual hostility logic
+        print($"Faction Checked! {this.factionId} is or is not equal to {target.factionId}");
+        return this.factionId != target.factionId;
     }
 
     // Convert this Unit to a Player if applicable

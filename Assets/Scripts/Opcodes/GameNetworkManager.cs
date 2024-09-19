@@ -87,10 +87,10 @@ public class GameNetworkManager : NetworkManager
         {
             // Retrieve character ID from the connection's authentication data
             int characterId = (int)conn.authenticationData;
-
+            
             // Fetch the character's location data from the database
             CharacterLocation location = DatabaseManager.Instance.GetCharacterLocation(characterId);
-
+            int factionId = DatabaseManager.Instance.GetFactionId(characterId);
             // Set default spawn position if no location data is found
             Vector3 spawnPosition = spawnPoint.position;
             Quaternion spawnRotation = spawnPoint.rotation;
@@ -104,8 +104,19 @@ public class GameNetworkManager : NetworkManager
 
             // Instantiate the player at the correct location
             GameObject player = Instantiate(playerPrefab, spawnPosition, spawnRotation);
+
+            // Ensure the player object has a Unit component
+            Unit playerUnit = player.GetComponent<Unit>();
+            if (playerUnit != null)
+            {
+                playerUnit.factionId = factionId;
+                playerUnit.character = DatabaseManager.Instance.GetCharacterById(characterId);
+            }
+
+            // Add the player to the server
             playerReferences[conn] = (player, characterId);
             NetworkServer.AddPlayerForConnection(conn, player);
+
         }
     }
 

@@ -107,6 +107,18 @@ public class DatabaseManager : MonoBehaviour
         _charConnection.Execute(query, location.x, location.y, location.z, location.orientation, location.Id);
     }
 
+    public int GetFactionId(int characterId)
+    {
+        var character = _charConnection.Table<Character>()
+                        .FirstOrDefault(c => c.characterId == characterId);
+        if (character != null)
+            return character.factionId;
+        else
+        {
+            Debug.LogWarning($"No character found with ID {characterId}.");
+            return -1;
+        }
+    }
 
 
     void OnDestroy()

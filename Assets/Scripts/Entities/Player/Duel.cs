@@ -1,3 +1,4 @@
+using Mirror;
 using UnityEngine;
 
 public class Duel : MonoBehaviour
@@ -140,6 +141,22 @@ public class Duel : MonoBehaviour
     {
         hasInitiated = true;
         Debug.Log("Duel initiation timer started (3 seconds).");
+
+        SendDuelStartOpcode();
+    }
+
+    private void SendDuelStartOpcode()
+    {
+        NetworkWriter writer = new NetworkWriter();
+
+        writer.WriteNetworkIdentity(player1.Identity);
+        writer.WriteNetworkIdentity(player2.Identity);
+
+        NetworkServer.SendToAll(new OpcodeMessage
+        {
+            opcode = Opcodes.SMSG_START_DUEL,
+            payload = writer.ToArray()
+        });
     }
 
     private void StartDuel()

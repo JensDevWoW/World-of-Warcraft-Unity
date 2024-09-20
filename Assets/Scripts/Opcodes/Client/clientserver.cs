@@ -51,6 +51,7 @@ public class ClientNetworkManager : MonoBehaviour
         opcodeHandler.RegisterHandler(Opcodes.SMSG_UPDATE_POS,          HandleUpdatePosition);
         opcodeHandler.RegisterHandler(Opcodes.SMSG_DUEL_REQUEST,        HandleDuelRequest);
         opcodeHandler.RegisterHandler(Opcodes.SMSG_REGISTER_UI,         HandleUIRegister);
+        opcodeHandler.RegisterHandler(Opcodes.SMSG_START_DUEL,          HandleStartDuel);
         //opcodeHandler.RegisterHandler(Opcodes.SMSG_CHANNELED_UPDATE,    HandleUpdateChannel);
         // Register the OpcodeMessage handler on the client
         NetworkClient.RegisterHandler<OpcodeMessage>(OnOpcodeMessageReceived);
@@ -62,6 +63,16 @@ public class ClientNetworkManager : MonoBehaviour
     {
         // Handle the opcode using the registered handler
         opcodeHandler.HandleOpcode(msg.opcode, new NetworkReader(msg.payload));
+    }
+
+    private void HandleStartDuel(NetworkReader reader)
+    {
+        NetworkIdentity player1 = reader.ReadNetworkIdentity();
+        NetworkIdentity player2 = reader.ReadNetworkIdentity();
+
+        if ((player1 != null && player1.netId == NetworkClient.localPlayer.netId) 
+            || (player2 != null && player2.netId == NetworkClient.localPlayer.netId))
+            UIHandler.Instance.StartDuelTimer();
     }
 
     private void HandleUIRegister(NetworkReader reader)

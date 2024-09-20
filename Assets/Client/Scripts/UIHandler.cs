@@ -39,6 +39,7 @@ public class UIHandler : MonoBehaviour
     public GameObject duelTextObject;
     public GameObject acceptObj;
     public GameObject declineObj;
+    public GameObject duelTimerObj;
     public List<ActionButton> actionButtons; // List of all ActionButton instances
     public Text combatText;
     public Transform buffCanvas; // Reference to the Buff Canvas
@@ -56,6 +57,9 @@ public class UIHandler : MonoBehaviour
     private Text duelText;
     private Button acceptDuel;
     private Button declineDuel;
+    private Text duelTimer;
+    private bool duelTimerStart = false;
+    private float duelTimerVal = 3f;
     private void Awake()
     {
         if (Instance == null)
@@ -68,7 +72,6 @@ public class UIHandler : MonoBehaviour
             Destroy(gameObject);
         }
     }
-
     private void Start()
     {
         GameObject canvas = GameObject.FindWithTag("Canvas");
@@ -88,6 +91,7 @@ public class UIHandler : MonoBehaviour
         duelText = duelTextObject.GetComponent<Text>();
         acceptDuel = acceptObj.GetComponent<Button>();
         declineDuel = declineObj.GetComponent<Button>();
+        duelTimer = duelTimerObj.GetComponent<Text>();
     }
 
     public void RegisterEvents()
@@ -109,6 +113,20 @@ public class UIHandler : MonoBehaviour
                 break;
             }
         }
+
+        // Duel timer
+        if (duelTimerStart)
+        {
+            duelTimer.text = Mathf.RoundToInt(duelTimerVal).ToString();
+            if (duelTimerVal > 0)
+                duelTimerVal -= Time.deltaTime;
+            else
+            {
+                duelTimerVal = 0;
+                duelTimerStart = false;
+                duelTimer.gameObject.SetActive(false);
+            }
+        }
     }
 
     private void OnDuelAccepted()
@@ -121,8 +139,15 @@ public class UIHandler : MonoBehaviour
             opcode = Opcodes.CMSG_DUEL_RESPONSE,
             payload = writer.ToArray()
         });
+    }
 
+    public void StartDuelTimer()
+    {
         duelPanel.SetActive(false);
+
+        duelTimer.gameObject.SetActive(true);
+
+        duelTimerStart = true;
     }
 
     private void OnDuelRejected()

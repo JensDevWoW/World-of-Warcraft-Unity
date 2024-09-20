@@ -502,6 +502,12 @@ public class Spell : MonoBehaviour
                     return;
                 }
 
+                // Spell Queue System
+                // When you attempt to cast a spell within 0.4 seconds of GCD or a cast-time being complete,
+                // the spell will be "queued". Once the cast ends, the spell will immediately begin preparing,
+                // this is built to reduce the lag between one spell and another as the server immediately
+                // starts the next spell
+
                 float queueTime = 0.4f; // TODO: Make this adjustable later client-side
                 if (canCast == "global cooldown")
                 {

@@ -20,6 +20,7 @@ using System.Diagnostics;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Android;
+using UnityEngine.ProBuilder.Shapes;
 using static UnityEngine.UI.CanvasScaler;
 
 public enum Stats
@@ -765,6 +766,14 @@ public void Update()
         return player;
     }
 
+    public bool IsDueling(Unit target)
+    {
+        if (target.ToPlayer() == null)
+            return false;
+
+        return target.ToPlayer().IsDueling(ToPlayer());
+    }
+
     public LocationHandler ToLocation()
     {
         return locationHandler;
@@ -823,6 +832,7 @@ public void Update()
     {
         CastSpell(aura.auraInfo.Id, this);
     }
+
     public void RemoveAura(int spellId)
     {
         Aura auraToRemove = null;

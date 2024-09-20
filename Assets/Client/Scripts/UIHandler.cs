@@ -17,6 +17,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Runtime.Versioning;
+using UnityEngine.EventSystems;
+using Mirror;
 
 public class UIHandler : MonoBehaviour
 {
@@ -30,6 +32,13 @@ public class UIHandler : MonoBehaviour
     public GameObject targetFrame;
     public GameObject targetHealthBarObject;
     public GameObject targetManaBarObject;
+    public GameObject buttonObject;
+    public GameObject targetPanel;
+    public GameObject requestDuelButton;
+    public GameObject duelPanel;
+    public GameObject duelTextObject;
+    public GameObject acceptObj;
+    public GameObject declineObj;
     public List<ActionButton> actionButtons; // List of all ActionButton instances
     public Text combatText;
     public Transform buffCanvas; // Reference to the Buff Canvas
@@ -42,6 +51,11 @@ public class UIHandler : MonoBehaviour
     public Unit target;
     private BuffPosition debuffPos;
     private BuffPosition buffPos;
+    private Button targetButton;
+    private Button requestDuel;
+    private Text duelText;
+    private Button acceptDuel;
+    private Button declineDuel;
     private void Awake()
     {
         if (Instance == null)
@@ -69,6 +83,18 @@ public class UIHandler : MonoBehaviour
         buffPos = buffCanvas.GetComponent<BuffPosition>();
         targetDebuffCanvas = canvas.transform.Find("TargetDebuffs");
         debuffPos = targetDebuffCanvas.GetComponent<BuffPosition>();
+        targetButton = buttonObject.GetComponent<Button>();
+        requestDuel = requestDuelButton.GetComponent<Button>();
+        duelText = duelTextObject.GetComponent<Text>();
+        acceptDuel = acceptObj.GetComponent<Button>();
+        declineDuel = declineObj.GetComponent<Button>();
+    }
+
+    public void RegisterEvents()
+    {
+        requestDuel.onClick.AddListener(OnRequestDuelButtonClicked);
+        acceptDuel.onClick.AddListener(OnDuelAccepted);
+        declineDuel.onClick.AddListener(OnDuelRejected);
     }
 
     public void Update()
@@ -83,6 +109,49 @@ public class UIHandler : MonoBehaviour
                 break;
             }
         }
+    }
+
+    private void OnDuelAccepted()
+    {
+        NetworkWriter writer = new NetworkWriter();
+        writer.WriteBool(true);
+
+        NetworkClient.Send(new OpcodeMessage
+        {
+            opcode = Opcodes.CMSG_DUEL_RESPONSE,
+            payload = writer.ToArray()
+        });
+
+        duelPanel.SetActive(false);
+    }
+
+    private void OnDuelRejected()
+    {
+        NetworkWriter writer = new NetworkWriter();
+        writer.WriteBool(false);
+
+        NetworkClient.Send(new OpcodeMessage
+        {
+            opcode = Opcodes.CMSG_DUEL_RESPONSE,
+            payload = writer.ToArray()
+        });
+
+        duelPanel.SetActive(false);
+    }
+
+    private void OnRequestDuelButtonClicked()
+    {
+        NetworkWriter writer2 = new NetworkWriter();
+
+        // Don't need to send data as server already knows target
+
+        NetworkClient.Send(new OpcodeMessage
+        {
+            opcode = Opcodes.CMSG_DUEL_REQUEST,
+            payload = writer2.ToArray()
+        });
+
+        targetPanel.SetActive(false);
     }
     
     public void StartChannel(int spellId, float duration)
@@ -130,6 +199,12 @@ public class UIHandler : MonoBehaviour
         {
             castBar.StartCast(castTime, name);
         }
+    }
+
+    public void DuelRequest(Unit initiator)
+    {
+        duelText.text = $"{initiator.name} has requested to duel you.";
+        duelPanel.gameObject.SetActive(true);
     }
 
     public void UpdateHealth(float currentHealth, float maxHealth)

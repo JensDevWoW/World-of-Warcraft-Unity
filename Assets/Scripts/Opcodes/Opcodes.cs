@@ -41,5 +41,10 @@ public class Opcodes
     public const int SMSG_ACCOUNT_INFO = 19;
     public const int CMSG_UPDATE_POS = 20;
     public const int SMSG_UPDATE_POS = 21;
+    public const int CMSG_DUEL_REQUEST = 22;
+    public const int CMSG_DUEL_RESPONSE = 23;
+    public const int SMSG_DUEL_REQUEST = 23;
+    public const int SMSG_REGISTER_UI = 24;
+    public const int CMSG_REGISTER_UI = 25;
 }
 

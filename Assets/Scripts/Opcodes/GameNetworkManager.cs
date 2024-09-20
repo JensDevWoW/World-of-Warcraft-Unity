@@ -16,6 +16,7 @@
 // Filename: GameNetworkManager.cs
 using Mirror;
 using System.Collections.Generic;
+using Unity.Services.Authentication;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -56,8 +57,15 @@ public class GameNetworkManager : NetworkManager
         opcodeHandler.RegisterHandler(Opcodes.CMSG_SELECT_TARGET,       HandleSelectTarget);
         opcodeHandler.RegisterHandler(Opcodes.CMSG_JOIN_WORLD,          HandleJoinWorld);
         opcodeHandler.RegisterHandler(Opcodes.CMSG_UPDATE_POS,          HandleMoveCharacter);
-
+        opcodeHandler.RegisterHandler(Opcodes.CMSG_DUEL_REQUEST,        HandleDuelRequest);
+        opcodeHandler.RegisterHandler(Opcodes.CMSG_DUEL_RESPONSE,       HandleDuelResponse);
+        opcodeHandler.RegisterHandler(Opcodes.CMSG_REGISTER_UI,         HandleRegisterUI);
         NetworkServer.RegisterHandler<OpcodeMessage>(OnOpcodeMessageReceived, true);
+    }
+
+    private void HandleRegisterUI(NetworkConnection conn, NetworkReader reader)
+    {
+        Debug.LogError("FUCKING HELL IT WORKED");
     }
     private void HandleJoinWorld(NetworkConnection conn, NetworkReader reader)
     {
@@ -81,6 +89,30 @@ public class GameNetworkManager : NetworkManager
         }
     }
 
+    private void HandleDuelResponse(NetworkConnection conn, NetworkReader reader)
+    {
+        Unit responder = conn.identity.GetComponent<Unit>();
+        bool response = reader.ReadBool();
+        Duel duel = responder.ToPlayer().ToActiveDuel();
+        if (duel != null)
+        {
+            duel.RespondToDuel(response);
+        }    
+    }
+
+    private void HandleDuelRequest(NetworkConnection conn, NetworkReader reader)
+    {
+        Unit initiator = conn.identity.GetComponent<Unit>();
+        Unit target = initiator.GetTarget();
+
+        if (target == null)
+        {
+            Debug.LogWarning("No Target Found! Exiting...");
+            return;
+        }
+        // We are ready to initiate the duel request
+        initiator.ToPlayer().RequestDuel(target);
+    }
     private void SpawnCharacter()
     {
         foreach (NetworkConnectionToClient conn in NetworkServer.connections.Values)
@@ -117,6 +149,16 @@ public class GameNetworkManager : NetworkManager
             playerReferences[conn] = (player, characterId);
             NetworkServer.AddPlayerForConnection(conn, player);
 
+            NetworkWriter writer = new NetworkWriter();
+            writer.WriteNetworkIdentity(conn.identity);
+
+            OpcodeMessage msg = new OpcodeMessage
+            {
+                opcode = Opcodes.SMSG_REGISTER_UI,
+                payload = writer.ToArray()
+            };
+
+            NetworkServer.SendToAll(msg);
         }
     }
 
@@ -272,8 +314,6 @@ public class GameNetworkManager : NetworkManager
 
         base.OnServerDisconnect(conn);
     }
-
-
 
     public override void OnStartClient()
     {

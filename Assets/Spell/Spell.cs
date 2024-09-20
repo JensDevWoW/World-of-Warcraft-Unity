@@ -653,7 +653,7 @@ public class Spell : MonoBehaviour
         if (caster.IsMoving() && !HasFlag(SpellFlags.SPELL_FLAG_CAST_WHILE_MOVING))
             return "moving";
 
-        if (!caster.IsHostileTo(target) && isPositive == false)
+        if (!caster.IsHostileTo(target) && isPositive == false && !caster.IsDueling(target))
             return "friendly";
 
         return "";

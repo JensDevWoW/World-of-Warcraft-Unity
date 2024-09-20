@@ -13,13 +13,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+using Mirror;
 using UnityEngine;
 
 public class Player : MonoBehaviour
 {
     public string playerName;
     public int level;
-
+    public Duel duelObj = null;
     private float gcdTimer = 0;
 
     public Unit unit { get; set; }
@@ -27,6 +28,19 @@ public class Player : MonoBehaviour
     public void Start()
     {
         unit = gameObject.GetComponent<Unit>();
+    }
+
+    public bool IsDueling(Player player)
+    {
+        if (player == null)
+            return false;
+
+        Duel duel = ToActiveDuel();
+
+        if (duel != null && duel.GetPlayer(player) && duel.HasStarted())
+            return true;
+
+        return false;
     }
 
     public void StopCasting()
@@ -40,6 +54,35 @@ public class Player : MonoBehaviour
     {
         return unit;
     }
+
+    public Duel ToActiveDuel()
+    {
+        return duelObj;
+    }
+
+    public void AssignDuel(Duel duel)
+    {
+        duelObj = duel;
+    }
+
+    public void RequestDuel(Unit target)
+    {
+
+        this.duelObj = DuelHandler.Instance.CreateDuel(ToUnit(), target);
+        target.ToPlayer().AssignDuel(this.duelObj);
+
+        NetworkWriter writer = new NetworkWriter();
+        writer.WriteNetworkIdentity(ToUnit().Identity);
+        writer.WriteNetworkIdentity(target.Identity);
+
+        // Send duel request to the server
+        NetworkServer.SendToAll(new OpcodeMessage
+        {
+            opcode = Opcodes.SMSG_DUEL_REQUEST,
+            payload = writer.ToArray()
+        });
+    }
+
 
     public bool IsOnGCD()
     {

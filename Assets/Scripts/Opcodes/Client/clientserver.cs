@@ -49,7 +49,8 @@ public class ClientNetworkManager : MonoBehaviour
         opcodeHandler.RegisterHandler(Opcodes.SMSG_CHANNELED_START,     HandleStartChannel);
         opcodeHandler.RegisterHandler(Opcodes.SMSG_ACCOUNT_INFO,        HandleAccountInfo);
         opcodeHandler.RegisterHandler(Opcodes.SMSG_UPDATE_POS,          HandleUpdatePosition);
-
+        opcodeHandler.RegisterHandler(Opcodes.SMSG_DUEL_REQUEST,        HandleDuelRequest);
+        opcodeHandler.RegisterHandler(Opcodes.SMSG_REGISTER_UI,         HandleUIRegister);
         //opcodeHandler.RegisterHandler(Opcodes.SMSG_CHANNELED_UPDATE,    HandleUpdateChannel);
         // Register the OpcodeMessage handler on the client
         NetworkClient.RegisterHandler<OpcodeMessage>(OnOpcodeMessageReceived);
@@ -63,6 +64,28 @@ public class ClientNetworkManager : MonoBehaviour
         opcodeHandler.HandleOpcode(msg.opcode, new NetworkReader(msg.payload));
     }
 
+    private void HandleUIRegister(NetworkReader reader)
+    {
+        NetworkIdentity user = reader.ReadNetworkIdentity();
+
+        if (user != null && user.netId == NetworkClient.localPlayer.netId)
+        {
+            UIHandler.Instance.RegisterEvents();
+            Debug.Log("Events registered.");
+        }
+    }
+    private void HandleDuelRequest(NetworkReader reader)
+    {
+        NetworkIdentity initiatorIdentity = reader.ReadNetworkIdentity();
+        NetworkIdentity targetIdentity = reader.ReadNetworkIdentity();
+
+        Unit initiator = initiatorIdentity.GetComponent<Unit>();
+
+        if (targetIdentity != null && targetIdentity.netId == NetworkClient.localPlayer.netId)
+        {
+            UIHandler.Instance.DuelRequest(initiator);
+        }
+    }
     private void HandleUpdatePosition(NetworkReader reader)
     {
         // Read the NetworkIdentity of the object being updated

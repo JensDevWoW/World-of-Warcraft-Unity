@@ -48,7 +48,6 @@ public class Unit : MonoBehaviour
     private List<Aura> auraList = new List<Aura>();
     private List<Unit> combatList = new List<Unit>();
     private List<AreaTrigger> areaTriggers = new List<AreaTrigger>();
-
     // Data
     public string m_name = "Voreli";
     public float m_health = 1000;
@@ -73,7 +72,7 @@ public class Unit : MonoBehaviour
     public LocationHandler locationHandler { get; protected set; }
     public Unit m_target { get; protected set; }
 
-    public List<UnitSpell> spellBook; // List of spell IDs the Unit knows
+    public List<UnitSpell> spellBook = new List<UnitSpell>(); // List of spell IDs the Unit knows
     public AnimationHandler animHandler { get; protected set; }
     public Creature creature { get; protected set; }
     public int factionId;
@@ -97,14 +96,8 @@ public class Unit : MonoBehaviour
             print("NetworkIdentity component is missing on the Unit's GameObject.");
         }
 
-        if (spellBook == null)
-            spellBook = new List<UnitSpell>();
-
         player = GetComponent<Player>();
-
         unitStates = new List<int>(); // Need to add the class, gotta wait for it to load, slow pc
-
-        FillKnownSpells();
     }
 
     public void SendUpdateCharges(int spellId, int stacks)
@@ -129,10 +122,21 @@ public class Unit : MonoBehaviour
         return character;
     }
 
+    public bool HasLearnedSpell(int spellId)
+    {
+        foreach (UnitSpell spell in spellBook)
+        {
+            if (spell.SpellInfo.Id == spellId)
+                return true;
+        }
+
+        return false;
+    }
+
     // This is trash, just a test case, eventually need to add in a SpellBook class
     public void FillKnownSpells()
     {
-        List<int> spells = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 };
+        List<int> spells = DatabaseManager.Instance.GetCharacterSpells(character.characterId);
 
         foreach (int spell in spells)
         {
@@ -766,6 +770,10 @@ public void Update()
         return player;
     }
 
+    public void LearnSpell(int spellId)
+    {
+
+    }
     public bool IsDueling(Unit target)
     {
         if (target.ToPlayer() == null)

@@ -1233,7 +1233,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   keybind: 49
-  spellId: 23
+  spellId: 21
   buttonImage: {fileID: 1721193079}
   cooldownImage: {fileID: 685330669}
   Charges: {fileID: 611835321}
@@ -7551,7 +7551,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   keybind: 50
-  spellId: 0
+  spellId: 22
   buttonImage: {fileID: 887830390}
   cooldownImage: {fileID: 1058053054}
   Charges: {fileID: 532529934}
@@ -10026,7 +10026,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   keybind: 51
-  spellId: 21
+  spellId: 23
   buttonImage: {fileID: 2146435261}
   cooldownImage: {fileID: 554747976}
   Charges: {fileID: 675895060}
@@ -10256,7 +10256,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   keybind: 52
-  spellId: 0
+  spellId: 2
   buttonImage: {fileID: 2125286805}
   cooldownImage: {fileID: 2116305263}
   Charges: {fileID: 1453219903}

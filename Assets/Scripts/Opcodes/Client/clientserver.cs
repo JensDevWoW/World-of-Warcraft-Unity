@@ -56,6 +56,7 @@ public class ClientNetworkManager : MonoBehaviour
         // Register the OpcodeMessage handler on the client
         NetworkClient.RegisterHandler<OpcodeMessage>(OnOpcodeMessageReceived);
         NetworkClient.RegisterHandler<CharacterListMessage>(OnCharacterListReceived);
+        NetworkClient.RegisterHandler<CharacterDataMessage>(OnCharacterDataReceived);
 
     }
 
@@ -63,6 +64,11 @@ public class ClientNetworkManager : MonoBehaviour
     {
         // Handle the opcode using the registered handler
         opcodeHandler.HandleOpcode(msg.opcode, new NetworkReader(msg.payload));
+    }
+
+    private void OnCharacterDataReceived(CharacterDataMessage msg)
+    {
+        UIHandler.Instance.RegisterSpellBook(msg.Spellbook);
     }
 
     private void HandleStartDuel(NetworkReader reader)
@@ -83,6 +89,7 @@ public class ClientNetworkManager : MonoBehaviour
         {
             UIHandler.Instance.RegisterEvents();
             Debug.Log("Events registered.");
+            ClientDebug.Instance.Log("Working here!");
         }
     }
     private void HandleDuelRequest(NetworkReader reader)
@@ -173,7 +180,7 @@ public class ClientNetworkManager : MonoBehaviour
         }
     }
 
-    private void HandleInitBars(NetworkReader reader)
+    private void HandleInitBars(NetworkReader reader) // TODO: Change to HandleCharacterData
     {
         NetworkIdentity identity = reader.ReadNetworkIdentity();
 

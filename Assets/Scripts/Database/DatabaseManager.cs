@@ -3,6 +3,7 @@ using UnityEngine;
 using SQLite4Unity3d;
 using System.IO;
 using System.Linq;
+using Sirenix.Utilities;
 
 public class DatabaseManager : MonoBehaviour
 {
@@ -120,6 +121,53 @@ public class DatabaseManager : MonoBehaviour
         }
     }
 
+    public List<int> GetCharacterSpells(int characterId)
+    {
+        // Check if the character exists
+        var character = GetCharacterById(characterId);
+        if (character == null)
+        {
+            Debug.LogWarning($"Character with ID {characterId} not found.");
+            return new List<int>();
+        }
+
+        // Get spells from CharacterSpells table (personal spells)
+        var characterSpells = _charConnection.Table<CharacterSpells>()
+                            .Where(cs => cs.CharacterId == characterId)
+                            .Select(cs => cs.SpellId)
+                            .ToList();
+
+        var specSpellsData = _charConnection.Table<SpecSpells>()
+                    .Where(ss => ss.SpecId == character.specId)
+                    .ToList();
+
+        List<int> specSpells = new List<int>();
+        foreach (var spell in specSpellsData)
+        {
+            specSpells.Add(spell.SpellId);
+        }
+
+
+
+        // Get spells from ClassSpells table (class-based spells)
+        var classSpells = _charConnection.Table<ClassSpells>()
+                             .Where(cs => cs.ClassId == character.classId)
+                             .Select(cs => cs.SpellId)
+                             .ToList();
+
+        // Combine all spells into a single list
+        var allSpells = new List<int>();
+        allSpells.AddRange(characterSpells); // Add personal spells
+        allSpells.AddRange(specSpells); // Add spec-based spells
+        allSpells.AddRange(classSpells); // Add class-based spells
+
+        // Remove duplicates if any
+        allSpells = allSpells.Distinct().ToList();
+
+        Debug.Log($"Returning spells for character {characterId} with class {character.classId} and spec {character.specId}");
+        return allSpells;
+    }
+
 
     void OnDestroy()
     {
@@ -128,6 +176,28 @@ public class DatabaseManager : MonoBehaviour
         _worldConnection?.Close();
     }
 }
+
+public class ClassSpells
+{
+    [PrimaryKey, AutoIncrement]
+    public int ClassId { get; set; }
+    public int SpellId { get; set; }
+}
+
+public class CharacterSpells
+{
+    [PrimaryKey, AutoIncrement]
+    public int CharacterId { get; set; }
+    public int SpellId { get; set; }
+}
+
+public class SpecSpells
+{
+    [PrimaryKey, AutoIncrement]
+    public int SpecId { get; set; }
+    public int SpellId { get; set; }
+}
+
 
 public class SpawnData
 {

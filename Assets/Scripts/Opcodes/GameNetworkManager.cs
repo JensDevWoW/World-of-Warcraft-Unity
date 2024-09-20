@@ -159,6 +159,8 @@ public class GameNetworkManager : NetworkManager
             };
 
             NetworkServer.SendToAll(msg);
+            playerUnit.InitBars(conn.identity);
+            playerUnit.FillKnownSpells();
         }
     }
 
@@ -242,12 +244,27 @@ public class GameNetworkManager : NetworkManager
         conn.Send(msg);
     }
 
+    private List<int> ConvertToInts(List<UnitSpell> list)
+    {
+        List<int> newList = new List<int>();
 
+        foreach (var unitSpell in list)
+        {
+            newList.Add(unitSpell.SpellInfo.Id);
+        }
 
+        return newList;
+    }
+    private void SendCharacterData(NetworkConnection conn, Unit unit)
+    {
+        CharacterDataMessage msg = new CharacterDataMessage
+        {
+            CharacterId = unit.character.characterId,
+            Spellbook = ConvertToInts(unit.spellBook)
+        };
 
-
-
-
+        conn.Send(msg);
+    }
 
     private void HandleSelectTarget(NetworkConnection conn, NetworkReader reader)
     {
@@ -333,4 +350,12 @@ public class GameNetworkManager : NetworkManager
         }
     }
 
+}
+
+public struct CharacterDataMessage : NetworkMessage
+{
+    public int CharacterId;
+    public List<int> Spellbook;
+
+    // Add other relevant character data like stats, levels, etc.
 }

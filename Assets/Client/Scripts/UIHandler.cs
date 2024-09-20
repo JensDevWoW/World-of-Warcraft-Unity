@@ -60,6 +60,7 @@ public class UIHandler : MonoBehaviour
     private Text duelTimer;
     private bool duelTimerStart = false;
     private float duelTimerVal = 3f;
+    private List<int> spellBook;
     private void Awake()
     {
         if (Instance == null)
@@ -92,6 +93,17 @@ public class UIHandler : MonoBehaviour
         acceptDuel = acceptObj.GetComponent<Button>();
         declineDuel = declineObj.GetComponent<Button>();
         duelTimer = duelTimerObj.GetComponent<Text>();
+
+    }
+
+    public void RegisterSpellBook(List<int> SpellBook)
+    {
+        spellBook = SpellBook;
+    }
+
+    public List<int> GetSpellBook()
+    {
+        return spellBook;
     }
 
     public void RegisterEvents()

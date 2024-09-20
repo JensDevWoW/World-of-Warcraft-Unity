@@ -18,10 +18,11 @@ using UnityEditor;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using Mirror;
 
 public class ActionButton : MonoBehaviour
 {
-    public KeyCode keybind = KeyCode.Space; // Set your default keybind here
+    public KeyCode keybind; // Set your default keybind here
     public int spellId = 0; // Add a spellId to link to the correct spell
 
     public Image buttonImage;
@@ -38,6 +39,7 @@ public class ActionButton : MonoBehaviour
     private int m_charges;
     private bool m_offGCD = false;
     SpellInfo currentSpell;
+    SpellList spell;
     public void Init()
     {
         if (spellId != 0)
@@ -46,7 +48,7 @@ public class ActionButton : MonoBehaviour
             this.cooldownImage.sprite = IconManager.GetSpellIcon(spellId);
             this.buttonImage.color = originalColor;
             this.currentSpell = SpellContainer.Instance.GetSpellById(spellId);
-           
+            this.spell = new SpellList(spellId);
             ChargeText = Charges.GetComponent<TextMeshProUGUI>();
 
             if (currentSpell != null)
@@ -69,6 +71,7 @@ public class ActionButton : MonoBehaviour
         if (Input.GetKeyDown(keybind))
         {
             DarkenButton();
+            StartCast();
         }
         else if (Input.GetKeyUp(keybind))
         {
@@ -86,6 +89,28 @@ public class ActionButton : MonoBehaviour
             gcdTimer -= Time.deltaTime;
             cooldownImage.fillAmount = Mathf.Clamp01(gcdTimer / gcdTime);
         }
+    }
+
+    private void StartCast()
+    {
+        if (spell != null)
+            SendOpcode(spell);
+    }
+
+    private void SendOpcode(SpellList spell)
+    {
+        NetworkWriter writer = new NetworkWriter();
+
+        writer.WriteInt(spell.SpellId);
+        writer.WriteVector3(spell.Position);
+
+        OpcodeMessage msg = new OpcodeMessage
+        {
+            opcode = Opcodes.CMSG_CAST_SPELL,
+            payload = writer.ToArray()
+        };
+
+        NetworkClient.Send(msg);
     }
 
     // TODO: Add in functionality to get local client spell cooldowns rather than from SpellData

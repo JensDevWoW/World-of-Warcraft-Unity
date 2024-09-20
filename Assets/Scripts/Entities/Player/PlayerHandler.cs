@@ -25,8 +25,6 @@ public class PlayerInput : NetworkBehaviour
     void Start()
     {
         KeyBindManager.LoadKeyBinds();
-        spellbook.Add(new SpellList("Drain Soul", 21, KeyBindManager.keyBinds.three));
-        spellbook.Add(new SpellList("Agony", 23, KeyBindManager.keyBinds.one));
     }
 
     void Update()
@@ -39,13 +37,13 @@ public class PlayerInput : NetworkBehaviour
             // Handle mouse click for AoE spell target position
             Vector3 position = GetMousePositionOnGround();
             currentAoESpell.Position = position;
-            SendOpcode(currentAoESpell);
+            //SendOpcode(currentAoESpell);
             awaitingAoETarget = false;
             currentAoESpell = null;
             return;
         }
 
-        foreach (var spell in spellbook)
+        /*foreach (var spell in spellbook)
         {
             if (Input.GetKeyDown(spell.KeyCode))
             {
@@ -58,11 +56,13 @@ public class PlayerInput : NetworkBehaviour
                 else
                 {
                     print($"Casting spell ID: {spell.SpellId}");
-                    SendOpcode(spell);
+                    //SendOpcode(spell);
                 }
             }
-        }
+        }*/
     }
+
+    
 
     private Vector3 GetMousePositionOnGround()
     {
@@ -81,23 +81,6 @@ public class PlayerInput : NetworkBehaviour
         return Vector3.zero;
     }
 
-
-
-    private void SendOpcode(SpellList spell)
-    {
-        NetworkWriter writer = new NetworkWriter();
-
-        writer.WriteInt(spell.SpellId);
-        writer.WriteVector3(spell.Position);
-
-        OpcodeMessage msg = new OpcodeMessage
-        {
-            opcode = Opcodes.CMSG_CAST_SPELL,
-            payload = writer.ToArray()
-        };
-
-        NetworkClient.Send(msg);
-    }
     private bool IsLoggedIn() { return true; }
     private bool CanCast() { return true; }
     private bool IsOnGlobalCooldown() { return false; }

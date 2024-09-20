@@ -487,6 +487,11 @@ public class Spell : MonoBehaviour
             // Load SpellScript Mods
             Modify();
 
+
+            //Check if we have spell after SpellScript mods just in case we learn it then
+            if (!caster.HasLearnedSpell(spellId))
+                return;
+
             string canCast = CheckCast();
             if (canCast != "")
             {

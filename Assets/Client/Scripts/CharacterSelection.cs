@@ -11,6 +11,7 @@ public class CharacterSelectionManager : MonoBehaviour
     public GameObject charPrefab; // Prefab for character UI panel
     public Transform charListParent; // Parent panel where character UI panels will be added
     private Character selectedCharacter; // Currently selected character
+    public GameObject charTemplatePrefab; // Prefab for the character template
     public static CharacterSelectionManager Instance { get; private set; }
     public List<Character> characterList = new List<Character>(); // List to store characters from the server
 
@@ -49,13 +50,35 @@ public class CharacterSelectionManager : MonoBehaviour
         }
 
         // Create a UI panel for each character
-        foreach (var character in characterList)
+        float panelHeight = 0.15f; // Relative height of each panel
+        float topOffset = 0.01f; // Offset from the top
+        int totalCharacters = characterList.Count;
+
+        for (int i = 0; i < totalCharacters; i++)
         {
             GameObject charPanel = Instantiate(charPrefab, charListParent);
-            charPanel.GetComponentInChildren<TextMeshProUGUI>().text = character.characterName; // Assuming the prefab has a Text component
+
+            // Store the character in a local variable
+            var character = characterList[i];
+
+            // Set the panel's text
+            charPanel.GetComponentInChildren<TextMeshProUGUI>().text = character.characterName;
+
+            // Adjust the RectTransform anchor and position
+            RectTransform rt = charPanel.GetComponent<RectTransform>();
+
+            rt.anchorMin = new Vector2(0.05f, 1f - (topOffset + panelHeight * (i + 1)));
+            rt.anchorMax = new Vector2(0.95f, 1f - (topOffset + panelHeight * i));
+
+            rt.offsetMin = new Vector2(0, 0); // Remove offsets
+            rt.offsetMax = new Vector2(0, 0);
+
+            // Use the captured character variable inside the lambda
             charPanel.GetComponent<Button>().onClick.AddListener(() => SelectCharacter(character));
         }
 
+
+        // Assign Join World button functionality
         GameObject joinWorldButton = GameObject.FindWithTag("JoinWorldButton");
         if (joinWorldButton != null)
         {
@@ -63,11 +86,32 @@ public class CharacterSelectionManager : MonoBehaviour
         }
     }
 
+
+
+
+
     // Called when a character panel is clicked
     private void SelectCharacter(Character character)
     {
         selectedCharacter = character;
-        Debug.Log($"Selected Character: {character.characterName}");
+       // SpawnCharTemplate(character);
+        Debug.LogError($"Selected Character: {character.characterName}");
+    }
+
+    private void SpawnCharTemplate(Character character)
+    {
+        if (charTemplatePrefab == null)
+            return;
+
+        Vector3 spawnPosition = new Vector3(1.59f, 0.75f, -1.03f);
+        Quaternion rotation = Quaternion.Euler(0, -89.347f, 0); // Rotate around Y-axis
+        GameObject prefab = Instantiate(charPrefab, spawnPosition, rotation);
+
+        if (prefab != null) 
+        {
+            ClientDebug.Instance.Log("It's here! Just can't see it, dumbass.");
+        }
+
     }
 
     // Called when the "Join" button is clicked
@@ -88,7 +132,7 @@ public class CharacterSelectionManager : MonoBehaviour
 
             // Send the opcode to join the world
             NetworkWriter writer = new NetworkWriter();
-            writer.WriteInt(accountId); // TODO: Get AccountId
+            writer.WriteInt(accountId);
             writer.WriteInt(selectedCharacter.characterId); // Send the character ID or necessary info
 
             OpcodeMessage joinWorldPacket = new OpcodeMessage

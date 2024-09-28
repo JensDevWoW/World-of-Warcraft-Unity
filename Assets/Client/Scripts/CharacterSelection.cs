@@ -14,7 +14,7 @@ public class CharacterSelectionManager : MonoBehaviour
     public GameObject charTemplatePrefab; // Prefab for the character template
     public static CharacterSelectionManager Instance { get; private set; }
     public List<Character> characterList = new List<Character>(); // List to store characters from the server
-
+    public GameObject chosenChar = null;
     private void Awake()
     {
         if (Instance == null)
@@ -74,7 +74,7 @@ public class CharacterSelectionManager : MonoBehaviour
             rt.offsetMax = new Vector2(0, 0);
 
             // Use the captured character variable inside the lambda
-            charPanel.GetComponent<Button>().onClick.AddListener(() => SelectCharacter(character));
+            charPanel.GetComponent<Button>().onClick.AddListener(() => SelectCharacter(character, charPanel));
         }
 
 
@@ -91,9 +91,18 @@ public class CharacterSelectionManager : MonoBehaviour
 
 
     // Called when a character panel is clicked
-    private void SelectCharacter(Character character)
+    private void SelectCharacter(Character character, GameObject panel)
     {
         selectedCharacter = character;
+
+        // Reset old char if we have it
+        if (chosenChar != null)
+            chosenChar.GetComponent<Image>().color = new Color32(56, 56, 56, 171);
+
+        // Update new panel
+        chosenChar = panel;
+
+        panel.GetComponent<Image>().color = new Color32(189, 174, 85, 171);
        // SpawnCharTemplate(character);
         Debug.LogError($"Selected Character: {character.characterName}");
     }

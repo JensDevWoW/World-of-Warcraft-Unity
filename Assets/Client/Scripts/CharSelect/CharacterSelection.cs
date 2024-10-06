@@ -92,6 +92,12 @@ public class CharacterSelectionManager : MonoBehaviour
             joinWorldButton.GetComponent<Button>().onClick.AddListener(OnJoinButtonClicked);
         }
 
+        GameObject backButton = GameObject.FindWithTag("BackButtonCharSelect");
+        if (backButton != null)
+        {
+            backButton.GetComponent<Button>().onClick.AddListener(Back);
+        }
+
         // Load CharName obj
         GameObject charName1 = GameObject.FindWithTag("CharName");
         if (charName1 != null)
@@ -108,6 +114,24 @@ public class CharacterSelectionManager : MonoBehaviour
             SelectCharacter(firstCharacter, characterPanels[firstCharacter]);
         }
     }
+
+    private void Back()
+    {
+        if (NetworkClient.isConnected)
+        {
+            // Stop the client connection and disconnect
+            NetworkManager.singleton.StopClient();
+            Debug.Log("Client disconnected. Returning to login screen.");
+
+            // Load the login scene
+            SceneManager.LoadScene("LoginScene", LoadSceneMode.Single);
+        }
+        else
+        {
+            Debug.LogWarning("Client is not connected, unable to disconnect.");
+        }
+    }
+
 
     private void Highlight(Image image)
     {

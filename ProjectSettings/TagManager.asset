@@ -20,6 +20,7 @@ TagManager:
   - CharacterCustomizeCanvas
   - CreateChar
   - CharName
+  - BackButtonCharSelect
   layers:
   - Default
   - TransparentFX

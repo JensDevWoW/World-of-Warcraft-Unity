@@ -15,6 +15,11 @@ TagManager:
   - DebuffCanvas
   - TDebuffCanvas
   - JoinWorldButton
+  - CharacterSelectionCanvas
+  - CharacterCreationCanvas
+  - CharacterCustomizeCanvas
+  - CreateChar
+  - CharName
   layers:
   - Default
   - TransparentFX

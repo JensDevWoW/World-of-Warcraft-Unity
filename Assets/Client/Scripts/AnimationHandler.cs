@@ -37,8 +37,6 @@ public class AnimationHandler : NetworkBehaviour
 
     private void Awake()
     {
-        bef = GameObject.Find("bloodelffemale");
-        animator = bef.GetComponent<Animator>();
         networkAnimator = GetComponent<NetworkAnimator>();
 
         if (animator == null)

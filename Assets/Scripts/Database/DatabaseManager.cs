@@ -4,6 +4,7 @@ using SQLite4Unity3d;
 using System.IO;
 using System.Linq;
 using Sirenix.Utilities;
+using UnityEngine.ProBuilder.MeshOperations;
 
 public class DatabaseManager : MonoBehaviour
 {
@@ -13,6 +14,8 @@ public class DatabaseManager : MonoBehaviour
     private SQLiteConnection _charConnection;
     private SQLiteConnection _worldConnection;
 
+    public GameObject belfFemaleModel;
+    public GameObject orcMaleModel;
     public List<Account> Accounts { get; private set; } = new List<Account>();
     public List<SpawnData> WorldData { get; private set; } = new List<SpawnData>();
 
@@ -100,6 +103,33 @@ public class DatabaseManager : MonoBehaviour
             Debug.LogWarning($"No location found for Character ID {characterId}.");
             return null;
         }
+    }
+
+    public GameObject LoadCharacterModel(Character character)
+    {
+        // TODO: Load Char Model from DB
+        switch (character.raceId)
+        {
+            case 0:
+                break;
+            case 1: // Blood Elf
+                if (character.bodyType == 1)
+                {
+                    // TODO: Add Male Belf
+                }
+                else
+                    return belfFemaleModel;
+                break;
+            case 2: // Orc
+                if (character.bodyType == 1)
+                {
+                    return orcMaleModel;
+                }
+                else
+                    return null; // TODO: Add Female Orc
+        }
+
+        return null;
     }
 
     public void UpdateCharacterLocation(CharacterLocation location)

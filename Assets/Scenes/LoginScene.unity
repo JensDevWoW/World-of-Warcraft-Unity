@@ -2052,6 +2052,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a418a19d9609cb46ab82f22a7154875, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  belfFemaleModel: {fileID: 8617765101290764005, guid: 7a82b7ca26a81dd41a738558502def37, type: 3}
+  orcMaleModel: {fileID: 5100268435330664580, guid: 94951805878e148488f9f0c0b148db5b, type: 3}
 --- !u!4 &952833162
 Transform:
   m_ObjectHideFlags: 0
@@ -3109,8 +3111,8 @@ MonoBehaviour:
   autoCreatePlayer: 0
   playerSpawnMethod: 1
   spawnPrefabs:
-  - {fileID: 5333289229326074016, guid: 1a4a23c692ba33b43967cf2f79e80c4e, type: 3}
   - {fileID: 6168637937526667396, guid: 6eed431b14c45a549a8147f79a698a87, type: 3}
+  - {fileID: 3986798803404752212, guid: 323c8c7be069ea2438129bffa4ae6265, type: 3}
   exceptionsDisconnect: 1
   snapshotSettings:
     bufferTimeMultiplier: 2
@@ -3130,6 +3132,10 @@ MonoBehaviour:
   triggerPrefab: {fileID: 3920085043327381962, guid: 09f6fe6dc687b6d458d70a442b9cd681, type: 3}
   spawnPoint: {fileID: 3308726553007104857, guid: e28e2a3f561d16448b90da185f1b5aee, type: 3}
   buttonPrefab: {fileID: 70122553011246687}
+  belfFemale: {fileID: 3986798803404752212, guid: d66b6754e3c507544843439572436b81, type: 3}
+  belfMale: {fileID: 0}
+  orcFemale: {fileID: 0}
+  orcMale: {fileID: 3986798803404752212, guid: 323c8c7be069ea2438129bffa4ae6265, type: 3}
 --- !u!114 &1552142696
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3813,6 +3819,7 @@ MonoBehaviour:
   charTemplatePrefab: {fileID: 3867260097395474882, guid: 7d40f6e114b1ba7429300de1d1187475, type: 3}
   charNameObj: {fileID: 0}
   charName: {fileID: 0}
+  BElfAnimationController: {fileID: 9100000, guid: ee9d52ca5d03bf0448dce8083eef5984, type: 2}
   chosenChar: {fileID: 0}
 --- !u!4 &1911573338
 Transform:

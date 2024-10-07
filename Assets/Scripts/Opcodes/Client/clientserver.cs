@@ -134,7 +134,10 @@ public class ClientNetworkManager : MonoBehaviour
                 characterName = data.CharacterName,
                 classId = data.ClassId,
                 specId = data.SpecId,
-                factionId = data.FactionId
+                factionId = data.FactionId,
+                raceId = data.RaceId,
+                bodyType = data.BodyType,
+                model = data.Model
             });
         }
 

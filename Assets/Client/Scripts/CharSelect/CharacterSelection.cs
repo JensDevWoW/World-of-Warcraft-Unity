@@ -14,6 +14,8 @@ public class CharacterSelectionManager : MonoBehaviour
     public GameObject charTemplatePrefab; // Prefab for the character template
     public GameObject charNameObj;
     public TextMeshProUGUI charName;
+    private GameObject loadedChar;
+    public RuntimeAnimatorController BElfAnimationController;
     private Dictionary<Character, GameObject> characterPanels = new Dictionary<Character, GameObject>();
     public static CharacterSelectionManager Instance { get; private set; }
     public List<Character> characterList = new List<Character>(); // List to store characters from the server
@@ -149,11 +151,30 @@ public class CharacterSelectionManager : MonoBehaviour
         }
     }
 
+    private void LoadCharacterIntoFrame(Character character)
+    {
+        if (loadedChar)
+            Destroy(loadedChar);
+
+        Vector3 position = new Vector3(1.556f, 0.749f, -1.1f);
+        Quaternion rotation = Quaternion.Euler(0, -90, 0);
+
+        GameObject charModel = DatabaseManager.Instance.LoadCharacterModel(character);
+
+        if (charModel != null)
+        {
+            GameObject model = Instantiate(charModel, position, rotation);     
+            loadedChar = model;
+        }
+    }
+
     // Called when a character panel is clicked
     private void SelectCharacter(Character character, GameObject panel)
     {
         selectedCharacter = character;
+        LoadCharacterIntoFrame(selectedCharacter);
         charName.text = character.characterName;
+
         // Reset old char if we have it
         if (chosenChar != null)
             Unhighlight(chosenChar.GetComponent<Image>());
@@ -162,8 +183,6 @@ public class CharacterSelectionManager : MonoBehaviour
         chosenChar = panel;
 
         Highlight(panel.GetComponent<Image>());
-       // SpawnCharTemplate(character);
-        Debug.LogError($"Selected Character: {character.characterName}");
     }
 
     private void SpawnCharTemplate(Character character)
@@ -200,7 +219,7 @@ public class CharacterSelectionManager : MonoBehaviour
 
             // Send the opcode to join the world
             NetworkWriter writer = new NetworkWriter();
-            writer.WriteInt(accountId);
+            //writer.WriteInt(accountId);
             writer.WriteInt(selectedCharacter.characterId); // Send the character ID or necessary info
 
             OpcodeMessage joinWorldPacket = new OpcodeMessage

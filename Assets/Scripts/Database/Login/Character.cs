@@ -1,7 +1,10 @@
 using SQLite4Unity3d;
+using UnityEngine;
 
 public class Character
 {
+    public GameObject model;
+
     [PrimaryKey, AutoIncrement]
 
     // Foreign key linking to the Account table
@@ -14,6 +17,8 @@ public class Character
     public string characterName { get; set; } // Name of the character
     public int factionId { get; set; } // Faction (e.g., Alliance, Horde)
 
+    public int raceId { get; set; } // Race (e.g., Blood Elf, Orc, etc)
+    public int bodyType { get; set; } // Male / Female
     // Additional fields can be added as needed
     public int Level { get; set; } // Character level
     public int Experience { get; set; } // Experience points

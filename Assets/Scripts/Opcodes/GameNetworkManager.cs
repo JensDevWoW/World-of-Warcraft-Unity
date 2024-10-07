@@ -28,6 +28,16 @@ public class GameNetworkManager : NetworkManager
     public GameObject triggerPrefab;
     public Transform spawnPoint;
     public GameObject buttonPrefab;
+
+
+    // Player prefab list
+    // TODO: Make in separate script
+
+    public GameObject belfFemale;
+    public GameObject belfMale;
+    public GameObject orcFemale;
+    public GameObject orcMale;
+
     private NetworkManagerHUD hud;
     private bool autoStartServer = true;
     private Dictionary<NetworkConnectionToClient, (GameObject, int)> playerReferences = new Dictionary<NetworkConnectionToClient, (GameObject, int)>();
@@ -113,6 +123,32 @@ public class GameNetworkManager : NetworkManager
         // We are ready to initiate the duel request
         initiator.ToPlayer().RequestDuel(target);
     }
+
+    private GameObject GetPlayerPrefab(Character character)
+    {
+        int male = character.bodyType;
+        switch (character.raceId)
+        {
+            case 0:
+                break;
+            case 1:
+                if (male == 1)
+                    return belfMale;
+                else
+                    return belfFemale;
+            case 2:
+                if (male == 1)
+                    return orcMale;
+                else
+                    return orcFemale;
+            default:
+                break;
+        }
+
+
+        return null;
+    }
+
     private void SpawnCharacter()
     {
         foreach (NetworkConnectionToClient conn in NetworkServer.connections.Values)
@@ -135,7 +171,7 @@ public class GameNetworkManager : NetworkManager
             }
 
             // Instantiate the player at the correct location
-            GameObject player = Instantiate(playerPrefab, spawnPosition, spawnRotation);
+            GameObject player = Instantiate(GetPlayerPrefab(DatabaseManager.Instance.GetCharacterById(characterId)), spawnPosition, spawnRotation);
 
             // Ensure the player object has a Unit component
             Unit playerUnit = player.GetComponent<Unit>();
@@ -234,7 +270,10 @@ public class GameNetworkManager : NetworkManager
                 character.characterName,
                 character.classId,
                 character.specId,
-                character.factionId
+                character.factionId,
+                character.raceId,
+                character.bodyType,
+                character.model
             );
 
             msg.Characters.Add(data);

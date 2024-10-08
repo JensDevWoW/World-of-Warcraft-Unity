@@ -91,7 +91,7 @@ public class GameNetworkManager : NetworkManager
             conn.authenticationData = charId; // Assign charId to use in SpawnCharacter
 
             // Start the timer to spawn the character after 1.5 seconds
-            Invoke(nameof(SpawnCharacter), 1.5f);
+            Invoke(nameof(SpawnCharacter), 0f);
         }
         else
         {

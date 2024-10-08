@@ -15,6 +15,7 @@ public class CharacterSelectionManager : MonoBehaviour
     public GameObject charNameObj;
     public TextMeshProUGUI charName;
     private GameObject loadedChar;
+    public bool LoadingComplete;
     public RuntimeAnimatorController BElfAnimationController;
     private Dictionary<Character, GameObject> characterPanels = new Dictionary<Character, GameObject>();
     public static CharacterSelectionManager Instance { get; private set; }
@@ -31,6 +32,11 @@ public class CharacterSelectionManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+    private void Update()
+    {
+        
     }
 
     // Call this function when the client receives character data from the server
@@ -201,8 +207,12 @@ public class CharacterSelectionManager : MonoBehaviour
 
     }
 
-    // Called when the "Join" button is clicked
-    private void OnJoinButtonClicked()
+    public void LoadingFinished()
+    {
+        JoinGame();
+    }
+
+    private void JoinGame()
     {
         if (selectedCharacter != null)
         {
@@ -230,6 +240,21 @@ public class CharacterSelectionManager : MonoBehaviour
             NetworkClient.Send(joinWorldPacket);
 
             SceneManager.LoadScene("SampleScene", LoadSceneMode.Single);
+            //SceneManager.LoadScene("LoadingScreen", LoadSceneMode.Single);
+        }
+        else
+        {
+            Debug.LogWarning("No character selected!");
+        }
+    }
+
+    // Called when the "Join" button is clicked
+    private void OnJoinButtonClicked()
+    {
+        if (selectedCharacter != null)
+        {
+            // SceneManager.LoadScene("SampleScene", LoadSceneMode.Single);
+            SceneManager.LoadScene("LoadingScreen", LoadSceneMode.Single);
         }
         else
         {

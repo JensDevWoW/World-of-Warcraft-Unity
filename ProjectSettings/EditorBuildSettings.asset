@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/CharacterSelectionScene.unity
     guid: e1e101293543f1b4f98e1c65ad1c0a43
+  - enabled: 1
+    path: Assets/Scenes/LoadingScreen.unity
+    guid: a54c6a7fba8d6d4429f2a86e65564300
   m_configObjects: {}

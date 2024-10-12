@@ -162,16 +162,24 @@ public class CharacterSelectionManager : MonoBehaviour
         if (loadedChar)
             Destroy(loadedChar);
 
-        Vector3 position = new Vector3(1.556f, 0.749f, -1.1f);
+        Vector3 position = new Vector3(0.124f, 4.979f, -5.85f);
         Quaternion rotation = Quaternion.Euler(0, -90, 0);
+        Vector3 scale = new Vector3(1, 1, 1);
 
         GameObject charModel = DatabaseManager.Instance.LoadCharacterModel(character);
 
         if (charModel != null)
         {
-            GameObject model = Instantiate(charModel, position, rotation);     
+            GameObject model = Instantiate(charModel, position, rotation);
+            model.transform.localScale = scale;
             loadedChar = model;
         }
+    }
+
+    public void DeleteLoadedChar()
+    {
+        if (loadedChar != null)
+            Destroy(loadedChar);
     }
 
     // Called when a character panel is clicked

@@ -223,7 +223,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: charactercreate - Copy_6
+      name: bluecircle
       rect:
         serializedVersion: 2
         x: 0
@@ -265,7 +265,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: charactercreate - Copy_8
+      name: redcircle
       rect:
         serializedVersion: 2
         x: 0
@@ -382,6 +382,7 @@ TextureImporter:
     nameFileIdTable:
       Highlighted: -2077942366
       SilverFrame: -1992031247
+      bluecircle: -1158397108
       charactercreate - Copy_1: -1288296298
       charactercreate - Copy_10: -2061576376
       charactercreate - Copy_12: 910743853
@@ -389,10 +390,9 @@ TextureImporter:
       charactercreate - Copy_3: 1369293826
       charactercreate - Copy_4: 1988540171
       charactercreate - Copy_5: -1982023726
-      charactercreate - Copy_6: -1158397108
       charactercreate - Copy_7: 766428507
-      charactercreate - Copy_8: 1595477788
       charactercreate - Copy_9: -157606822
+      redcircle: 1595477788
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

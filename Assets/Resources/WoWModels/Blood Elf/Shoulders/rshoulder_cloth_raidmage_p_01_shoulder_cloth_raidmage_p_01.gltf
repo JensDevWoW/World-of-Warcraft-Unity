@@ -1,0 +1,433 @@
+{
+	"asset": {
+		"version": "2.0",
+		"generator": "wow.export v0.1.64 win-x64 [cfdf6c14-f1cf-4f31-80b1-d5128130cf0a]"
+	},
+	"nodes": [
+		{
+			"name": "rshoulder_cloth_raidmage_p_01_shoulder_cloth_raidmage_p_01",
+			"children": [
+				1,
+				6,
+				7
+			]
+		},
+		{
+			"name": "rshoulder_cloth_raidmage_p_01_shoulder_cloth_raidmage_p_01",
+			"children": [
+				2,
+				4
+			]
+		},
+		{
+			"name": "bone_0_p",
+			"translation": [
+				-0.03223545476794243,
+				-0.12504784762859344,
+				0.19004453718662262
+			],
+			"children": [
+				3
+			]
+		},
+		{
+			"name": "bone_0"
+		},
+		{
+			"name": "bone_1_p",
+			"translation": [
+				0.006363144610077143,
+				0.0547691211104393,
+				0.09254379570484161
+			],
+			"children": [
+				5
+			]
+		},
+		{
+			"name": "bone_1"
+		},
+		{
+			"name": "rshoulder_cloth_raidmage_p_01_shoulder_cloth_raidmage_p_01_Geoset0",
+			"mesh": 0,
+			"skin": 0
+		},
+		{
+			"name": "rshoulder_cloth_raidmage_p_01_shoulder_cloth_raidmage_p_01_Geoset1",
+			"mesh": 1,
+			"skin": 0
+		}
+	],
+	"scenes": [
+		{
+			"name": "rshoulder_cloth_raidmage_p_01_shoulder_cloth_raidmage_p_01_Scene",
+			"nodes": [
+				0
+			]
+		}
+	],
+	"buffers": [
+		{
+			"uri": "rshoulder_cloth_raidmage_p_01_shoulder_cloth_raidmage_p_01.bin",
+			"byteLength": 52256
+		}
+	],
+	"bufferViews": [
+		{
+			"buffer": 0,
+			"byteLength": 11784,
+			"byteOffset": 0,
+			"target": 34962
+		},
+		{
+			"buffer": 0,
+			"byteLength": 11784,
+			"byteOffset": 11784,
+			"target": 34962
+		},
+		{
+			"buffer": 0,
+			"byteLength": 3928,
+			"byteOffset": 23568,
+			"target": 34962
+		},
+		{
+			"buffer": 0,
+			"byteLength": 3928,
+			"byteOffset": 27496,
+			"target": 34962
+		},
+		{
+			"buffer": 0,
+			"byteLength": 128,
+			"byteOffset": 31424
+		},
+		{
+			"buffer": 0,
+			"byteLength": 7856,
+			"byteOffset": 31552,
+			"target": 34962
+		},
+		{
+			"buffer": 0,
+			"byteLength": 7856,
+			"byteOffset": 39408,
+			"target": 34962
+		},
+		{
+			"buffer": 0,
+			"byteLength": 4956,
+			"byteOffset": 47264,
+			"target": 34963
+		},
+		{
+			"buffer": 0,
+			"byteLength": 36,
+			"byteOffset": 52220,
+			"target": 34963
+		}
+	],
+	"accessors": [
+		{
+			"name": "POSITION",
+			"bufferView": 0,
+			"byteOffset": 0,
+			"componentType": 5126,
+			"count": 982,
+			"type": "VEC3",
+			"min": [
+				-0.23935821652412415,
+				-0.48107948899269104,
+				-0.14211861789226532
+			],
+			"max": [
+				0.2621326446533203,
+				0.15362170338630676,
+				0.5120657086372375
+			]
+		},
+		{
+			"name": "NORMAL",
+			"bufferView": 1,
+			"byteOffset": 0,
+			"componentType": 5126,
+			"count": 982,
+			"type": "VEC3",
+			"min": [
+				-0.9814118146896362,
+				-0.999841570854187,
+				-0.9924797415733337
+			],
+			"max": [
+				0.9983403086662292,
+				0.9997830986976624,
+				0.9982232451438904
+			]
+		},
+		{
+			"name": "JOINTS_0",
+			"byteOffset": 0,
+			"componentType": 5121,
+			"count": 982,
+			"type": "VEC4",
+			"bufferView": 2,
+			"min": [
+				0,
+				0,
+				0,
+				0
+			],
+			"max": [
+				0,
+				0,
+				0,
+				0
+			]
+		},
+		{
+			"name": "WEIGHTS_0",
+			"byteOffset": 0,
+			"componentType": 5121,
+			"count": 982,
+			"normalized": true,
+			"type": "VEC4",
+			"bufferView": 3,
+			"min": [
+				255,
+				0,
+				0,
+				0
+			],
+			"max": [
+				255,
+				0,
+				0,
+				0
+			]
+		},
+		{
+			"name": "INV_BIND_MATRICES",
+			"byteOffset": 0,
+			"componentType": 5126,
+			"count": 2,
+			"type": "MAT4",
+			"bufferView": 4,
+			"min": [
+				1,
+				0,
+				0,
+				0,
+				0,
+				1,
+				0,
+				0,
+				0,
+				0,
+				1,
+				0,
+				-0.006363144610077143,
+				-0.0547691211104393,
+				-0.19004453718662262,
+				1
+			],
+			"max": [
+				1,
+				0,
+				0,
+				0,
+				0,
+				1,
+				0,
+				0,
+				0,
+				0,
+				1,
+				0,
+				0.03223545476794243,
+				0.12504784762859344,
+				-0.09254379570484161,
+				1
+			]
+		},
+		{
+			"name": "TEXCOORD_0",
+			"bufferView": 5,
+			"byteOffset": 0,
+			"componentType": 5126,
+			"count": 982,
+			"type": "VEC2",
+			"min": [
+				0.0069357543252408504,
+				0.00968778133392334
+			],
+			"max": [
+				0.9928232431411743,
+				0.987139105796814
+			]
+		},
+		{
+			"name": "TEXCOORD_1",
+			"bufferView": 6,
+			"byteOffset": 0,
+			"componentType": 5126,
+			"count": 982,
+			"type": "VEC2",
+			"min": [
+				0,
+				0
+			],
+			"max": [
+				0,
+				0
+			]
+		},
+		{
+			"bufferView": 7,
+			"byteOffset": 0,
+			"componentType": 5123,
+			"count": 2478,
+			"type": "SCALAR"
+		},
+		{
+			"bufferView": 8,
+			"byteOffset": 0,
+			"componentType": 5123,
+			"count": 18,
+			"type": "SCALAR"
+		}
+	],
+	"meshes": [
+		{
+			"primitives": [
+				{
+					"attributes": {
+						"POSITION": 0,
+						"NORMAL": 1,
+						"JOINTS_0": 2,
+						"WEIGHTS_0": 3,
+						"TEXCOORD_0": 5,
+						"TEXCOORD_1": 6
+					},
+					"indices": 7,
+					"mode": 4,
+					"material": 2
+				}
+			]
+		},
+		{
+			"primitives": [
+				{
+					"attributes": {
+						"POSITION": 0,
+						"NORMAL": 1,
+						"JOINTS_0": 2,
+						"WEIGHTS_0": 3,
+						"TEXCOORD_0": 5,
+						"TEXCOORD_1": 6
+					},
+					"indices": 8,
+					"mode": 4,
+					"material": 2
+				}
+			]
+		}
+	],
+	"scene": 0,
+	"skins": [
+		{
+			"name": "rshoulder_cloth_raidmage_p_01_shoulder_cloth_raidmage_p_01_Armature",
+			"joints": [
+				3,
+				5
+			],
+			"inverseBindMatrices": 4,
+			"skeleton": 0
+		}
+	],
+	"images": [
+		{
+			"uri": "t_vfx_fire_anim_stylized_desat_02.png"
+		},
+		{
+			"uri": "arcane_wisps_desat_02.png"
+		},
+		{
+			"uri": "shoulder_cloth_raidmage_p_01.png"
+		},
+		{
+			"uri": "armorreflect4.png"
+		}
+	],
+	"textures": [
+		{
+			"source": 0
+		},
+		{
+			"source": 1
+		},
+		{
+			"source": 2
+		},
+		{
+			"source": 3
+		}
+	],
+	"materials": [
+		{
+			"name": "t_vfx_fire_anim_stylized_desat_02",
+			"emissiveFactor": [
+				0,
+				0,
+				0
+			],
+			"pbrMetallicRoughness": {
+				"baseColorTexture": {
+					"index": 0
+				},
+				"metallicFactor": 0
+			}
+		},
+		{
+			"name": "arcane_wisps_desat_02",
+			"emissiveFactor": [
+				0,
+				0,
+				0
+			],
+			"pbrMetallicRoughness": {
+				"baseColorTexture": {
+					"index": 1
+				},
+				"metallicFactor": 0
+			}
+		},
+		{
+			"name": "shoulder_cloth_raidmage_p_01",
+			"emissiveFactor": [
+				0,
+				0,
+				0
+			],
+			"pbrMetallicRoughness": {
+				"baseColorTexture": {
+					"index": 2
+				},
+				"metallicFactor": 0
+			}
+		},
+		{
+			"name": "armorreflect4",
+			"emissiveFactor": [
+				0,
+				0,
+				0
+			],
+			"pbrMetallicRoughness": {
+				"baseColorTexture": {
+					"index": 3
+				},
+				"metallicFactor": 0
+			}
+		}
+	]
+}

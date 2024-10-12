@@ -34,8 +34,10 @@ public class CreateCharButton : MonoBehaviour
     {
         if (select != null && create != null)
         {
+            CharacterSelectionManager.Instance.DeleteLoadedChar();
             ShowCanvas(create);
             HideCanvas(select);
+            CharCreationUI.Instance.Build();
             return;
         }
     }

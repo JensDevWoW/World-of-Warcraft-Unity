@@ -2052,7 +2052,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a418a19d9609cb46ab82f22a7154875, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  belfFemaleModel: {fileID: 8617765101290764005, guid: 7a82b7ca26a81dd41a738558502def37, type: 3}
+  belfFemaleModel: {fileID: 3125497616322758277, guid: be181b0a70504aa4a9dfb7346dc6cad1, type: 3}
   orcMaleModel: {fileID: 5100268435330664580, guid: 94951805878e148488f9f0c0b148db5b, type: 3}
 --- !u!4 &952833162
 Transform:
@@ -3819,6 +3819,7 @@ MonoBehaviour:
   charTemplatePrefab: {fileID: 3867260097395474882, guid: 7d40f6e114b1ba7429300de1d1187475, type: 3}
   charNameObj: {fileID: 0}
   charName: {fileID: 0}
+  LoadingComplete: 0
   BElfAnimationController: {fileID: 9100000, guid: ee9d52ca5d03bf0448dce8083eef5984, type: 2}
   chosenChar: {fileID: 0}
 --- !u!4 &1911573338

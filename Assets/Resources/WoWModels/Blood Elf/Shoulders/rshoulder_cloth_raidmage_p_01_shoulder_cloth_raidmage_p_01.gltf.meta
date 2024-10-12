@@ -1,0 +1,46 @@
+fileFormatVersion: 2
+guid: f4ab5bac9b409974aaa2c87aff63da5f
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 715df9372183c47e389bb6e19fbc3b52, type: 3}
+  editorImportSettings:
+    generateSecondaryUVSet: 0
+  importSettings:
+    nodeNameMethod: 1
+    animationMethod: 2
+    generateMipMaps: 1
+    texturesReadable: 0
+    defaultMinFilterMode: 9729
+    defaultMagFilterMode: 9729
+    anisotropicFilterLevel: 1
+  instantiationSettings:
+    mask: -1
+    layer: 0
+    skinUpdateWhenOffscreen: 1
+    lightIntensityFactor: 1
+    sceneObjectCreation: 2
+  assetDependencies:
+  - type: 0
+    originalUri: Assets\Resources\WoWModels\Blood Elf\Shoulders\rshoulder_cloth_raidmage_p_01_shoulder_cloth_raidmage_p_01.bin
+    assetPath: Assets\Resources\WoWModels\Blood Elf\Shoulders\rshoulder_cloth_raidmage_p_01_shoulder_cloth_raidmage_p_01.bin
+  - type: 1
+    originalUri: Assets\Resources\WoWModels\Blood Elf\Shoulders\t_vfx_fire_anim_stylized_desat_02.png
+    assetPath: Assets\Resources\WoWModels\Blood Elf\Shoulders\t_vfx_fire_anim_stylized_desat_02.png
+  - type: 1
+    originalUri: Assets\Resources\WoWModels\Blood Elf\Shoulders\arcane_wisps_desat_02.png
+    assetPath: Assets\Resources\WoWModels\Blood Elf\Shoulders\arcane_wisps_desat_02.png
+  - type: 1
+    originalUri: Assets\Resources\WoWModels\Blood Elf\Shoulders\shoulder_cloth_raidmage_p_01.png
+    assetPath: Assets\Resources\WoWModels\Blood Elf\Shoulders\shoulder_cloth_raidmage_p_01.png
+  - type: 1
+    originalUri: Assets\Resources\WoWModels\Blood Elf\Shoulders\armorreflect4.png
+    assetPath: Assets\Resources\WoWModels\Blood Elf\Shoulders\armorreflect4.png
+  reportItems:
+  - type: 2
+    code: 3
+    messages: []

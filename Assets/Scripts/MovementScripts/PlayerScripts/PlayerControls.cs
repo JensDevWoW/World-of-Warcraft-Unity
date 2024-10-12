@@ -73,6 +73,8 @@ public class PlayerControls : NetworkBehaviour
 
     private bool isLanding;  // Flag to control landing animation state
 
+    public GameObject head;
+
     //ground
     Vector3 forwardDirection, collisionPoint;
     float slopeAngle, directionAngle, forwardAngle, strafeAngle;
@@ -128,6 +130,40 @@ public class PlayerControls : NetworkBehaviour
 
         GetInputs();
         GetSwimDirection();
+
+        // Check if the player is strafing (Q for left, E for right)
+        bool isStrafing = Mathf.Abs(inputNormalized.x) > 0;
+
+        // Get the forward direction from the camera
+        Vector3 cameraForward = Camera.main.transform.forward;
+        cameraForward.y = 0; // We only care about the horizontal direction
+
+        // Rotate the player model while strafing
+        if (isStrafing)
+        {
+            // Depending on strafe direction, rotate the character to the correct side
+            float rotationDirection = inputNormalized.x > 0 ? 90f : -90f;
+            Vector3 strafeDirection = Quaternion.Euler(0, rotationDirection, 0) * cameraForward;
+
+            // Gradually rotate the character to the strafing direction
+            characterModel.transform.rotation = Quaternion.Slerp(
+                characterModel.transform.rotation,
+                Quaternion.LookRotation(strafeDirection),
+                Time.deltaTime * rotateSpeed);
+        }
+        else
+        {
+            // When strafing stops, rotate the character back to face forward (camera direction)
+            characterModel.transform.rotation = Quaternion.Slerp(
+                characterModel.transform.rotation,
+                Quaternion.LookRotation(cameraForward),
+                Time.deltaTime * rotateSpeed);
+        }
+
+
+
+
+
 
         // Update animator parameters based on movement
         animator.SetBool("IsRunning", inputNormalized.y > 0 && !jumping);  // Forward movement

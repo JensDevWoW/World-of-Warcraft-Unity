@@ -118,7 +118,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: charactercreate - Copy_1
+      name: dice
       rect:
         serializedVersion: 2
         x: 1322
@@ -286,7 +286,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: charactercreate - Copy_9
+      name: bodyYellow
       rect:
         serializedVersion: 2
         x: 309
@@ -369,6 +369,111 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: bodyGrey
+      rect:
+        serializedVersion: 2
+        x: 308
+        y: 1421
+        width: 101
+        height: 102
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9a0aef2680808f241bf90b30eb18d1a2
+      internalID: -806688490
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaceGrey
+      rect:
+        serializedVersion: 2
+        x: 309
+        y: 1102
+        width: 99
+        height: 101
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1b808206aa1859e4d8b8b35308d28700
+      internalID: -404942290
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FaceYellow
+      rect:
+        serializedVersion: 2
+        x: 309
+        y: 942
+        width: 99
+        height: 101
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 79bd5a8023faf8d4e9aa3bdf33a3d323
+      internalID: 378538284
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: jewelryGrey
+      rect:
+        serializedVersion: 2
+        x: 1751
+        y: 1659
+        width: 100
+        height: 102
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e559cceef6974d94f98e226dd0a98043
+      internalID: -877026033
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: JewelryYellow
+      rect:
+        serializedVersion: 2
+        x: 1909
+        y: 1660
+        width: 99
+        height: 101
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7fb427e1d232cef4ab2f28b968831b19
+      internalID: -426686526
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -380,10 +485,14 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
+      FaceGrey: -404942290
+      FaceYellow: 378538284
       Highlighted: -2077942366
+      JewelryYellow: -426686526
       SilverFrame: -1992031247
       bluecircle: -1158397108
-      charactercreate - Copy_1: -1288296298
+      bodyGrey: -806688490
+      bodyYellow: -157606822
       charactercreate - Copy_10: -2061576376
       charactercreate - Copy_12: 910743853
       charactercreate - Copy_2: 635447661
@@ -391,7 +500,8 @@ TextureImporter:
       charactercreate - Copy_4: 1988540171
       charactercreate - Copy_5: -1982023726
       charactercreate - Copy_7: 766428507
-      charactercreate - Copy_9: -157606822
+      dice: -1288296298
+      jewelryGrey: -877026033
       redcircle: 1595477788
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0

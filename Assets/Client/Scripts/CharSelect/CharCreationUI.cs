@@ -46,6 +46,27 @@ public class CharCreationUI : MonoBehaviour
     public int selectedRaceId = 0;
     public int selectedBodyType = 0;
 
+    // Listener references to remove later
+    private UnityEngine.Events.UnityAction assignClassMage;
+    private UnityEngine.Events.UnityAction assignClassWarlock;
+    private UnityEngine.Events.UnityAction assignClassRogue;
+
+    private UnityEngine.Events.UnityAction assignRaceHuman;
+    private UnityEngine.Events.UnityAction assignRaceDwarf;
+    private UnityEngine.Events.UnityAction assignRaceNightelf;
+    private UnityEngine.Events.UnityAction assignRaceDraenei;
+    private UnityEngine.Events.UnityAction assignRaceWorgen;
+    private UnityEngine.Events.UnityAction assignRaceAlliancepanda;
+    private UnityEngine.Events.UnityAction assignRaceOrc;
+    private UnityEngine.Events.UnityAction assignRaceUndead;
+    private UnityEngine.Events.UnityAction assignRaceTauren;
+    private UnityEngine.Events.UnityAction assignRaceTroll;
+    private UnityEngine.Events.UnityAction assignRaceBloodelf;
+    private UnityEngine.Events.UnityAction assignRaceGoblin;
+    private UnityEngine.Events.UnityAction assignRaceHordepanda;
+
+    private UnityEngine.Events.UnityAction customizeAction;
+
     private void Awake()
     {
         if (Instance == null)
@@ -59,34 +80,91 @@ public class CharCreationUI : MonoBehaviour
         }
     }
 
-    public void Build()
+    public void Build(bool cam, bool loadChar)
     {
+        // Assign each listener to a variable for future removal
+        assignClassMage = () => AssignClass(mage, 1);
+        assignClassWarlock = () => AssignClass(warlock, 2);
+        assignClassRogue = () => AssignClass(rogue, 3);
 
-        mage.onClick.AddListener(() => AssignClass(mage, 1));
-        warlock.onClick.AddListener(() => AssignClass(warlock, 2));
-        rogue.onClick.AddListener(() => AssignClass(rogue, 3));
+        assignRaceHuman = () => AssignRace(human, 1);
+        assignRaceDwarf = () => AssignRace(dwarf, 2);
+        assignRaceNightelf = () => AssignRace(nightelf, 3);
+        assignRaceDraenei = () => AssignRace(draenei, 4);
+        assignRaceWorgen = () => AssignRace(worgen, 5);
+        assignRaceAlliancepanda = () => AssignRace(alliancepanda, 6);
+        assignRaceOrc = () => AssignRace(orc, 7);
+        assignRaceUndead = () => AssignRace(undead, 8);
+        assignRaceTauren = () => AssignRace(tauren, 9);
+        assignRaceTroll = () => AssignRace(troll, 10);
+        assignRaceBloodelf = () => AssignRace(bloodelf, 11);
+        assignRaceGoblin = () => AssignRace(goblin, 12);
+        assignRaceHordepanda = () => AssignRace(hordepanda, 13);
 
-        human.onClick.AddListener(() => AssignRace(human, 1));
-        dwarf.onClick.AddListener(() => AssignRace(dwarf, 2));
-        nightelf.onClick.AddListener(() => AssignRace(nightelf, 3));
-        draenei.onClick.AddListener(() => AssignRace(draenei, 4));
-        worgen.onClick.AddListener(() => AssignRace(worgen, 5));
-        alliancepanda.onClick.AddListener(() => AssignRace(alliancepanda, 6));
-        orc.onClick.AddListener(() => AssignRace(orc, 7));
-        undead.onClick.AddListener(() => AssignRace(undead, 8));
-        tauren.onClick.AddListener(() => AssignRace(tauren, 9));
-        troll.onClick.AddListener(() => AssignRace(troll, 10));
-        bloodelf.onClick.AddListener(() => AssignRace(bloodelf, 11));
-        goblin.onClick.AddListener(() => AssignRace(goblin, 12));
-        hordepanda.onClick.AddListener(() => AssignRace(hordepanda, 13));
+        customizeAction = () => Customize();
 
-        customize.onClick.AddListener(() => Customize());
+        // Add listeners
+        mage.onClick.AddListener(assignClassMage);
+        warlock.onClick.AddListener(assignClassWarlock);
+        rogue.onClick.AddListener(assignClassRogue);
+
+        human.onClick.AddListener(assignRaceHuman);
+        dwarf.onClick.AddListener(assignRaceDwarf);
+        nightelf.onClick.AddListener(assignRaceNightelf);
+        draenei.onClick.AddListener(assignRaceDraenei);
+        worgen.onClick.AddListener(assignRaceWorgen);
+        alliancepanda.onClick.AddListener(assignRaceAlliancepanda);
+        orc.onClick.AddListener(assignRaceOrc);
+        undead.onClick.AddListener(assignRaceUndead);
+        tauren.onClick.AddListener(assignRaceTauren);
+        troll.onClick.AddListener(assignRaceTroll);
+        bloodelf.onClick.AddListener(assignRaceBloodelf);
+        goblin.onClick.AddListener(assignRaceGoblin);
+        hordepanda.onClick.AddListener(assignRaceHordepanda);
+
+        customize.onClick.AddListener(customizeAction);
 
         AssignRace(bloodelf, 11);
         AssignClass(mage, 1);
         selectedBodyType = 2; // Female
-        LoadCharacterIntoFrame();
+
+        // Checks
+        if (loadChar)
+            LoadCharacterIntoFrame();
+        if (cam)
+            CameraBezierMovement.Instance.StartCameraMovement();
     }
+
+    public void RemoveListeners()
+    {
+        // Remove listeners
+        mage.onClick.RemoveListener(assignClassMage);
+        warlock.onClick.RemoveListener(assignClassWarlock);
+        rogue.onClick.RemoveListener(assignClassRogue);
+
+        human.onClick.RemoveListener(assignRaceHuman);
+        dwarf.onClick.RemoveListener(assignRaceDwarf);
+        nightelf.onClick.RemoveListener(assignRaceNightelf);
+        draenei.onClick.RemoveListener(assignRaceDraenei);
+        worgen.onClick.RemoveListener(assignRaceWorgen);
+        alliancepanda.onClick.RemoveListener(assignRaceAlliancepanda);
+        orc.onClick.RemoveListener(assignRaceOrc);
+        undead.onClick.RemoveListener(assignRaceUndead);
+        tauren.onClick.RemoveListener(assignRaceTauren);
+        troll.onClick.RemoveListener(assignRaceTroll);
+        bloodelf.onClick.RemoveListener(assignRaceBloodelf);
+        goblin.onClick.RemoveListener(assignRaceGoblin);
+        hordepanda.onClick.RemoveListener(assignRaceHordepanda);
+
+        customize.onClick.RemoveListener(customizeAction);
+    }
+
+    private void Back()
+    {
+        RemoveListeners();
+        // TODO: Add in a way to reload the char selection screen from here
+    }
+
     private GameObject LoadModel(int raceId, int classId, int bodyType)
     {
         switch (raceId)
@@ -145,6 +223,20 @@ public class CharCreationUI : MonoBehaviour
         button.GetComponent<Image>().color = new Color32(255, 255, 255, 125);
     }
 
+    private void ShowCanvas(CanvasGroup canvasGroup)
+    {
+        canvasGroup.alpha = 1; // Make it visible
+        canvasGroup.interactable = true; // Allow interaction
+        canvasGroup.blocksRaycasts = true; // Block UI raycasts for clicks
+    }
+
+    // Function to hide a canvas
+    private void HideCanvas(CanvasGroup canvasGroup)
+    {
+        canvasGroup.alpha = 0; // Make it invisible
+        canvasGroup.interactable = false; // Disable interaction
+        canvasGroup.blocksRaycasts = false; // Allow other UI elements to be clicked
+    }
     void AssignClass(Button button, int classId)
     {
         selectedClassId = classId;
@@ -172,8 +264,10 @@ public class CharCreationUI : MonoBehaviour
         GameObject customizeCanvas = GameObject.FindWithTag("CharacterCustomizeCanvas");
         if (customizeCanvas != null)
         {
-            gameObject.SetActive(false);
-            customizeCanvas.SetActive(true);
+            HideCanvas(gameObject.GetComponent<CanvasGroup>());
+            ShowCanvas(customizeCanvas.GetComponent<CanvasGroup>());
+            CharCustomize.Instance.currentCharacter = loadedChar;
+            CharCustomize.Instance.Build();
             return;
         }
     }

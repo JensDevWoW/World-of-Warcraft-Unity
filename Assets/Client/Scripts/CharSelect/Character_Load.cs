@@ -8,10 +8,24 @@ using UnityEngine.SceneManagement;
 public class Character_Load : MonoBehaviour
 {
     // Start is called before the first frame update
-    private bool _loaded = false;
+    public bool loaded = false;
+    public static Character_Load Instance { get; private set; }
+
+    void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);  // Ensure there's only one instance of this script
+        }
+    }
+
     private void Update()
     {
-        if (ClientAccountManager.Instance.GetCurrentAccount() != null && !_loaded)
+        if (ClientAccountManager.Instance.GetCurrentAccount() != null && !loaded)
         {
             // Check if the CharacterSelectionScene is loaded
             if (SceneManager.GetSceneByName("CharacterSelectionScene").isLoaded)
@@ -20,8 +34,7 @@ public class Character_Load : MonoBehaviour
                 if (CharacterSelectionManager.Instance.HasReceivedCharacterList())
                 {
                     CharacterSelectionManager.Instance.LoadCharacters();
-                    _loaded = true;
-                    Destroy(this);
+                    loaded = true;
                 }
             }
         }

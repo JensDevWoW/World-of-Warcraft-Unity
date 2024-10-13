@@ -52,6 +52,15 @@ public class DatabaseManager : MonoBehaviour
         Debug.Log("Accounts loaded successfully.");
     }
 
+    public void InsertCharacter(Character character)
+    {
+        string query = "INSERT INTO Character (accountId, classId, specId, characterName, factionId, raceId, bodyType) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        _charConnection.Execute(query, character.accountId, character.classId, character.specId, character.characterName, character.factionId, character.raceId, character.bodyType);
+
+        Debug.Log("Character inserted into the database.");
+    }
+
+
     private void LoadWorldData()
     {
         WorldData = _worldConnection.Table<SpawnData>().ToList();
@@ -110,23 +119,75 @@ public class DatabaseManager : MonoBehaviour
         // TODO: Load Char Model from DB
         switch (character.raceId)
         {
-            case 0:
+            case 0: // null
                 break;
-            case 1: // Blood Elf
+            case 1: // human
                 if (character.bodyType == 1)
-                {
-                    // TODO: Add Male Belf
-                }
+                    return null;
                 else
-                    return belfFemaleModel;
-                break;
-            case 2: // Orc
+                    return null;
+            case 2: // dwarf
+                if (character.bodyType == 1)
+                    return null;
+                else
+                    return null;
+            case 3: // night elf
+                if (character.bodyType == 1)
+                    return null;
+                else
+                    return null;
+            case 4: // draenei
+                if (character.bodyType == 1)
+                    return null;
+                else
+                    return null;
+            case 5: // worgen
+                if (character.bodyType == 1)
+                    return null;
+                else
+                    return null;
+            case 6: // alliance panda
+                if (character.bodyType == 1)
+                    return null;
+                else
+                    return null;
+            case 7: // Orc
                 if (character.bodyType == 1)
                 {
                     return orcMaleModel;
                 }
                 else
                     return null; // TODO: Add Female Orc
+            case 8: // undead
+                if (character.bodyType == 1)
+                    return null;
+                else
+                    return null;
+            case 9: // tauren
+                if (character.bodyType == 1)
+                    return null;
+                else
+                    return null;
+            case 10: // troll
+                if (character.bodyType == 1)
+                    return null;
+                else
+                    return null;
+            case 11: // Blood Elf
+                if (character.bodyType == 1)
+                    return null;
+                else
+                    return belfFemaleModel;
+            case 12: // goblin
+                if (character.bodyType == 1)
+                    return null;
+                else
+                    return null;
+            case 13: // horde panda
+                if (character.bodyType == 1)
+                    return null;
+                else
+                    return null;
         }
 
         return null;

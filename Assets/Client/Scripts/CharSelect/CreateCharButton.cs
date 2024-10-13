@@ -9,9 +9,17 @@ public class CreateCharButton : MonoBehaviour
     public Button button;
     public CanvasGroup select;
     public CanvasGroup create;
+
     void Start()
     {
         button.GetComponent<Button>().onClick.AddListener(onCreateCharButtonClicked);
+
+        create = GameObject.FindWithTag("CharacterCreationCanvas").GetComponent<CanvasGroup>();
+    }
+
+    private void OnDisable()
+    {
+        button.onClick.RemoveListener(onCreateCharButtonClicked);
     }
 
     // Function to show a canvas
@@ -37,7 +45,7 @@ public class CreateCharButton : MonoBehaviour
             CharacterSelectionManager.Instance.DeleteLoadedChar();
             ShowCanvas(create);
             HideCanvas(select);
-            CharCreationUI.Instance.Build();
+            CharCreationUI.Instance.Build(true, true);
             return;
         }
     }

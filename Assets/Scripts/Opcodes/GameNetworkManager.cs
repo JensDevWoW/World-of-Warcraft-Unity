@@ -70,7 +70,32 @@ public class GameNetworkManager : NetworkManager
         opcodeHandler.RegisterHandler(Opcodes.CMSG_DUEL_REQUEST,        HandleDuelRequest);
         opcodeHandler.RegisterHandler(Opcodes.CMSG_DUEL_RESPONSE,       HandleDuelResponse);
         opcodeHandler.RegisterHandler(Opcodes.CMSG_REGISTER_UI,         HandleRegisterUI);
+        opcodeHandler.RegisterHandler(Opcodes.CMSG_CREATE_CHAR,         HandleCreateChar);
         NetworkServer.RegisterHandler<OpcodeMessage>(OnOpcodeMessageReceived, true);
+    }
+
+    private void HandleCreateChar(NetworkConnection conn, NetworkReader reader)
+    {
+        int AccountId = (int)conn.authenticationData;
+        string Name = reader.ReadString();
+        int ClassId = reader.ReadInt();
+        int RaceId = reader.ReadInt();
+        int FactionId = reader.ReadInt();
+        int BodyType = reader.ReadInt();
+
+        Character newChar = new Character
+        {
+            accountId = AccountId,
+            characterName = Name,
+            classId = ClassId,
+            raceId = RaceId,
+            factionId = FactionId,
+            bodyType = BodyType,
+        };
+
+        DatabaseManager.Instance.InsertCharacter(newChar);
+        List<Character> characters = DatabaseManager.Instance.GetCharactersByAccountId(AccountId);
+        SendCharacterList(conn, characters);
     }
 
     private void HandleRegisterUI(NetworkConnection conn, NetworkReader reader)
@@ -133,14 +158,59 @@ public class GameNetworkManager : NetworkManager
                 break;
             case 1:
                 if (male == 1)
-                    return belfMale;
+                    return null;
                 else
-                    return belfFemale;
+                    return null;
             case 2:
+                if (male == 1)
+                    return null;
+                else
+                    return null;
+            case 3:
+                if (male == 1)
+                    return null;
+                else
+                    return null;
+            case 4:
+                if (male == 1)
+                    return null;
+                else
+                    return null;
+            case 5:
+                if (male == 1)
+                    return null;
+                else
+                    return null;
+            case 6:
+                if (male == 1)
+                    return null;
+                else
+                    return null;
+            case 7:
                 if (male == 1)
                     return orcMale;
                 else
                     return orcFemale;
+            case 8:
+                if (male == 1)
+                    return null;
+                else
+                    return null;
+            case 9:
+                if (male == 1)
+                    return null;
+                else
+                    return null;
+            case 10:
+                if (male == 1)
+                    return null;
+                else
+                    return null;
+            case 11:
+                if (male == 1)
+                    return belfMale;
+                else
+                    return belfFemale;
             default:
                 break;
         }

@@ -47,5 +47,6 @@ public class Opcodes
     public const int SMSG_REGISTER_UI = 24;
     public const int CMSG_REGISTER_UI = 25;
     public const int SMSG_START_DUEL = 25;
+    public const int CMSG_CREATE_CHAR = 26;
 }
 

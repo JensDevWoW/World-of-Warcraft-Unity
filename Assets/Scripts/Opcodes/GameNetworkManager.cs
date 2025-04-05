@@ -149,76 +149,6 @@ public class GameNetworkManager : NetworkManager
         initiator.ToPlayer().RequestDuel(target);
     }
 
-    private GameObject GetPlayerPrefab(Character character)
-    {
-        int male = character.bodyType;
-        switch (character.raceId)
-        {
-            case 0:
-                break;
-            case 1:
-                if (male == 1)
-                    return null;
-                else
-                    return null;
-            case 2:
-                if (male == 1)
-                    return null;
-                else
-                    return null;
-            case 3:
-                if (male == 1)
-                    return null;
-                else
-                    return null;
-            case 4:
-                if (male == 1)
-                    return null;
-                else
-                    return null;
-            case 5:
-                if (male == 1)
-                    return null;
-                else
-                    return null;
-            case 6:
-                if (male == 1)
-                    return null;
-                else
-                    return null;
-            case 7:
-                if (male == 1)
-                    return orcMale;
-                else
-                    return orcFemale;
-            case 8:
-                if (male == 1)
-                    return null;
-                else
-                    return null;
-            case 9:
-                if (male == 1)
-                    return null;
-                else
-                    return null;
-            case 10:
-                if (male == 1)
-                    return null;
-                else
-                    return null;
-            case 11:
-                if (male == 1)
-                    return belfMale;
-                else
-                    return belfFemale;
-            default:
-                break;
-        }
-
-
-        return null;
-    }
-
     private void SpawnCharacter()
     {
         foreach (NetworkConnectionToClient conn in NetworkServer.connections.Values)
@@ -241,7 +171,7 @@ public class GameNetworkManager : NetworkManager
             }
 
             // Instantiate the player at the correct location
-            GameObject player = Instantiate(GetPlayerPrefab(DatabaseManager.Instance.GetCharacterById(characterId)), spawnPosition, spawnRotation);
+            GameObject player = Instantiate(ModelHandler.Instance.LoadCharacterModel(DatabaseManager.Instance.GetCharacterById(characterId)), spawnPosition, spawnRotation);
 
             // Ensure the player object has a Unit component
             Unit playerUnit = player.GetComponent<Unit>();

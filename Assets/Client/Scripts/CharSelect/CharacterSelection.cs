@@ -165,7 +165,7 @@ public class CharacterSelectionManager : MonoBehaviour
         Vector3 position = new Vector3(0.124f, 4.979f, -5.85f);
         Quaternion rotation = Quaternion.Euler(0, -90, 0);
         Vector3 scale = new Vector3(1, 1, 1);
-        GameObject charModel = DatabaseManager.Instance.LoadCharacterModel(character);
+        GameObject charModel = ModelHandler.Instance.LoadCharacterModel(character);
 
         if (charModel != null)
         {

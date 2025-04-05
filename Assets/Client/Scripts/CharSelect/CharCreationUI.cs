@@ -165,29 +165,6 @@ public class CharCreationUI : MonoBehaviour
         // TODO: Add in a way to reload the char selection screen from here
     }
 
-    private GameObject LoadModel(int raceId, int classId, int bodyType)
-    {
-        switch (raceId)
-        {
-            case 7: // Orc
-                if (classId == 1)
-                    if (bodyType == 1)
-                        return orcMale;
-                    else
-                        return orcFemale;
-                break;
-            case 11: // Blood elf
-                if (classId == 1)
-                    if (bodyType == 1)
-                        return belfMale;
-                    else
-                        return belfFemale;
-                break;
-        }
-
-        return null;
-    }
-
     private void LoadCharacterIntoFrame()
     {
         if (loadedChar)
@@ -197,7 +174,7 @@ public class CharCreationUI : MonoBehaviour
         Quaternion rotation = Quaternion.Euler(0, -90, 0);
         Vector3 scale = new Vector3(1, 1, 1);
 
-        GameObject charModel = LoadModel(selectedRaceId, selectedClassId, selectedBodyType);
+        GameObject charModel = ModelHandler.Instance.LoadCharacterModel(selectedRaceId, selectedBodyType); // TODO: Require ClassId for specific clothing
 
         if (charModel != null)
         {
